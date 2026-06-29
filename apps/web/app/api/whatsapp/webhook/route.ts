@@ -1,53 +1,74 @@
 import { NextResponse } from 'next/server'
-import { verifyWebhook, validateSignature, parseInboundMessage, sendMessage, downloadMedia, generateListing, uploadImage, createListing } from '@brisvora/api'
+import { parseInboundMessage, sendMessage, downloadMedia, generateListing, uploadImage, createListing, processConversationalMessage, clearConversationState } from '@brisvora/api'
 import { prisma } from '@brisvora/shared'
 
-export function GET(req: Request) {
-  const { searchParams } = new URL(req.url)
-  const challenge = verifyWebhook(
-    searchParams.get('hub.mode') ?? '',
-    searchParams.get('hub.verify_token') ?? '',
-    searchParams.get('hub.challenge') ?? ''
-  )
-  if (!challenge) return new Response('Forbidden', { status: 403 })
-  return new Response(challenge, { status: 200 })
+function normalizePhone(raw: string): string {
+  return raw.replace(/\D/g, '')
 }
 
 export async function POST(req: Request) {
-  const rawBody = await req.text()
-  const signature = req.headers.get('x-hub-signature-256') ?? ''
+  try {
+    const body = await req.json()
+    console.log('--- NEW AISENSY WEBHOOK RECEIVED ---')
+    console.log(JSON.stringify(body, null, 2))
 
-  if (!validateSignature(rawBody, signature)) {
-    return new Response('Unauthorized', { status: 401 })
-  }
+    const msg = parseInboundMessage(body)
+    if (!msg) {
+      console.log('Webhook parsed as non-message or unsupported format, ignoring.')
+      return NextResponse.json({ ok: true })
+    }
 
-  const body = JSON.parse(rawBody)
-  const msg = parseInboundMessage(body)
-  if (!msg) return NextResponse.json({ ok: true })
+    console.log('Parsed Message:', msg)
 
-  // Find broker by phone
-  const user = await prisma.user.findUnique({ where: { phone: msg.waId } })
-  if (!user) {
-    await sendMessage({ to: msg.waId, body: 'Please register at our platform first.' })
+    const normalizedWaId = normalizePhone(msg.waId)
+    const possiblePhones = [normalizedWaId]
+
+    if (normalizedWaId.startsWith('91') && normalizedWaId.length > 10) {
+      possiblePhones.push(normalizedWaId.slice(2))
+    }
+
+    let user = null
+    for (const phone of possiblePhones) {
+      user = await prisma.user.findUnique({ where: { phone } })
+      if (user) break
+    }
+
+    if (!user) {
+      console.log(`User not found for phone: ${msg.waId}`)
+      await sendMessage({ to: msg.waId, body: 'Please register at our platform first and link your WhatsApp number in the Profile Settings.' })
+      return NextResponse.json({ ok: true })
+    }
+
+    const flowResult = await processConversationalMessage(user.id, msg.waId, msg.body)
+
+    if (flowResult === 'GENERATING') {
+      await sendMessage({ to: msg.waId, body: 'Generating your listing with AI... Please wait a moment.' })
+
+      const imageUrls: string[] = []
+      for (const mediaId of msg.mediaUrls ?? []) {
+        try {
+          const buffer = await downloadMedia(mediaId)
+          const { url } = await uploadImage(buffer)
+          imageUrls.push(url)
+        } catch (err) {
+          console.error('Failed to process image:', err)
+        }
+      }
+
+      const generated = await generateListing({ rawMessage: msg.body })
+      const property = await createListing(user.id, generated, imageUrls, msg.body)
+
+      const listingUrl = `${process.env.NEXTAUTH_URL || 'https://brisvora.vercel.app'}/property/${property.slug}`
+      await sendMessage({ to: msg.waId, body: `Your listing is ready!\n\n${generated.title}\n\n${listingUrl}` })
+
+      await clearConversationState(user.id)
+      return NextResponse.json({ ok: true })
+    }
+
+    await sendMessage({ to: msg.waId, body: flowResult })
     return NextResponse.json({ ok: true })
+  } catch (error) {
+    console.error('Webhook error:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-
-  // Download and upload images if any
-  const imageUrls: string[] = []
-  for (const mediaId of msg.mediaUrls ?? []) {
-    const buffer = await downloadMedia(mediaId)
-    const { url } = await uploadImage(buffer)
-    imageUrls.push(url)
-  }
-
-  // Generate listing via AI
-  const generated = await generateListing({ rawMessage: msg.body })
-
-  // Save to DB
-  const property = await createListing(user.id, generated, imageUrls, msg.body)
-
-  const listingUrl = `${process.env.NEXTAUTH_URL}/property/${property.slug}`
-  await sendMessage({ to: msg.waId, body: `✅ Your listing is ready!\n\n${generated.title}\n\n${listingUrl}` })
-
-  return NextResponse.json({ ok: true })
 }

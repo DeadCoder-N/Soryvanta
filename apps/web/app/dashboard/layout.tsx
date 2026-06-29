@@ -37,9 +37,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <span>✓</span> WhatsApp linked
             </p>
           ) : (
-            <p style={{ fontSize: '0.65rem', color: 'var(--gold)', marginTop: '2px' }}>
-              ⚠ No WhatsApp number
-            </p>
+            <Link href="/dashboard/profile" style={{ textDecoration: 'none' }}>
+              <p style={{ fontSize: '0.65rem', color: 'var(--gold)', marginTop: '2px' }}>
+                ⚠ No WhatsApp number — click to add
+              </p>
+            </Link>
           )}
         </div>
 
@@ -49,6 +51,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             { href: '/dashboard', label: 'Overview', icon: '▦' },
             { href: '/dashboard/listings/new', label: 'New Listing', icon: '+' },
             { href: '/dashboard/leads', label: 'Leads', icon: '◎' },
+            { href: '/dashboard/profile', label: 'Profile', icon: '⚙' },
           ].map(item => (
             <Link key={item.href} href={item.href} style={{
               display: 'flex', alignItems: 'center', gap: '10px',

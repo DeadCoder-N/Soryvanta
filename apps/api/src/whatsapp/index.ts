@@ -1,87 +1,101 @@
-import crypto from 'crypto'
 import type { WhatsAppInboundMessage, WhatsAppOutboundMessage } from '@brisvora/shared'
 
-const VERIFY_TOKEN = process.env.META_WHATSAPP_VERIFY_TOKEN!
-const PHONE_NUMBER_ID = process.env.META_PHONE_NUMBER_ID!
-const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN!
-const API_URL = `https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`
+const API_KEY = process.env.AISENSY_API_KEY!
+const API_URL = 'https://backend.aisensy.com/campaign/t1/api/v2'
 
-// Webhook verification handshake (GET)
-export function verifyWebhook(
-  mode: string,
-  token: string,
-  challenge: string
-): string | null {
-  if (mode === 'subscribe' && token === VERIFY_TOKEN) return challenge
-  return null
-}
-
-// Validate incoming webhook signature (POST)
-export function validateSignature(rawBody: string, signature: string): boolean {
-  const appSecret = process.env.META_APP_SECRET!
-  const expected = crypto
-    .createHmac('sha256', appSecret)
-    .update(rawBody)
-    .digest('hex')
-  return `sha256=${expected}` === signature
-}
-
-// Parse Meta Cloud API webhook payload
-export function parseInboundMessage(body: Record<string, unknown>): WhatsAppInboundMessage | null {
+// Parse AiSensy Webhook payload
+export function parseInboundMessage(body: Record<string, any>): WhatsAppInboundMessage | null {
   try {
-    const entry = (body.entry as any[])?.[0]
-    const change = entry?.changes?.[0]
-    const message = change?.value?.messages?.[0]
-    if (!message) return null
+    // AiSensy payloads typically look like:
+    // { "event": "message", "from": "919876543210", "message": { "type": "text", "text": "Hello" } }
+    // Or they might have slightly different structures.
+    // This is a flexible parser that attempts to find the sender and the text.
 
-    const mediaUrls: string[] = []
-    if (message.image?.id) mediaUrls.push(message.image.id)
-    if (message.video?.id) mediaUrls.push(message.video.id)
+    // If it's a Meta payload wrapped by AiSensy, check for 'entry'
+    if (body.entry) {
+      const entry = (body.entry as any[])?.[0]
+      const change = entry?.changes?.[0]
+      const message = change?.value?.messages?.[0]
+      if (!message) return null
 
-    return {
-      from: change.value.contacts?.[0]?.profile?.name ?? 'Unknown',
-      waId: message.from,
-      body: message.text?.body ?? '',
-      mediaUrls,
-      timestamp: message.timestamp,
+      const mediaUrls: string[] = []
+      if (message.image?.id) mediaUrls.push(message.image.id) // AiSensy might provide direct URLs instead of IDs.
+
+      return {
+        from: change.value.contacts?.[0]?.profile?.name ?? 'Unknown',
+        waId: message.from,
+        body: message.text?.body ?? '',
+        mediaUrls,
+        timestamp: message.timestamp,
+      }
     }
-  } catch {
+
+    // Direct AiSensy format
+    if (body.destination || body.from) {
+      const sender = body.source || body.from || body.sender
+      const msgData = body.message || body.text
+      let textBody = ''
+
+      if (typeof msgData === 'string') {
+        textBody = msgData
+      } else if (msgData?.text) {
+        textBody = msgData.text
+      } else if (msgData?.body) {
+        textBody = msgData.body
+      }
+
+      if (!sender || !textBody) return null
+
+      return {
+        from: 'User', // AiSensy might not always provide profile name in the basic payload
+        waId: sender,
+        body: textBody,
+        mediaUrls: [], // Media handling depends on how AiSensy sends it (often a public URL)
+        timestamp: Date.now().toString(),
+      }
+    }
+
+    return null
+  } catch (err) {
+    console.error('Error parsing inbound message:', err)
     return null
   }
 }
 
-// Send a WhatsApp text message via Meta Cloud API
+// Send a WhatsApp text message via AiSensy Campaign API
 export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to: msg.to,
+      apiKey: API_KEY,
+      campaignName: 'bristova_reply', // We can specify a generic campaign name or omit if AiSensy allows direct replies
+      destination: msg.to,
+      userName: 'User',
+      source: 'new-landing-page',
+      media: {},
+      templateParams: [],
       type: 'text',
-      text: { body: msg.body },
+      text: msg.body
     }),
   })
 
   if (!res.ok) {
     const error = await res.text()
-    throw new Error(`WhatsApp send failed: ${error}`)
+    console.error('AiSensy Send Error:', error)
+    // We don't throw aggressively so it doesn't crash the webhook if it fails
   }
 }
 
-// Download media from Meta servers (returns buffer)
-export async function downloadMedia(mediaId: string): Promise<Buffer> {
-  const urlRes = await fetch(`https://graph.facebook.com/v19.0/${mediaId}`, {
-    headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
-  })
-  const { url } = (await urlRes.json()) as { url: string }
-
-  const mediaRes = await fetch(url, {
-    headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
-  })
-  const arrayBuffer = await mediaRes.arrayBuffer()
-  return Buffer.from(arrayBuffer)
+// Download media
+export async function downloadMedia(mediaIdOrUrl: string): Promise<Buffer> {
+  // With AiSensy, if they give us a public URL, we just fetch it directly.
+  if (mediaIdOrUrl.startsWith('http')) {
+     const res = await fetch(mediaIdOrUrl)
+     const arrayBuffer = await res.arrayBuffer()
+     return Buffer.from(arrayBuffer)
+  }
+  throw new Error('AiSensy media download not fully configured. Awaiting payload format.')
 }

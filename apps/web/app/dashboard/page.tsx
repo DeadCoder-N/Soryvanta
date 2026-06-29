@@ -132,6 +132,9 @@ export default async function DashboardPage() {
                   <td style={{ padding: '16px 20px', color: 'var(--ink-soft)' }}>{p._count.leads}</td>
                   <td style={{ padding: '16px 20px' }}>
                     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                      <Link href={`/dashboard/listings/${p.id}/edit`} style={{ fontSize: '0.72rem', color: 'var(--ink-muted)', textDecoration: 'none', borderBottom: '1px solid var(--linen-dk)', paddingBottom: '1px' }}>
+                        Edit
+                      </Link>
                       <Link href={`/property/${p.slug}`} style={{ fontSize: '0.72rem', color: 'var(--ink-muted)', textDecoration: 'none', borderBottom: '1px solid var(--linen-dk)', paddingBottom: '1px' }}>
                         View
                       </Link>

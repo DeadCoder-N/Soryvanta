@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { getListingBySlug } from '@brisvora/api'
+import { getListingBySlug, incrementViewCount } from '@brisvora/api'
 import { formatPrice } from '@brisvora/shared'
 import { auth } from '@/auth'
 import LeadForm from './LeadForm'
@@ -24,6 +24,10 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   const property = await getListingBySlug(slug)
   if (!property) notFound()
   const session = await auth()
+
+  // Track the view count
+  await incrementViewCount(property.id).catch(err => console.error('Failed to increment view count', err))
+
 
   const waLink = property.owner.phone
     ? `https://wa.me/${property.owner.phone.replace(/[^0-9]/g, '')}?text=Hi, I'm interested in: ${property.title}`

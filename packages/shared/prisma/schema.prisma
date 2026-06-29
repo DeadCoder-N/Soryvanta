@@ -21,6 +21,7 @@ model User {
   whatsappMessages  WhatsappMessage[]
   sessions          Session[]
   accounts          Account[]
+  conversations     ConversationState[]
 }
 
 model Account {
@@ -167,4 +168,16 @@ enum PropertyStatus {
 enum MessageDirection {
   INBOUND
   OUTBOUND
+}
+
+model ConversationState {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  state         String
+  context       Json?
+  lastMessageAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

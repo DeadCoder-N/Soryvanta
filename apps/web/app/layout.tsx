@@ -19,6 +19,10 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: 'Brisvora — Premium AI Property Listings',
   description: 'Turn WhatsApp messages into professional property listings instantly.',
+  icons: {
+    icon: '/favicon.png',
+    apple: '/favicon.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

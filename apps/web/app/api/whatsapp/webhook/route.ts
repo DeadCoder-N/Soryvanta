@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { parseInboundMessage, sendMessage, downloadMedia, generateListing, uploadImage, createListing, processConversationalMessage, clearConversationState } from '@brisvora/api'
+import { parseInboundMessage, sendMessage, downloadMedia, generateListing, uploadImage, createListing, processConversationalMessage, clearConversationState, getConversationState } from '@brisvora/api'
 import { prisma } from '@brisvora/shared'
 
 function normalizePhone(raw: string): string {
@@ -39,13 +39,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true })
     }
 
-    const flowResult = await processConversationalMessage(user.id, msg.waId, msg.body)
+    const flowResult = await processConversationalMessage(user.id, msg.waId, msg.body, msg.mediaUrls ?? [])
 
     if (flowResult === 'GENERATING') {
       await sendMessage({ to: msg.waId, body: 'Generating your listing with AI... Please wait a moment.' })
 
+      const conversation = await getConversationState(user.id)
+      const context = conversation?.context as any ?? {}
+      const accumulatedImageIds = context.imageUrls ?? []
+
+      const allMediaIds = [...accumulatedImageIds, ...(msg.mediaUrls ?? [])]
       const imageUrls: string[] = []
-      for (const mediaId of msg.mediaUrls ?? []) {
+
+      for (const mediaId of allMediaIds) {
         try {
           const buffer = await downloadMedia(mediaId)
           const { url } = await uploadImage(buffer)

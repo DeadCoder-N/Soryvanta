@@ -1,6 +1,6 @@
 import { prisma } from '@brisvora/shared'
 
-export type ConversationStateType = 
+export type ConversationStateType =
   | 'GREETING'
   | 'PROPERTY_TYPE'
   | 'LOCATION'
@@ -16,6 +16,7 @@ export interface ConversationContext {
   price?: number
   bedrooms?: number
   amenities?: string[]
+  imageUrls?: string[]
 }
 
 export async function getConversationState(userId: string) {
@@ -48,10 +49,18 @@ export async function clearConversationState(userId: string) {
 export async function processConversationalMessage(
   userId: string,
   waId: string,
-  message: string
+  message: string,
+  newImageUrls: string[] = []
 ): Promise<string> {
   const existing = await getConversationState(userId)
   const lower = message.toLowerCase().trim()
+
+  let context: ConversationContext = existing?.context as ConversationContext ?? {}
+
+  if (newImageUrls.length > 0) {
+    const existingImages = context.imageUrls ?? []
+    context = { ...context, imageUrls: [...existingImages, ...newImageUrls] }
+  }
 
   if (!existing || existing.state === 'GREETING') {
     if (
@@ -63,10 +72,10 @@ export async function processConversationalMessage(
       lower.includes('flat') ||
       lower.includes('apartment')
     ) {
-      await setConversationState(userId, 'PROPERTY_TYPE')
+      await setConversationState(userId, 'PROPERTY_TYPE', context)
       return "Let's create a new listing! What type of property is this?\n\n1. Apartment\n2. House\n3. Villa\n4. Plot\n5. Commercial\n\nJust type the number or name."
     }
-    await setConversationState(userId, 'GREETING')
+    await setConversationState(userId, 'GREETING', context)
     return "Hello! I'm Brisvora, your AI listing assistant. Send me property details like:\n\n\"3 BHK apartment in Mumbai for 85 lakh with parking\"\n\nOr say \"create listing\" to start a guided conversation."
   }
 
@@ -88,15 +97,19 @@ export async function processConversationalMessage(
       if (!matched) {
         return "I didn't catch that. Please choose:\n1. Apartment\n2. House\n3. Villa\n4. Plot\n5. Commercial"
       }
-      await setConversationState(userId, 'LOCATION', { ...existing.context as ConversationContext, propertyType: matched })
-      return `Great, ${matched}. Which city or locality is the property in?`
+      await setConversationState(userId, 'LOCATION', { ...context, propertyType: matched })
+      let reply = `Great, ${matched}. Which city or locality is the property in?`
+      if (newImageUrls.length > 0) {
+        reply += `\n\nGot ${newImageUrls.length} photo${newImageUrls.length > 1 ? 's' : ''} — I'll add them to your listing.`
+      }
+      return reply
     }
 
     case 'LOCATION': {
       if (!message.trim()) {
         return "Please enter the city or locality (e.g. \"Bandra West, Mumbai\")."
       }
-      await setConversationState(userId, 'PRICE', { ...existing.context as ConversationContext, location: message.trim() })
+      await setConversationState(userId, 'PRICE', { ...context, location: message.trim() })
       return "Got it. What is the expected price? (e.g. \"85 lakh\", \"1.2 Cr\", \"25000000\")"
     }
 
@@ -105,7 +118,7 @@ export async function processConversationalMessage(
       if (!price) {
         return "I couldn't understand the price. Please send it like \"85 lakh\", \"1.2 Cr\", or \"25000000\"."
       }
-      await setConversationState(userId, 'BEDROOMS', { ...existing.context as ConversationContext, price })
+      await setConversationState(userId, 'BEDROOMS', { ...context, price })
       return "How many bedrooms? (e.g. \"2\", \"3 BHK\")"
     }
 
@@ -115,24 +128,28 @@ export async function processConversationalMessage(
         return "Please enter a number like 1, 2, 3, or 4."
       }
       const bedrooms = (bhk ?? parseInt(message.trim())) || 3
-      await setConversationState(userId, 'AMENITIES', { ...existing.context as ConversationContext, bedrooms })
+      await setConversationState(userId, 'AMENITIES', { ...context, bedrooms })
       return "Any key features or amenities? (e.g. \"modular kitchen, parking, near metro, 24/7 security\")\nType \"skip\" if none."
     }
 
     case 'AMENITIES': {
       const amenities = lower === 'skip' ? [] : message.split(',').map((s) => s.trim()).filter(Boolean)
-      await setConversationState(userId, 'CONFIRMATION', { ...existing.context as ConversationContext, amenities })
-      const ctx = existing.context as ConversationContext
-      return summarizeAndConfirm(ctx, amenities)
+      await setConversationState(userId, 'CONFIRMATION', { ...context, amenities })
+      const ctx = context
+      let reply = summarizeAndConfirm(ctx, amenities)
+      if (ctx.imageUrls?.length) {
+        reply += `\n\n(${ctx.imageUrls.length} photo${ctx.imageUrls.length > 1 ? 's' : ''} will be attached)`
+      }
+      return reply
     }
 
     case 'CONFIRMATION': {
       if (lower.includes('yes') || lower.includes('correct') || lower.includes('create') || lower === '1') {
-        await setConversationState(userId, 'GENERATING', existing.context as ConversationContext)
+        await setConversationState(userId, 'GENERATING', context)
         return 'GENERATING'
       }
       if (lower.includes('no') || lower.includes('change')) {
-        await setConversationState(userId, 'LOCATION', existing.context as ConversationContext)
+        await setConversationState(userId, 'LOCATION', context)
         return 'No problem. Let me know the correct city or locality.'
       }
       return 'Please reply with "yes" to confirm or "no" to make changes.'
@@ -143,7 +160,7 @@ export async function processConversationalMessage(
     }
 
     default:
-      await setConversationState(userId, 'GREETING')
+      await setConversationState(userId, 'GREETING', context)
       return "Let's start fresh. Send me property details or say \"create listing\" to begin."
   }
 }

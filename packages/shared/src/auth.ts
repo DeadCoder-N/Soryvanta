@@ -1,11 +1,10 @@
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import type { NextAuthConfig } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './db'
 
 export const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma),
+  trustHost: true,
   session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 },
   pages: {
     signIn: '/login',

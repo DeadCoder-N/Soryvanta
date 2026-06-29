@@ -1,0 +1,336 @@
+Good, that tells us everything we need. Here's the full picture from all the tests:
+
+Test Results Summary
+✅ Webhook GET (verification) — WORKING
+
+Correct token → returns challenge test123 ✅
+
+Wrong token → returns Forbidden ✅
+
+✅ Webhook POST signature validation — WORKING
+
+Invalid signature → returns Unauthorized ✅
+
+❌ Webhook POST full flow — 500 ERROR
+
+Valid signed payload → HTTP 500 crash
+
+This is expected — the flow reaches the sendMessage() call which uses the expired access token
+
+❌ META_ACCESS_TOKEN — EXPIRED
+
+Error: Session has expired on Friday, 26-Jun-26 07:00:00 PDT
+
+This is a temporary user token — these expire in ~60 days
+
+You need a permanent System User token from Meta Business Manager
+
+What Needs to be Fixed on Meta Side
+The access token in .env.local and on Vercel is expired. This is the root cause of the 500. Here's how to get a permanent one:
+
+Step 1 — Go to Meta Business Manager
+
+business.facebook.com → Settings → System Users
+
+Step 2 — Create a System User (if not already)
+
+Give it EMPLOYEE or ADMIN role
+
+Assign your WhatsApp app to it with whatsapp_business_messaging + whatsapp_business_management permissions
+
+Step 3 — Generate a permanent token
+
+Click "Generate New Token" on the system user
+
+Select your App
+
+Select permissions: whatsapp_business_messaging, whatsapp_business_management
+
+This token never expires
+
+Step 4 — Update env vars
+
+Replace META_ACCESS_TOKEN in .env.local
+
+Replace it on Vercel dashboard → Project Settings → Environment Variables
+
+Once you do that, the 500 will go away and the flow will work (except for the broker phone issue and Cloudinary — but those are next).
+
+Do you have access to the Meta Business Manager for this app?
+
+i think first we need to setup "https://developers.facebook.com/" and i etill dont know what no. its using
+
+Yes exactly, let's check everything from scratch on the Meta developer side. First let me see what credentials we actually have:
+
+1 file read
+.env.local
+Check who this token belongs to
+
+shell
+
+Completed
+curl -s "https://graph.facebook.com/v19.0/me?access_token=EAANtFyTZABecBRZBmjuc5c3uQ4dccY7K8d3z5zrgsuT9bYEzJFpovU5UTXdNm0ZARBvSG2ickOkZA4oj4Rhld4yfn9ahiPgSYJRl66FXuaJ8mD9wpA10gtHHmx4gaetQYv1Et9AzeCorh0LONo6lGLgkEkVkoiudS8JEL6ZBprZBZB04raICwpx69b2FkOcEEqqXwsCVtXKtQjfE09pp3HPvgt9GFyj1vpElBN2bHMr0RaNu2FAyrQ3Sx59BhBeLfNjBTSFmZCvxzblNAnK4sMiKQItn"
+Try to get phone number details even with expired token
+
+shell
+
+Completed
+curl -s "https://graph.facebook.com/v19.0/1238749782649154?access_token=EAANtFyTZABecBRZBmjuc5c3uQ4dccY7K8d3z5zrgsuT9bYEzJFpovU5UTXdNm0ZARBvSG2ickOkZA4oj4Rhld4yfn9ahiPgSYJRl66FXuaJ8mD9wpA10gtHHmx4gaetQYv1Et9AzeCorh0LONo6lGLgkEkVkoiudS8JEL6ZBprZBZB04raICwpx69b2FkOcEEqqXwsCVtXKtQjfE09pp3HPvgt9GFyj1vpElBN2bHMr0RaNu2FAyrQ3Sx59BhBeLfNjBTSFmZCvxzblNAnK4sMiKQItn"
+Token is expired and we can't get any info from it. Here's the full situation and what you need to do:
+
+What We Know
+From .env.local:
+
+META_PHONE_NUMBER_ID = 1238749782649154 — this is the ID of the WhatsApp business number, but we don't know the actual phone number
+
+META_ACCESS_TOKEN — expired since June 26, 2026 (was a temporary user token, ~60 day lifetime)
+
+META_APP_SECRET = c47e590f6521335642f0e29818a05bd8
+
+META_WHATSAPP_VERIFY_TOKEN = marketing_os_webhook_2024
+
+The token is dead so we can't query anything from Meta's API right now.
+
+What You Need to Do on developers.facebook.com
+Go through this step by step and tell me what you see at each step:
+
+Step 1 — Login & find the app
+
+Go to developers.facebook.com
+
+Click "My Apps" (top right)
+
+You should see an app — probably named something like "Marketing OS" or similar
+
+Tell me the App ID you see (it should be 964371100009959 based on plan.md)
+
+Step 2 — Find the WhatsApp product
+
+Click into the app
+
+Left sidebar → look for WhatsApp → API Setup
+
+Under "Phone numbers" you'll see the actual phone number linked
+
+That's the number brokers need to message
+
+Step 3 — Get a new access token
+
+On that same API Setup page, there's a "Temporary access token" section
+
+It shows a token valid for 24h — good for testing
+
+For permanent token we'll set up a System User after
+
+Step 4 — Check webhook config
+
+Left sidebar → WhatsApp → Configuration
+
+You should see the webhook URL: https://marketing-os-web-snowy.vercel.app/api/whatsapp/webhook
+
+And verify token: marketing_os_webhook_2024
+
+Check if it shows "Verified" ✅
+
+Go to developers.facebook.com now and tell me what you see — specifically the app name, the phone number under WhatsApp API Setup, and whether the webhook shows as verified.
+
+firstly lets get proper work folw done i dont understand what u said so explain in normal laungauge and dicuss with how it will work and how step and what step what do
+
+Alright, let me explain everything simply from scratch.
+
+What We're Building
+A broker sends a WhatsApp message like:
+
+"3 BHK flat in Mumbai, 85 lakh, parking, near metro"
+
+Your system automatically:
+
+Receives that message
+
+AI generates a proper listing
+
+Creates a webpage for that property
+
+Sends back the link to broker on WhatsApp
+
+The 4 Things Needed For This To Work
+1. META DEVELOPER ACCOUNT
+   → This is your "WhatsApp Business API" setup
+   → Without this, your app can't receive or send WhatsApp messages
+
+2. A PHONE NUMBER
+   → The number brokers will message
+   → Meta gives you a free test number OR you use your own
+
+3. ACCESS TOKEN
+   → Like a password that lets your code talk to Meta's API
+   → Current one is expired → needs to be regenerated
+
+4. WEBHOOK
+   → When someone messages your WhatsApp number
+   → Meta forwards that message to your website
+   → Your website URL: https://marketing-os-web-snowy.vercel.app/api/whatsapp/webhook
+
+Copy
+The Flow Simply
+Broker sends WhatsApp msg
+        ↓
+Meta receives it on their servers
+        ↓
+Meta forwards it to YOUR website (webhook)
+        ↓
+Your code processes it → generates listing
+        ↓
+Your code sends reply back via Meta API
+        ↓
+Broker gets the listing URL on WhatsApp
+
+Copy
+Current Status of Each Piece
+Thing	Status	Problem
+Meta Developer App	✅ Exists	App ID: 964371100009959
+Phone Number ID	✅ Exists	ID: 1238749782649154 — but don't know actual number
+Access Token	❌ Expired	Expired June 26 — needs renewal
+Webhook URL	✅ Working	Tested and responding correctly
+Webhook Verified	✅ Was verified	But need to re-check after token renewal
+Step by Step What To Do RIGHT NOW
+Step 1 — Open Meta Developer Dashboard
+Open this link: https://developers.facebook.com/apps/964371100009959/whatsapp-business/wa-dev-console/
+
+Login with the Facebook account that owns this app
+
+This takes you directly to the WhatsApp setup page
+
+Step 2 — Find the Phone Number
+On that page you'll see a section called "From" with a phone number
+
+That's the number brokers will message
+
+Screenshot or note it down — tell me what number it shows
+
+Step 3 — Get a Fresh Access Token
+On the same page there's a box called "Temporary access token"
+
+Click the copy button next to it
+
+This gives you a token valid for 24 hours — enough for testing
+
+Paste it here so we can update the .env.local
+
+Step 4 — Check Webhook
+Left sidebar → Configuration
+
+See if webhook URL shows as verified
+
+If not, we'll re-verify it
+
+After That — Only 2 More Things Left
+Once token is fresh, the remaining issues are:
+
+Broker phone number — register form doesn't collect phone, so WhatsApp can't match broker to account
+
+Cloudinary — needs API keys so photos work
+
+Both are quick code fixes once Meta side is sorted.
+
+Start with Step 1 — open that link and tell me what you see on the page. We'll go one step at a time.
+
+we we do it later can we update UI UX and make i lucxurius primium looking website which we give rich in looking feel
+
+Yes absolutely! Let's plan this out first before touching any code.
+
+Current UI — What It Looks Like
+Right now everything is very basic — plain zinc/gray colors, minimal styling, just functional. Nothing that says "premium real estate platform."
+
+What "Luxury Premium" Means For Real Estate
+Think of platforms like 99acres premium, Sotheby's, JLL India, Housing.com — the feel is:
+
+Dark rich backgrounds (deep navy, charcoal, warm black)
+
+Gold / amber accents
+
+Large cinematic property images
+
+Elegant typography (serif for headings, clean sans for body)
+
+Smooth hover animations
+
+Glassmorphism cards
+
+Lots of whitespace
+
+Premium badges and tags
+
+Pages We Need To Redesign
+1. Homepage (/)
+   - Hero section with full screen background
+   - Premium search bar
+   - Property cards with hover effects
+
+2. Property Page (/property/[slug])
+   - Full screen image gallery
+   - Elegant property details layout
+   - Premium contact sidebar
+
+3. Dashboard (/dashboard)
+   - Clean dark sidebar
+   - Stats cards with gradients
+   - Polished listings table
+
+4. Login / Register
+   - Split screen layout
+   - Premium form styling
+
+5. New Listing Form (/dashboard/listings/new)
+   - Clean minimal form
+
+Copy
+Color Palette Options — Pick One
+Option A — Dark Gold (Most Luxury)
+
+Background:  #0A0A0A (near black)
+Surface:     #141414
+Accent:      #C9A84C (gold)
+Text:        #F5F5F0 (warm white)
+
+Copy
+Option B — Navy & Champagne
+
+Background:  #0D1B2A (deep navy)
+Surface:     #1B2A3B
+Accent:      #D4AF37 (champagne gold)
+Text:        #EEE8D5
+
+Copy
+Option C — Warm Cream & Black (Modern Luxury)
+
+Background:  #FAFAF8 (warm cream)
+Surface:     #FFFFFF
+Accent:      #1A1A1A (rich black)
+Highlight:   #8B6914 (dark gold)
+Text:        #1A1A1A
+
+Copy
+Typography
+For luxury feel, we'd use:
+
+Headings — Playfair Display (serif, elegant)
+
+Body — Inter or DM Sans (clean, readable)
+
+Both are free Google Fonts, easy to add to Next.js.
+
+Before I Start Coding — Tell Me:
+Which color palette — A, B, or C? Or mix?
+
+Light or Dark overall theme?
+
+Any reference websites you like the look of? (can be any real estate site, luxury brand, anything)
+
+Which page first — homepage, property page, or dashboard?
+
+Once you confirm these I'll start with the full redesign page by page.
+
+u can use colour pallets from this referance image and start where u want just dont break work flow and anything else
+
+Perfect reference. I can see the 

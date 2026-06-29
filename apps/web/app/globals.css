@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --linen:      #FBF5E6;
+  --linen-md:   #F2E6C8;
+  --linen-dk:   #DFD0A8;
+  --gold:       #B8860B;
+  --gold-lt:    #C9960E;
+  --gold-bright:#D4A832;
+  --gold-pale:  #F7E4A8;
+  --bark:       #5C3A00;
+  --ink:        #1A1508;
+  --ink-soft:   #4A3C1A;
+  --ink-muted:  #8C7848;
+  --warm-white: #FFFDF5;
+
+  /* Brisvora logo accent colours */
+  --logo-gold:        #B8860B;   /* used for buttons, borders, labels */
+  --logo-gold-lt:     #C9960E;   /* used for italic accents on dark bg */
+  --logo-gold-bright: #D4A832;   /* used for em text on dark backgrounds */
+  --logo-green:       #1A6B2A;   /* logo circuit + tagline green */
+
+  /* Aliases */
+  --mauve:      #B8860B;
+  --mauve-lt:   #C9960E;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--linen);
+  color: var(--ink);
+  font-family: var(--font-sans), 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif), 'Playfair Display', serif;
+  font-weight: 400;
+}
+
+::selection {
+  background: var(--mauve);
+  color: var(--warm-white);
+}
+
+input, select, textarea, button {
+  font-family: var(--font-sans), 'DM Sans', sans-serif;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}

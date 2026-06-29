@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     apple: '/favicon.png',
   },
   verification: {
-    google: 'google-site-verification=YOUR_GOOGLE_VERIFICATION_CODE',
+    google: 'YNk-8h8-mk-a2Rm-5M9CTiVBuC8mCxwQoqI1RmVCcHo',
   },
 }
 

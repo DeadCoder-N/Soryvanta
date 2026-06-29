@@ -2,11 +2,17 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
+import { prisma } from '@brisvora/shared'
 import SignOutButton from './SignOutButton'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   if (!session?.user) redirect('/login')
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { phone: true, email: true },
+  })
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--linen)' }}>
@@ -26,6 +32,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <p style={{ fontSize: '0.68rem', color: 'var(--ink-muted)', marginTop: '4px' }} className="truncate">
             {session.user.email}
           </p>
+          {user?.phone ? (
+            <p style={{ fontSize: '0.65rem', color: 'var(--logo-green)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span>✓</span> WhatsApp linked
+            </p>
+          ) : (
+            <p style={{ fontSize: '0.65rem', color: 'var(--gold)', marginTop: '2px' }}>
+              ⚠ No WhatsApp number
+            </p>
+          )}
         </div>
 
         {/* Nav */}

@@ -25,6 +25,7 @@ export default function RegisterPage() {
     setError('')
     setLoading(true)
     const form = new FormData(e.currentTarget)
+    const phone = (form.get('phone') as string).replace(/[^0-9+]/g, '')
     const res = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,6 +33,7 @@ export default function RegisterPage() {
         name: form.get('name'),
         email: form.get('email'),
         password: form.get('password'),
+        phone,
       }),
     })
     if (!res.ok) {
@@ -76,6 +78,17 @@ export default function RegisterPage() {
           <input name="email" type="email" required style={inputStyle}
             onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
             onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+        </div>
+        <div>
+          <label style={{ fontSize: '0.68rem', color: 'var(--ink-soft)', letterSpacing: '0.14em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+            WhatsApp Number
+          </label>
+          <input name="phone" type="tel" required placeholder="919876543210" style={inputStyle}
+            onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
+            onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+          <p style={{ fontSize: '0.68rem', color: 'var(--ink-muted)', marginTop: '6px' }}>
+            With country code, no spaces — e.g. 919876543210
+          </p>
         </div>
         <div>
           <label style={{ fontSize: '0.68rem', color: 'var(--ink-soft)', letterSpacing: '0.14em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>

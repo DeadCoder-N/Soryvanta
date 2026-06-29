@@ -13,9 +13,47 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const property = await getListingBySlug(slug)
   if (!property) return {}
+
+  const propertyType = property.type.charAt(0) + property.type.slice(1).toLowerCase()
+  const bhkInfo = property.bedrooms ? ` ${property.bedrooms} BHK` : ''
+  const location = property.city
+
   return {
     title: `${property.title} — Brisvora`,
-    description: property.description.slice(0, 160),
+    description: `${property.description.slice(0, 120)}... View ${propertyType}${bhkInfo} for ${formatPrice(property.price)} in ${location}. Contact broker now.`,
+    keywords: [
+      `property in ${location}`,
+      `${propertyType} for sale`,
+      `${location} real estate`,
+      `${bhkInfo.trim()} in ${location}`,
+      'premium property India',
+      'luxury real estate',
+    ],
+    alternates: {
+      canonical: `/property/${property.slug}`,
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'en_IN',
+      url: `https://brisvora.vercel.app/property/${property.slug}`,
+      siteName: 'Brisvora',
+      title: property.title,
+      description: property.description.slice(0, 160),
+      images: property.images.length > 0 ? [
+        {
+          url: property.images[0].url,
+          width: 1200,
+          height: 630,
+          alt: property.title,
+        },
+      ] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: property.title,
+      description: property.description.slice(0, 160),
+      images: property.images.length > 0 ? [property.images[0].url] : [],
+    },
   }
 }
 
@@ -33,8 +71,84 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
     ? `https://wa.me/${property.owner.phone.replace(/[^0-9]/g, '')}?text=Hi, I'm interested in: ${property.title}`
     : null
 
+  const propertySchema = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: property.title,
+    description: property.description,
+    url: `https://brisvora.vercel.app/property/${property.slug}`,
+    datePosted: property.createdAt.toISOString(),
+    dateModified: property.updatedAt.toISOString(),
+    image: property.images.map(img => img.url),
+    offers: {
+      '@type': 'Offer',
+      price: property.price,
+      priceCurrency: 'INR',
+      url: `https://brisvora.vercel.app/property/${property.slug}`,
+      availability: 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Person',
+        name: property.owner.name ?? 'Broker',
+      },
+    },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: property.address,
+      addressLocality: property.city,
+      addressCountry: 'IN',
+    },
+    numberOfRooms: property.bedrooms,
+    floorSize: property.areaSqft ? {
+      '@type': 'QuantitativeValue',
+      value: property.areaSqft,
+      unitCode: 'FTSQ',
+    } : undefined,
+    propertyType: property.type,
+  }
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://brisvora.vercel.app',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Properties',
+        item: 'https://brisvora.vercel.app',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: property.city,
+        item: `https://brisvora.vercel.app?city=${encodeURIComponent(property.city)}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: property.title,
+        item: `https://brisvora.vercel.app/property/${property.slug}`,
+      },
+    ],
+  }
+
   return (
     <div style={{ background: 'var(--linen)', minHeight: '100vh' }}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(propertySchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+      </head>
 
       {/* Nav */}
       <header style={{ background: 'var(--warm-white)', borderBottom: '2px solid var(--logo-gold)', position: 'sticky', top: 0, zIndex: 50 }}>

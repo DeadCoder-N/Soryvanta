@@ -295,6 +295,52 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         )}
       </section>
 
+      {/* ── FAQ SECTION ── */}
+      <section style={{ background: 'var(--warm-white)', padding: '80px 0', borderTop: '1px solid var(--linen-dk)' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 2rem' }}>
+          <p style={{ fontSize: '0.65rem', color: 'var(--mauve)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: '12px', textAlign: 'center' }}>
+            Frequently Asked Questions
+          </p>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: 'var(--ink)', fontWeight: 400, marginBottom: '48px', textAlign: 'center' }}>
+            How Brisvora Works
+          </h2>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            {[
+              {
+                q: 'What is Brisvora?',
+                a: 'Brisvora is India\'s first AI-powered property listing platform. Real estate brokers send property details via WhatsApp, and our AI instantly generates a professional, SEO-optimized listing page with a shareable URL.',
+              },
+              {
+                q: 'How do I create a property listing?',
+                a: 'Simply register on Brisvora, link your WhatsApp number in your profile, and send a message to our WhatsApp bot with your property details. You can have a guided conversation or send all details in one message — either way, your listing goes live in under 2 minutes.',
+              },
+              {
+                q: 'Which cities in India are supported?',
+                a: 'Brisvora supports property listings across all major Indian cities including Mumbai, Delhi, Bangalore, Pune, Hyderabad, Chennai, Kolkata, Jaipur, Ahmedabad, Noida, Gurgaon and more.',
+              },
+              {
+                q: 'Is Brisvora free for brokers?',
+                a: 'Yes! Creating and sharing property listings is completely free for brokers. You only need an AiSensy WhatsApp account to receive and send messages.',
+              },
+              {
+                q: 'Can buyers contact me directly?',
+                a: 'Yes. Every listing page has a WhatsApp chat button and an enquiry form. Interested buyers can reach you instantly, and all leads are tracked in your broker dashboard.',
+              },
+            ].map((faq) => (
+              <div key={faq.q} style={{ borderBottom: '1px solid var(--linen-dk)', paddingBottom: '24px' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--ink)', fontWeight: 500, marginBottom: '8px' }}>
+                  {faq.q}
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', lineHeight: 1.7 }}>
+                  {faq.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA STRIP ── */}
       <section style={{ background: 'var(--bark)', padding: '90px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>

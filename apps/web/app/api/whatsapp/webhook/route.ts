@@ -1,20 +1,48 @@
 import { NextResponse } from 'next/server'
-import { parseInboundMessage, sendMessage, downloadMedia, generateListing, uploadImage, createListing, processConversationalMessage, clearConversationState, getConversationState } from '@brisvora/api'
 import { prisma } from '@brisvora/shared'
+import { parseInboundMessage, sendMessage, downloadMedia, generateListing, uploadImage, createListing, processConversationalMessage, clearConversationState, getConversationState } from '@brisvora/api'
 
 function normalizePhone(raw: string): string {
   return raw.replace(/\D/g, '')
 }
 
+// GET — Handles AiSensy webhook verification (challenge/verify)
+export async function GET(req: Request) {
+  const url = new URL(req.url)
+  const mode = url.searchParams.get('hub.mode')
+  const token = url.searchParams.get('hub.verify_token')
+  const challenge = url.searchParams.get('hub.challenge')
+
+  console.log('WEBHOOK_GET — mode:', mode, 'token:', token, 'challenge:', challenge)
+
+  // AiSensy sends: hub.mode=subscribe&hub.verify_token=YOUR_TOKEN&hub.challenge=RANDOM_STRING
+  // We must return the challenge string with 200 to verify
+  if (mode === 'subscribe' && token && challenge) {
+    // Accept any verify token for now (we'll secure this later)
+    return NextResponse.json(challenge)
+  }
+
+  // Also handle plain ?token=&challenge= style (AiSensy sometimes uses this)
+  const plainToken = url.searchParams.get('token')
+  const plainChallenge = url.searchParams.get('challenge')
+  if (plainToken && plainChallenge) {
+    return NextResponse.json(plainChallenge)
+  }
+
+  return NextResponse.json({ ok: true })
+}
+
+// POST — Receives webhook events from AiSensy
 export async function POST(req: Request) {
   try {
     const body = await req.json()
     console.log('--- NEW AISENSY WEBHOOK RECEIVED ---')
-    console.log(JSON.stringify(body, null, 2))
+    console.log('Keys:', Object.keys(body))
+    console.log(JSON.stringify(body).slice(0, 3000))
 
     const msg = parseInboundMessage(body)
     if (!msg) {
-      console.log('Webhook parsed as non-message or unsupported format, ignoring.')
+      console.log('Webhook parsed as non-message or unsupported format.')
       return NextResponse.json({ ok: true })
     }
 
@@ -35,11 +63,14 @@ export async function POST(req: Request) {
 
     if (!user) {
       console.log(`User not found for phone: ${msg.waId}`)
-      await sendMessage({ to: msg.waId, body: 'Please register at our platform first and link your WhatsApp number in the Profile Settings.' })
+      const reply = await sendMessage({ to: msg.waId, body: 'Please register at our platform first and link your WhatsApp number in the Profile Settings.' })
+      console.log('Reply to unregistered user:', reply)
       return NextResponse.json({ ok: true })
     }
 
     const flowResult = await processConversationalMessage(user.id, msg.waId, msg.body, msg.mediaUrls ?? [])
+
+    console.log('Flow result:', flowResult)
 
     if (flowResult === 'GENERATING') {
       await sendMessage({ to: msg.waId, body: 'Generating your listing with AI... Please wait a moment.' })
@@ -71,6 +102,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true })
     }
 
+    console.log('Sending reply:', flowResult)
     await sendMessage({ to: msg.waId, body: flowResult })
     return NextResponse.json({ ok: true })
   } catch (error) {

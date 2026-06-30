@@ -1,102 +1,85 @@
 import type { WhatsAppInboundMessage, WhatsAppOutboundMessage } from '@brisvora/shared'
-import { prisma } from '@brisvora/shared'
 
 const API_KEY = process.env.AISENSY_API_KEY!
 const API_URL = 'https://backend.aisensy.com/campaign/t1/api/v2'
 const AISENSY_PHONE = process.env.AISENSY_PHONE_NUMBER || '+918850908790'
 
+// --- Payload extraction ---
 function extractPhoneAndText(body: Record<string, any>): { phone: string; text: string; mediaUrls: string[] } | null {
   const mediaUrls: string[] = []
 
-  // Strategy 1: Deep recursive search for any phone-like string and any text-like string
-  const findDeep = (obj: any, depth = 0): { phone: string; text: string } | null => {
-    if (depth > 8 || !obj || typeof obj !== 'object') return null
+  // Walk any object/array looking for: phone-like string (10+ digits) + text-like string
+  function walk(obj: any, depth: number): { phone: string; text: string } | null {
+    if (depth > 10 || !obj) return null
+
+    if (Array.isArray(obj)) {
+      for (const item of obj) {
+        const r = walk(item, depth + 1)
+        if (r) return r
+      }
+      return null
+    }
 
     if (typeof obj === 'object') {
-      const keys = Object.keys(obj)
-      const phoneKey = keys.find(k => /phone|mobile|from|waId|sender|number|to/.test(k.toLowerCase()))
-      const textKey = keys.find(k => /text|body|message|content|caption/.test(k.toLowerCase()))
+      // Same-object heuristic: this object has both a phone-looking value and a text-looking value
+      const entries = Object.entries(obj)
+      let phoneMatch: string | null = null
+      let textMatch: string | null = null
 
-      if (phoneKey && textKey) {
-        const phone = String(obj[phoneKey] ?? '').replace(/\D/g, '')
-        const text = String(obj[textKey] ?? '')
-        if (phone.length >= 10 && text.length > 0) {
-          return { phone, text }
+      for (const [k, v] of entries) {
+        if (typeof v !== 'string') continue
+        const digits = v.replace(/\D/g, '')
+        const lowerK = k.toLowerCase()
+        if (!phoneMatch && digits.length >= 10 && /phone|from|waId|sender|number|mobile|to|destination/.test(lowerK)) {
+          phoneMatch = digits
+        }
+        if (!textMatch && v.length > 0 && /text|body|message|content|caption/.test(lowerK)) {
+          textMatch = v
         }
       }
 
-      for (const key of keys) {
-        const val = obj[key]
-        if (Array.isArray(val)) {
-          for (const item of val) {
-            const result = findDeep(item, depth + 1)
-            if (result) return result
-          }
-        } else if (typeof val === 'object') {
-          const result = findDeep(val, depth + 1)
-          if (result) return result
+      if (phoneMatch && textMatch) {
+        return { phone: phoneMatch, text: textMatch }
+      }
+
+      // Collect media URLs anywhere
+      for (const [k, v] of entries) {
+        if (typeof v === 'string' && v.startsWith('http')) {
+          mediaUrls.push(v)
         }
+      }
+
+      // Recurse into child objects/arrays
+      for (const [k, v] of entries) {
+        if (k === 'password' || k === 'apiKey' || k === 'secret') continue
+        const r = walk(v, depth + 1)
+        if (r) return r
       }
     }
+
     return null
   }
 
-  // Also look for image/media URLs anywhere in the payload
-  const findMediaUrls = (obj: any, depth = 0): string[] => {
-    if (depth > 8 || !obj || typeof obj !== 'object') return []
-    if (typeof obj === 'object') {
-      const urls: string[] = []
-      for (const key of Object.keys(obj)) {
-        const val = obj[key]
-        if (typeof val === 'string' && val.startsWith('http')) {
-          urls.push(val)
-        } else if (typeof val === 'object') {
-          urls.push(...findMediaUrls(val, depth + 1))
-        }
-      }
-      return urls
-    }
-    return []
-  }
-
-  // Strategy 2: Known top-level keys
-  if (body.waId || body.from || body.sender) {
-    const phone = String(body.waId || body.from || body.sender).replace(/\D/g, '')
-    const text = String(body.body || body.text || body.message?.text || body.message?.body || '')
-    mediaUrls.push(...findMediaUrls(body))
-    if (phone.length >= 10) return { phone, text, mediaUrls }
-  }
-
-  // Strategy 3: Deep search
-  const deep = findDeep(body)
-  if (deep) {
-    mediaUrls.push(...findMediaUrls(body))
-    return { phone: deep.phone, text: deep.text, mediaUrls }
-  }
-
-  return null
+  const found = walk(body, 0)
+  if (!found) return null
+  return { phone: found.phone, text: found.text, mediaUrls }
 }
 
-// Parse AiSensy Webhook payload — robust against ANY format
+// Parse AiSensy Webhook payload — extremely robust against unknown formats
 export function parseInboundMessage(body: Record<string, any>): WhatsAppInboundMessage | null {
   try {
     const extracted = extractPhoneAndText(body)
     if (!extracted) {
-      console.log('Could not extract phone+text from payload. Keys:', Object.keys(body))
+      console.log('PARSE_FAIL — top-level keys:', Object.keys(body))
+      // As a last resort, dump the whole body so we can inspect it in Vercel logs
+      console.log('PARSE_FAIL — full body:', JSON.stringify(body).slice(0, 2000))
       return null
     }
 
-    const waId = extracted.phone
-    const textBody = extracted.text
-
-    // Determine sender name if available
-    let fromName = 'User'
-    const deep = findDeep(body, (obj: any) => obj?.profile?.name || obj?.name || null)
-
     return {
-      from: fromName,
-      waId,
-      body: textBody,
+      from: 'User',
+      waId: extracted.phone,
+      body: extracted.text,
       mediaUrls: extracted.mediaUrls,
       timestamp: Date.now().toString(),
     }
@@ -105,8 +88,6 @@ export function parseInboundMessage(body: Record<string, any>): WhatsAppInboundM
     return null
   }
 }
-
-// old signature removed — using new robust extractor below
 
 // Send a WhatsApp text message via AiSensy Campaign API
 export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
@@ -142,23 +123,4 @@ export async function downloadMedia(mediaIdOrUrl: string): Promise<Buffer> {
      return Buffer.from(arrayBuffer)
   }
   throw new Error('AiSensy media download not fully configured. Awaiting payload format.')
-}
-
-// Helper for finding values in nested objects
-function findDeep(obj: any, predicate: (v: any) => any, depth = 0): any {
-  if (depth > 8 || !obj || typeof obj !== 'object') return undefined
-  const direct = predicate(obj)
-  if (direct !== undefined) return direct
-  if (Array.isArray(obj)) {
-    for (const item of obj) {
-      const r = findDeep(item, predicate, depth + 1)
-      if (r !== undefined) return r
-    }
-  } else {
-    for (const key of Object.keys(obj)) {
-      const r = findDeep(obj[key], predicate, depth + 1)
-      if (r !== undefined) return r
-    }
-  }
-  return undefined
 }

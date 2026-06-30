@@ -2,6 +2,7 @@ import type { WhatsAppInboundMessage, WhatsAppOutboundMessage } from '@brisvora/
 
 const API_KEY = process.env.AISENSY_API_KEY!
 const API_URL = 'https://backend.aisensy.com/campaign/t1/api/v2'
+const AISENSY_PHONE = process.env.AISENSY_PHONE_NUMBER || '+918850908790'
 
 // Parse AiSensy Webhook payload
 export function parseInboundMessage(body: Record<string, any>): WhatsAppInboundMessage | null {
@@ -71,10 +72,10 @@ export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
     },
     body: JSON.stringify({
       apiKey: API_KEY,
-      campaignName: 'bristova_reply', // We can specify a generic campaign name or omit if AiSensy allows direct replies
+      campaignName: 'bristova_reply',
       destination: msg.to,
       userName: 'User',
-      source: 'new-landing-page',
+      source: AISENSY_PHONE,
       media: {},
       templateParams: [],
       type: 'text',

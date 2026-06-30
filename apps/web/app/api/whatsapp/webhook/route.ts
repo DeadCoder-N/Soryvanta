@@ -51,6 +51,9 @@ export async function POST(req: Request) {
     const normalizedWaId = normalizePhone(msg.waId)
     const possiblePhones = [normalizedWaId]
 
+    if (normalizedWaId.startsWith('91') && normalizedWaId.length > 10) {
+      possiblePhones.push(normalizedWaId.slice(2))
+    }
     if (!normalizedWaId.startsWith('91') && normalizedWaId.length === 10) {
       possiblePhones.push(`91${normalizedWaId}`)
     }
@@ -63,8 +66,7 @@ export async function POST(req: Request) {
 
     if (!user) {
       console.log(`User not found for phone: ${msg.waId}`)
-      const reply = await sendMessage({ to: msg.waId, body: 'Please register at our platform first and link your WhatsApp number in the Profile Settings.' })
-      console.log('Reply to unregistered user:', reply)
+      await sendMessage({ to: msg.waId, body: 'Please register at our platform first and link your WhatsApp number in the Profile Settings.' })
       return NextResponse.json({ ok: true })
     }
 
@@ -77,6 +79,7 @@ export async function POST(req: Request) {
 
       const conversation = await getConversationState(user.id)
       const context = conversation?.context as any ?? {}
+      const accumulatedText = context.accumulatedText ?? ''
       const accumulatedImageIds = context.imageUrls ?? []
 
       const allMediaIds = [...accumulatedImageIds, ...(msg.mediaUrls ?? [])]
@@ -92,8 +95,9 @@ export async function POST(req: Request) {
         }
       }
 
-      const generated = await generateListing({ rawMessage: msg.body })
-      const property = await createListing(user.id, generated, imageUrls, msg.body)
+      const rawMessage = accumulatedText || msg.body
+      const generated = await generateListing({ rawMessage })
+      const property = await createListing(user.id, generated, imageUrls, rawMessage)
 
       const listingUrl = `${process.env.NEXTAUTH_URL || 'https://brisvora.vercel.app'}/property/${property.slug}`
       await sendMessage({ to: msg.waId, body: `Your listing is ready!\n\n${generated.title}\n\n${listingUrl}` })

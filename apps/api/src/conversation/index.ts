@@ -1,34 +1,20 @@
 import { prisma } from '@brisvora/shared'
 
-export type ConversationStateType =
-  | 'GREETING'
-  | 'PROPERTY_TYPE'
-  | 'LOCATION'
-  | 'PRICE'
-  | 'BEDROOMS'
-  | 'AMENITIES'
-  | 'CONFIRMATION'
-  | 'GENERATING'
+export type ConversationStateType = 'GREETING' | 'ACCUMULATING' | 'GENERATING'
 
 export interface ConversationContext {
-  propertyType?: string
-  location?: string
-  price?: number
-  bedrooms?: number
-  amenities?: string[]
-  imageUrls?: string[]
+  accumulatedText: string
+  imageUrls: string[]
 }
 
 export async function getConversationState(userId: string) {
-  return prisma.conversationState.findUnique({
-    where: { userId },
-  })
+  return prisma.conversationState.findUnique({ where: { userId } })
 }
 
 export async function setConversationState(
   userId: string,
   state: ConversationStateType,
-  context: ConversationContext = {}
+  context: ConversationContext = { accumulatedText: '', imageUrls: [] }
 ) {
   return prisma.conversationState.upsert({
     where: { userId },
@@ -55,144 +41,52 @@ export async function processConversationalMessage(
   const existing = await getConversationState(userId)
   const lower = message.toLowerCase().trim()
 
-  let context: ConversationContext = existing?.context as ConversationContext ?? {}
+  let context: ConversationContext = (existing?.context as unknown as ConversationContext) ?? { accumulatedText: '', imageUrls: [] }
 
   if (newImageUrls.length > 0) {
-    const existingImages = context.imageUrls ?? []
-    context = { ...context, imageUrls: [...existingImages, ...newImageUrls] }
+    context = { ...context, imageUrls: [...(context.imageUrls ?? []), ...newImageUrls] }
   }
 
+  // If no state yet, or state is GREETING → start accumulating
   if (!existing || existing.state === 'GREETING') {
-    if (
-      lower.includes('create') ||
-      lower.includes('listing') ||
-      lower.includes('property') ||
-      lower.includes('sell') ||
-      lower.includes('rent') ||
-      lower.includes('flat') ||
-      lower.includes('apartment')
-    ) {
-      await setConversationState(userId, 'PROPERTY_TYPE', context)
-      return "Let's create a new listing! What type of property is this?\n\n1. Apartment\n2. House\n3. Villa\n4. Plot\n5. Commercial\n\nJust type the number or name."
+    const isKeyword = lower.includes('create') || lower.includes('listing') || lower.includes('property') || lower.includes('sell') || lower.includes('rent')
+
+    if (isKeyword) {
+      const reply = "Please share all property details and photos here.\n\nSend everything in one go or in multiple messages — I'll collect it all.\n\nWhen you're done, just send: done"
+      await setConversationState(userId, 'ACCUMULATING', { accumulatedText: '', imageUrls: [] })
+      return reply
     }
-    await setConversationState(userId, 'GREETING', context)
-    return "Hello! I'm Brisvora, your AI listing assistant. Send me property details like:\n\n\"3 BHK apartment in Mumbai for 85 lakh with parking\"\n\nOr say \"create listing\" to start a guided conversation."
+
+    // Even if no keyword, just start accumulating (they might send details directly)
+    await setConversationState(userId, 'ACCUMULATING', { accumulatedText: message, imageUrls: context.imageUrls })
+    return "Got it. Send more details or photos. When you're done, send: done"
   }
 
-  switch (existing.state as ConversationStateType) {
-    case 'PROPERTY_TYPE': {
-      const typeMap: Record<string, string> = {
-        apartment: 'APARTMENT',
-        house: 'HOUSE',
-        villa: 'VILLA',
-        plot: 'PLOT',
-        commercial: 'COMMERCIAL',
-        '1': 'APARTMENT',
-        '2': 'HOUSE',
-        '3': 'VILLA',
-        '4': 'PLOT',
-        '5': 'COMMERCIAL',
+  // If currently accumulating
+  if (existing.state === 'ACCUMULATING') {
+    if (lower === 'done' || lower === 'done.') {
+      if (!context.accumulatedText && context.imageUrls.length === 0) {
+        return "I don't have any details yet. Please send property details or photos first, then send done."
       }
-      const matched = typeMap[lower]
-      if (!matched) {
-        return "I didn't catch that. Please choose:\n1. Apartment\n2. House\n3. Villa\n4. Plot\n5. Commercial"
-      }
-      await setConversationState(userId, 'LOCATION', { ...context, propertyType: matched })
-      let reply = `Great, ${matched}. Which city or locality is the property in?`
-      if (newImageUrls.length > 0) {
-        reply += `\n\nGot ${newImageUrls.length} photo${newImageUrls.length > 1 ? 's' : ''} — I'll add them to your listing.`
-      }
-      return reply
-    }
-
-    case 'LOCATION': {
-      if (!message.trim()) {
-        return "Please enter the city or locality (e.g. \"Bandra West, Mumbai\")."
-      }
-      await setConversationState(userId, 'PRICE', { ...context, location: message.trim() })
-      return "Got it. What is the expected price? (e.g. \"85 lakh\", \"1.2 Cr\", \"25000000\")"
-    }
-
-    case 'PRICE': {
-      const price = extractPrice(message)
-      if (!price) {
-        return "I couldn't understand the price. Please send it like \"85 lakh\", \"1.2 Cr\", or \"25000000\"."
-      }
-      await setConversationState(userId, 'BEDROOMS', { ...context, price })
-      return "How many bedrooms? (e.g. \"2\", \"3 BHK\")"
-    }
-
-    case 'BEDROOMS': {
-      const bhk = extractBhk(message)
-      if (!bhk && !message.trim().match(/^(0|1|2|3|4|5)$/)) {
-        return "Please enter a number like 1, 2, 3, or 4."
-      }
-      const bedrooms = (bhk ?? parseInt(message.trim())) || 3
-      await setConversationState(userId, 'AMENITIES', { ...context, bedrooms })
-      return "Any key features or amenities? (e.g. \"modular kitchen, parking, near metro, 24/7 security\")\nType \"skip\" if none."
-    }
-
-    case 'AMENITIES': {
-      const amenities = lower === 'skip' ? [] : message.split(',').map((s) => s.trim()).filter(Boolean)
-      await setConversationState(userId, 'CONFIRMATION', { ...context, amenities })
-      const ctx = context
-      let reply = summarizeAndConfirm(ctx, amenities)
-      if (ctx.imageUrls?.length) {
-        reply += `\n\n(${ctx.imageUrls.length} photo${ctx.imageUrls.length > 1 ? 's' : ''} will be attached)`
-      }
-      return reply
-    }
-
-    case 'CONFIRMATION': {
-      if (lower.includes('yes') || lower.includes('correct') || lower.includes('create') || lower === '1') {
-        await setConversationState(userId, 'GENERATING', context)
-        return 'GENERATING'
-      }
-      if (lower.includes('no') || lower.includes('change')) {
-        await setConversationState(userId, 'LOCATION', context)
-        return 'No problem. Let me know the correct city or locality.'
-      }
-      return 'Please reply with "yes" to confirm or "no" to make changes.'
-    }
-
-    case 'GENERATING': {
+      await setConversationState(userId, 'GENERATING', context)
       return 'GENERATING'
     }
 
-    default:
-      await setConversationState(userId, 'GREETING', context)
-      return "Let's start fresh. Send me property details or say \"create listing\" to begin."
+    const updatedText = context.accumulatedText ? `${context.accumulatedText}\n${message}` : message
+    await setConversationState(userId, 'ACCUMULATING', { accumulatedText: updatedText, imageUrls: context.imageUrls })
+
+    if (newImageUrls.length > 0) {
+      return `Got ${newImageUrls.length} photo${newImageUrls.length > 1 ? 's' : ''}. Send more details or photos. When done, send: done`
+    }
+    return 'Got it. Send more details or photos. When done, send: done'
   }
-}
 
-function extractPrice(text: string): number | null {
-  const normalized = text.toLowerCase().replace(/,/g, '').trim()
-  const croreMatch = normalized.match(/(\d+(\.\d+)?)\s*(crore|cr)/)
-  if (croreMatch) return parseFloat(croreMatch[1]) * 10000000
+  // If generating, stay in generating state (webhook handles it)
+  if (existing.state === 'GENERATING') {
+    return 'GENERATING'
+  }
 
-  const lakhMatch = normalized.match(/(\d+(\.\d+)?)\s*(lakh|lac|l)/)
-  if (lakhMatch) return parseFloat(lakhMatch[1]) * 100000
-
-  const digitsOnly = normalized.replace(/[^0-9]/g, '')
-  if (digitsOnly.length >= 5) return parseInt(digitsOnly)
-  return null
-}
-
-function extractBhk(text: string): number | null {
-  const m = text.toLowerCase().match(/(\d)\s*bhk/)
-  return m ? parseInt(m[1]) : null
-}
-
-function summarizeAndConfirm(ctx: ConversationContext, amenities: string[]): string {
-  const lines = [
-    'Here is what I have:',
-    `Type: ${ctx.propertyType}`,
-    `Location: ${ctx.location}`,
-    `Price: ₹${ctx.price?.toLocaleString('en-IN')}`,
-    `Bedrooms: ${ctx.bedrooms} BHK`,
-    `Amenities: ${amenities.length ? amenities.join(', ') : 'None'}`,
-    '',
-    'Reply "yes" to confirm and create the listing, or "no" to make changes.',
-  ]
-  return lines.join('\n')
+  // Fallback
+  await setConversationState(userId, 'GREETING', { accumulatedText: '', imageUrls: [] })
+  return "Let's start fresh. Send me property details or photos, and say done when finished."
 }

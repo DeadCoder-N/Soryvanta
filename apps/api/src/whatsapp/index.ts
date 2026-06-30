@@ -89,29 +89,61 @@ export function parseInboundMessage(body: Record<string, any>): WhatsAppInboundM
   }
 }
 
-// Send a WhatsApp text message via AiSensy Campaign API
+// Send a WhatsApp text message via AiSensy
+// Tries multiple endpoints: CleverTap (Bearer auth) → Campaign (apiKey body)
 export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      apiKey: API_KEY,
-      campaignName: 'bristova_reply',
-      destination: msg.to,
-      userName: 'User',
-      source: AISENSY_PHONE,
-      media: {},
-      templateParams: [],
-      type: 'text',
-      text: msg.body
-    }),
-  })
+  const destination = msg.to.replace(/[^0-9]/g, '')
+  const payload = {
+    apiKey: API_KEY,
+    campaignName: 'bristova_reply',
+    destination,
+    userName: 'User',
+    source: AISENSY_PHONE,
+    media: {},
+    templateParams: [],
+    type: 'text',
+    text: msg.body
+  }
 
-  if (!res.ok) {
-    const error = await res.text()
-    console.error('AiSensy Send Error:', error)
+  // Strategy 1: CleverTap endpoint with Bearer token
+  try {
+    const res = await fetch('https://backend.aisensy.com/clever-tap/t1/messages', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: destination,
+        type: 'text',
+        text: msg.body,
+      }),
+    })
+    if (res.ok) {
+      console.log('Message sent via CleverTap endpoint')
+      return
+    }
+    const errText = await res.text()
+    console.log('CleverTap endpoint failed:', res.status, errText)
+  } catch (e) {
+    console.log('CleverTap endpoint error:', e)
+  }
+
+  // Strategy 2: Campaign endpoint (requires campaign to exist)
+  try {
+    const res2 = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (res2.ok) {
+      console.log('Message sent via Campaign endpoint')
+      return
+    }
+    const errText2 = await res2.text()
+    console.error('AiSensy Send Error (campaign):', errText2)
+  } catch (e) {
+    console.error('AiSensy Campaign endpoint error:', e)
   }
 }
 

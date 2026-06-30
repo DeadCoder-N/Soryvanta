@@ -23,8 +23,8 @@ export async function POST(req: Request) {
     const normalizedWaId = normalizePhone(msg.waId)
     const possiblePhones = [normalizedWaId]
 
-    if (normalizedWaId.startsWith('91') && normalizedWaId.length > 10) {
-      possiblePhones.push(normalizedWaId.slice(2))
+    if (!normalizedWaId.startsWith('91') && normalizedWaId.length === 10) {
+      possiblePhones.push(`91${normalizedWaId}`)
     }
 
     let user = null

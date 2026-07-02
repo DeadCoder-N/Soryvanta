@@ -64,7 +64,7 @@ export async function processConversationalMessage(
     }
 
     await setConversationState(userId, 'ACCUMULATING', { accumulatedText: message, imageUrls: context.imageUrls })
-    return "Noted. Keep going — add more details, photos, price, location, anything relevant. When you are done, send: done"
+    return "Hi, this is the Brisvora team.\n\nSend your property details in one or more messages. Include the property type, BHK, price, location, built-up area, amenities, furnishing, parking, availability, and any other relevant information. Upload clear property photos as well.\n\nOnce you've shared everything, simply send done. We'll generate your property listing and share the live link."
   }
 
   if (existing.state === 'ACCUMULATING') {

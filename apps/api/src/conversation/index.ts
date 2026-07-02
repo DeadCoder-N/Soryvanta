@@ -64,10 +64,15 @@ export async function processConversationalMessage(
     }
 
     await setConversationState(userId, 'ACCUMULATING', { accumulatedText: message, imageUrls: context.imageUrls })
-    return "Hi, this is the *Brisvora team*.\n\nSend your property details in one or more messages. Include the property type, BHK, price, location, built-up area, amenities, furnishing, parking, availability, and any other relevant information. Upload clear property photos as well.\n\nOnce you've shared everything, simply send *done*. We'll generate your property listing and share the live link."
+    return "Hi, this is the *Brisvora team*.\n\nSend your property details in one or more messages. Include the property type, BHK, price, location, built-up area, amenities, furnishing, parking, availability, and any other relevant information. Upload clear property photos as well.\n\nOnce you've shared everything, simply send *done*. To cancel at any time, send *cancel*. We'll generate your property listing and share the live link."
   }
 
   if (existing.state === 'ACCUMULATING') {
+    if (lower === 'cancel' || lower === 'cancel.') {
+      await clearConversationState(userId)
+      return 'Your listing process has been cancelled. Send us a message anytime to start again.'
+    }
+
     if (lower === 'done' || lower === 'done.') {
       if (!context.accumulatedText && context.imageUrls.length === 0) {
         return "I don't have any details yet. Please send property details or photos first, then send done."
@@ -82,7 +87,7 @@ export async function processConversationalMessage(
     if (newImageUrls.length > 0) {
       return `${newImageUrls.length} photo${newImageUrls.length > 1 ? 's' : ''} received. Add more or send details. Once done, send *done*.`
     }
-    return 'Details noted. Keep adding — price, location, size, photos. Send *done* when ready.'
+    return 'Details noted. Keep adding — price, location, size, photos. Send *done* when ready or *cancel* to stop.'
   }
 
   if (existing.state === 'GENERATING') {

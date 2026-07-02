@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 // Property types
 export interface ListingGenerationInput {
   rawMessage: string
@@ -24,12 +26,14 @@ export interface WhatsAppInboundMessage {
   from: string
   waId: string
   body: string
+  contactId?: string
   mediaUrls?: string[]
   timestamp: string
 }
 
 export interface WhatsAppOutboundMessage {
   to: string
+  contactId?: string
   body: string
 }
 
@@ -47,3 +51,15 @@ export interface PropertyAnalytics {
   inquiryCount: number
   lastViewed?: Date
 }
+
+// Conversation types
+export const ConversationContextSchema = z.object({
+  accumulatedText: z.string(),
+  imageUrls: z.array(z.string()).default([]),
+})
+
+export type ConversationContext = z.infer<typeof ConversationContextSchema>
+
+export const ConversationStateTypeSchema = z.enum(['GREETING', 'ACCUMULATING', 'GENERATING'])
+export type ConversationStateType = z.infer<typeof ConversationStateTypeSchema>
+

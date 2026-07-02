@@ -1,90 +1,92 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@brisvora/shared'
-import { parseInboundMessage, sendMessage, downloadMedia, generateListing, uploadImage, createListing, processConversationalMessage, clearConversationState, getConversationState } from '@brisvora/api'
+import { prisma, ConversationContextSchema } from '@brisvora/shared'
+import {
+  parseInboundMessage, sendMessage, downloadMedia,
+  generateListing, uploadImage, createListing,
+  processConversationalMessage, clearConversationState, getConversationState,
+} from '@brisvora/api'
 
-function normalizePhone(raw: string): string {
-  return raw.replace(/\D/g, '')
-}
+const WEBHOOK_SECRET = process.env.AISENSY_WEBHOOK_SECRET
 
-// GET — Handles AiSensy webhook verification (challenge/verify)
 export async function GET(req: Request) {
   const url = new URL(req.url)
   const mode = url.searchParams.get('hub.mode')
   const token = url.searchParams.get('hub.verify_token')
   const challenge = url.searchParams.get('hub.challenge')
 
-  console.log('WEBHOOK_GET — mode:', mode, 'token:', token, 'challenge:', challenge)
-
-  // AiSensy sends: hub.mode=subscribe&hub.verify_token=YOUR_TOKEN&hub.challenge=RANDOM_STRING
-  // We must return the challenge string with 200 to verify
   if (mode === 'subscribe' && token && challenge) {
-    // Accept any verify token for now (we'll secure this later)
+    if (WEBHOOK_SECRET && token !== WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Invalid verify token' }, { status: 403 })
+    }
     return NextResponse.json(challenge)
   }
 
-  // Also handle plain ?token=&challenge= style (AiSensy sometimes uses this)
   const plainToken = url.searchParams.get('token')
   const plainChallenge = url.searchParams.get('challenge')
   if (plainToken && plainChallenge) {
+    if (WEBHOOK_SECRET && plainToken !== WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Invalid verify token' }, { status: 403 })
+    }
     return NextResponse.json(plainChallenge)
   }
 
   return NextResponse.json({ ok: true })
 }
 
-// POST — Receives webhook events from AiSensy
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    console.log('--- NEW AISENSY WEBHOOK RECEIVED ---')
-    console.log('Keys:', Object.keys(body))
-    console.log(JSON.stringify(body).slice(0, 3000))
+    console.log('--- WEBHOOK RECEIVED ---')
+    console.log(JSON.stringify(body).slice(0, 2000))
 
     const msg = parseInboundMessage(body)
     if (!msg) {
-      console.log('Webhook parsed as non-message or unsupported format.')
+      console.log('Ignored: non-message or system event')
       return NextResponse.json({ ok: true })
     }
 
-    console.log('Parsed Message:', msg)
+    console.log('Parsed:', { waId: msg.waId, body: msg.body, contactId: msg.contactId })
 
-    const normalizedWaId = normalizePhone(msg.waId)
-    const possiblePhones = [normalizedWaId]
-
-    if (normalizedWaId.startsWith('91') && normalizedWaId.length > 10) {
-      possiblePhones.push(normalizedWaId.slice(2))
+    // Look up registered user — optional, not required
+    const phone = msg.waId
+    const digits = phone.replace(/\D/g, '')
+    const candidates = new Set<string>([digits, `+${digits}`])
+    if (digits.length === 12 && digits.startsWith('91')) {
+      candidates.add(digits.slice(2))
+      candidates.add(`+91${digits.slice(2)}`)
+    } else if (digits.length === 10) {
+      candidates.add(`91${digits}`)
+      candidates.add(`+91${digits}`)
     }
-    if (!normalizedWaId.startsWith('91') && normalizedWaId.length === 10) {
-      possiblePhones.push(`91${normalizedWaId}`)
-    }
 
-    let user = null
-    for (const phone of possiblePhones) {
-      user = await prisma.user.findUnique({ where: { phone } })
+    let user: { id: string } | null = null
+    for (const candidate of candidates) {
+      user = await prisma.user.findUnique({ where: { phone: candidate } })
       if (user) break
     }
 
-    if (!user) {
-      console.log(`User not found for phone: ${msg.waId}`)
-      await sendMessage({ to: msg.waId, body: 'Please register at our platform first and link your WhatsApp number in the Profile Settings.' })
-      return NextResponse.json({ ok: true })
-    }
+    // Use userId if registered, otherwise use phone as the conversation key
+    const conversationKey = user?.id ?? `phone:${digits}`
 
-    const flowResult = await processConversationalMessage(user.id, msg.waId, msg.body, msg.mediaUrls ?? [])
+    const flowResult = await processConversationalMessage(
+      conversationKey,
+      msg.waId,
+      msg.body,
+      msg.mediaUrls ?? []
+    )
 
     console.log('Flow result:', flowResult)
 
     if (flowResult === 'GENERATING') {
-      await sendMessage({ to: msg.waId, body: 'Generating your listing with AI... Please wait a moment.' })
+      await sendMessage({ to: msg.waId, contactId: msg.contactId, body: 'Generating your listing with AI... Please wait a moment.' })
 
-      const conversation = await getConversationState(user.id)
-      const context = conversation?.context as any ?? {}
+      const conversation = await getConversationState(conversationKey)
+      const context = ConversationContextSchema.parse(conversation?.context ?? {})
       const accumulatedText = context.accumulatedText ?? ''
       const accumulatedImageIds = context.imageUrls ?? []
-
       const allMediaIds = [...accumulatedImageIds, ...(msg.mediaUrls ?? [])]
-      const imageUrls: string[] = []
 
+      const imageUrls: string[] = []
       for (const mediaId of allMediaIds) {
         try {
           const buffer = await downloadMedia(mediaId)
@@ -97,17 +99,23 @@ export async function POST(req: Request) {
 
       const rawMessage = accumulatedText || msg.body
       const generated = await generateListing({ rawMessage })
-      const property = await createListing(user.id, generated, imageUrls, rawMessage)
+
+      // createListing: ownerPhone always set, ownerId only if registered
+      const property = await createListing(digits, generated, imageUrls, rawMessage, user?.id)
 
       const listingUrl = `${process.env.NEXTAUTH_URL || 'https://brisvora.vercel.app'}/property/${property.slug}`
-      await sendMessage({ to: msg.waId, body: `Your listing is ready!\n\n${generated.title}\n\n${listingUrl}` })
 
-      await clearConversationState(user.id)
+      let replyBody = `Your listing is ready!\n\n${generated.title}\n\n${listingUrl}`
+      if (!user) {
+        replyBody += `\n\nTo edit this listing, register at brisvora.vercel.app with this WhatsApp number.`
+      }
+
+      await sendMessage({ to: msg.waId, contactId: msg.contactId, body: replyBody })
+      await clearConversationState(conversationKey)
       return NextResponse.json({ ok: true })
     }
 
-    console.log('Sending reply:', flowResult)
-    await sendMessage({ to: msg.waId, body: flowResult })
+    await sendMessage({ to: msg.waId, contactId: msg.contactId, body: flowResult })
     return NextResponse.json({ ok: true })
   } catch (error) {
     console.error('Webhook error:', error)

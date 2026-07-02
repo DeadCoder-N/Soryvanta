@@ -1,10 +1,16 @@
 import { prisma } from '@brisvora/shared'
+import { ConversationContextSchema, ConversationStateTypeSchema } from '@brisvora/shared'
 
 export type ConversationStateType = 'GREETING' | 'ACCUMULATING' | 'GENERATING'
 
-export interface ConversationContext {
-  accumulatedText: string
-  imageUrls: string[]
+export type ConversationContext = ReturnType<typeof ConversationContextSchema.parse>
+
+function safeContext(input: unknown): ConversationContext {
+  try {
+    return ConversationContextSchema.parse(input)
+  } catch {
+    return { accumulatedText: '', imageUrls: [] }
+  }
 }
 
 export async function getConversationState(userId: string) {
@@ -16,13 +22,14 @@ export async function setConversationState(
   state: ConversationStateType,
   context: ConversationContext = { accumulatedText: '', imageUrls: [] }
 ) {
+  const validated = ConversationContextSchema.parse(context)
   return prisma.conversationState.upsert({
     where: { userId },
-    update: { state, context: context as any, lastMessageAt: new Date() },
+    update: { state, context: validated as any, lastMessageAt: new Date() },
     create: {
       userId,
       state,
-      context: context as any,
+      context: validated as any,
       lastMessageAt: new Date(),
     },
   })
@@ -41,13 +48,12 @@ export async function processConversationalMessage(
   const existing = await getConversationState(userId)
   const lower = message.toLowerCase().trim()
 
-  let context: ConversationContext = (existing?.context as unknown as ConversationContext) ?? { accumulatedText: '', imageUrls: [] }
+  let context: ConversationContext = safeContext(existing?.context)
 
   if (newImageUrls.length > 0) {
     context = { ...context, imageUrls: [...(context.imageUrls ?? []), ...newImageUrls] }
   }
 
-  // If no state yet, or state is GREETING → start accumulating
   if (!existing || existing.state === 'GREETING') {
     const isKeyword = lower.includes('create') || lower.includes('listing') || lower.includes('property') || lower.includes('sell') || lower.includes('rent')
 
@@ -57,12 +63,10 @@ export async function processConversationalMessage(
       return reply
     }
 
-    // Even if no keyword, just start accumulating (they might send details directly)
     await setConversationState(userId, 'ACCUMULATING', { accumulatedText: message, imageUrls: context.imageUrls })
     return "Got it. Send more details or photos. When you're done, send: done"
   }
 
-  // If currently accumulating
   if (existing.state === 'ACCUMULATING') {
     if (lower === 'done' || lower === 'done.') {
       if (!context.accumulatedText && context.imageUrls.length === 0) {
@@ -81,12 +85,10 @@ export async function processConversationalMessage(
     return 'Got it. Send more details or photos. When done, send: done'
   }
 
-  // If generating, stay in generating state (webhook handles it)
   if (existing.state === 'GENERATING') {
     return 'GENERATING'
   }
 
-  // Fallback
   await setConversationState(userId, 'GREETING', { accumulatedText: '', imageUrls: [] })
   return "Let's start fresh. Send me property details or photos, and say done when finished."
 }

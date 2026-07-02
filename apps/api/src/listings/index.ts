@@ -2,10 +2,11 @@ import { prisma, generateSlug } from '@brisvora/shared'
 import type { GeneratedListing } from '@brisvora/shared'
 
 export async function createListing(
-  ownerId: string,
+  ownerPhone: string,
   generated: GeneratedListing,
   imageUrls: string[],
-  rawInput: string
+  rawInput: string,
+  ownerId?: string
 ) {
   const tempId = crypto.randomUUID()
   const slug = generateSlug(generated.title, tempId)
@@ -13,7 +14,8 @@ export async function createListing(
   const property = await prisma.property.create({
     data: {
       slug,
-      ownerId,
+      ownerId: ownerId ?? null,
+      ownerPhone,
       title: generated.title,
       description: generated.description,
       address: generated.address,
@@ -101,6 +103,19 @@ export async function updateListing(
   return prisma.property.update({
     where: { id, ownerId },
     data: { ...data, updatedAt: new Date() },
+  })
+}
+
+export async function claimListings(ownerPhone: string, ownerId: string) {
+  const digits = ownerPhone.replace(/\D/g, '')
+  // Try all phone formats that could be stored
+  const candidates = [digits, `+${digits}`]
+  if (digits.length === 12 && digits.startsWith('91')) candidates.push(digits.slice(2))
+  if (digits.length === 10) candidates.push(`91${digits}`)
+
+  return prisma.property.updateMany({
+    where: { ownerPhone: { in: candidates }, ownerId: null },
+    data: { ownerId },
   })
 }
 

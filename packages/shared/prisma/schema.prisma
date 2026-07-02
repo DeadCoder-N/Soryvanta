@@ -63,7 +63,8 @@ model VerificationToken {
 model Property {
   id          String         @id @default(cuid())
   slug        String         @unique
-  ownerId     String
+  ownerId     String?
+  ownerPhone  String?
   title       String
   description String
   address     String

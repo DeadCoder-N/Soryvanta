@@ -1,17 +1,17 @@
 import type { WhatsAppInboundMessage, WhatsAppOutboundMessage } from '@brisvora/shared'
 
-const API_KEY = process.env.AISENSY_API_KEY!
-const API_URL = 'https://backend.aisensy.com/campaign/t1/api/v2'
-const AISENSY_PHONE = process.env.AISENSY_PHONE_NUMBER || '+918850908790'
+const CAMPAIGN_API_KEY = process.env.AISENSY_API_KEY!
+const PROJECT_API_KEY = process.env.AISENSY_PROJECT_API_KEY!
+const PROJECT_ID = process.env.AISENSY_PROJECT_ID!
+const PROJECT_API_BASE = 'https://apis.aisensy.com/project-apis/v1'
 
-// --- Known AiSensy webhook format (from actual payload) ---
-// body.topic === "message.created"
-// body.data.message.phone_number  => "918454806491"
-// body.data.message.message_content.text  => "Hello"
-// body.data.message.userName  => "Nitesh"
-// body.data.message.message_type  => "TEXT"
-// body.data.message.sent_at  => timestamp
-function extractFromAiSensy(body: Record<string, any>): { phone: string; text: string; fromName: string; mediaUrls: string[] } | null {
+function extractFromAiSensy(body: Record<string, any>): {
+  phone: string
+  text: string
+  fromName: string
+  contactId: string
+  mediaUrls: string[]
+} | null {
   try {
     const topic = body.topic ?? body.event ?? body.data?.topic
     if (topic !== 'message.created') return null
@@ -19,8 +19,13 @@ function extractFromAiSensy(body: Record<string, any>): { phone: string; text: s
     const msg = body.data?.message ?? body.data
     if (!msg) return null
 
+    // Skip system-generated messages (Auto Closed, etc.)
+    if (msg.sender === 'SYSTEM') return null
+
     const phone = String(msg.phone_number ?? msg.from ?? msg.sender ?? '').replace(/\D/g, '')
     if (phone.length < 10) return null
+
+    const contactId = String(msg.contact_id ?? '')
 
     const content = msg.message_content ?? msg.content ?? {}
     let text = ''
@@ -29,6 +34,8 @@ function extractFromAiSensy(body: Record<string, any>): { phone: string; text: s
     } else if (typeof content === 'object') {
       text = String(content.text ?? content.body ?? content.caption ?? '')
     }
+
+    if (!text) return null
 
     const fromName = String(msg.userName ?? msg.user_name ?? msg.contact_name ?? 'User')
 
@@ -48,32 +55,26 @@ function extractFromAiSensy(body: Record<string, any>): { phone: string; text: s
       for (const u of msg.media_urls) mediaUrls.push(u)
     }
 
-    return { phone, text, fromName, mediaUrls }
+    return { phone, text, fromName, contactId, mediaUrls }
   } catch (e) {
     console.error('Error extracting AiSensy payload:', e)
     return null
   }
 }
 
-// Parse AiSensy Webhook payload — targeted extractor first, deep walk fallback
 export function parseInboundMessage(body: Record<string, any>): WhatsAppInboundMessage | null {
   try {
-    // Strategy 1: Known AiSensy webhook format
     const known = extractFromAiSensy(body)
     if (known && known.phone && known.text) {
       return {
         from: known.fromName,
         waId: known.phone,
         body: known.text,
+        contactId: known.contactId,
         mediaUrls: known.mediaUrls,
         timestamp: Date.now().toString(),
       }
     }
-
-    // Strategy 2: Generic deep recursive walk (fallback for unknown formats)
-    const generic = extractGeneric(body)
-    if (generic) return generic
-
     return null
   } catch (err) {
     console.error('Error parsing inbound message:', err)
@@ -81,130 +82,96 @@ export function parseInboundMessage(body: Record<string, any>): WhatsAppInboundM
   }
 }
 
-function extractGeneric(body: Record<string, any>): WhatsAppInboundMessage | null {
-  const mediaUrls: string[] = []
-
-  function walk(obj: any, depth: number): { phone: string; text: string; fromName: string } | null {
-    if (depth > 10 || !obj) return null
-    if (Array.isArray(obj)) {
-      for (const item of obj) {
-        const r = walk(item, depth + 1)
-        if (r) return r
-      }
-      return null
-    }
-    if (typeof obj === 'object') {
-      const entries = Object.entries(obj)
-      let phoneMatch: string | null = null
-      let textMatch: string | null = null
-      let nameMatch: string | null = null
-
-      for (const [k, v] of entries) {
-        if (typeof v !== 'string') continue
-        const digits = v.replace(/\D/g, '')
-        const lowerK = k.toLowerCase()
-        if (!phoneMatch && digits.length >= 10 && /phone|from|waId|sender|number|mobile|to|destination/.test(lowerK)) {
-          phoneMatch = digits
-        }
-        if (!textMatch && v.length > 0 && /text|body|message|content|caption/.test(lowerK)) {
-          textMatch = v
-        }
-        if (!nameMatch && v.length > 0 && /name|user/.test(lowerK)) {
-          nameMatch = v
-        }
-      }
-
-      if (phoneMatch && textMatch) {
-        return { phone: phoneMatch, text: textMatch, fromName: nameMatch ?? 'User' }
-      }
-
-      for (const [k, v] of entries) {
-        if (typeof v === 'string' && v.startsWith('http')) mediaUrls.push(v)
-      }
-      for (const [k, v] of entries) {
-        if (k === 'password' || k === 'apiKey' || k === 'secret') continue
-        const r = walk(v, depth + 1)
-        if (r) return r
-      }
-    }
-    return null
-  }
-
-  const found = walk(body, 0)
-  if (!found) return null
-  return {
-    from: found.fromName,
-    waId: found.phone,
-    body: found.text,
-    mediaUrls,
-    timestamp: Date.now().toString(),
-  }
-}
-
-// Send a WhatsApp text message via AiSensy
-// Tries CleverTap endpoint (Bearer) → Campaign endpoint (apiKey body)
+// Send a WhatsApp message via AiSensy Project API (live chat reply)
 export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
-  const destination = msg.to.replace(/[^0-9]/g, '')
-  const payload = {
-    apiKey: API_KEY,
-    campaignName: 'bristova_reply',
-    destination,
-    userName: 'User',
-    source: AISENSY_PHONE,
-    media: {},
-    templateParams: [],
-    type: 'text',
-    text: msg.body,
+  const destination = msg.to.replace(/\D/g, '')
+
+  // Strategy 1: Project API with contactId (best — session reply, no template needed)
+  if (msg.contactId && PROJECT_API_KEY && PROJECT_ID) {
+    try {
+      const res = await fetch(`${PROJECT_API_BASE}/message/send`, {
+        method: 'POST',
+        headers: {
+          'X-AiSensy-Project-API-Pwd': PROJECT_API_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          project_id: PROJECT_ID,
+          contact_id: msg.contactId,
+          message: {
+            type: 'text',
+            text: msg.body,
+          },
+        }),
+      })
+      const resText = await res.text()
+      if (res.ok) {
+        console.log('Message sent via Project API')
+        return
+      }
+      console.log('Project API failed:', res.status, resText)
+    } catch (e) {
+      console.log('Project API error:', e)
+    }
   }
 
-  // Strategy 1: CleverTap endpoint with Bearer token
-  try {
-    const res = await fetch('https://backend.aisensy.com/clever-tap/t1/messages', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: destination,
-        type: 'text',
-        text: msg.body,
-      }),
-    })
-    if (res.ok) {
-      console.log('Message sent via CleverTap endpoint')
-      return
+  // Strategy 2: Campaign API with approved template (fallback)
+  if (CAMPAIGN_API_KEY) {
+    try {
+      const res = await fetch('https://backend.aisensy.com/campaign/t1/api/v2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apiKey: CAMPAIGN_API_KEY,
+          campaignName: 'brisvora_reply',
+          destination,
+          userName: 'User',
+          templateParams: [msg.body],
+          media: {},
+        }),
+      })
+      const resText = await res.text()
+      if (res.ok) {
+        console.log('Message sent via Campaign API')
+        return
+      }
+      console.error('Campaign API failed:', res.status, resText)
+    } catch (e) {
+      console.error('Campaign API error:', e)
     }
-    const errText = await res.text()
-    console.log('CleverTap endpoint failed:', res.status, errText)
-  } catch (e) {
-    console.log('CleverTap endpoint error:', e)
   }
 
-  // Strategy 2: Campaign endpoint
-  try {
-    const res2 = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-    if (res2.ok) {
-      console.log('Message sent via Campaign endpoint')
-      return
-    }
-    const errText2 = await res2.text()
-    console.error('AiSensy Send Error (campaign):', errText2)
-  } catch (e) {
-    console.error('AiSensy Campaign endpoint error:', e)
-  }
+  console.error('All send strategies failed for:', destination)
 }
 
-// Download media
+// Download media from URL or AiSensy media endpoint
 export async function downloadMedia(mediaIdOrUrl: string): Promise<Buffer> {
   if (mediaIdOrUrl.startsWith('http')) {
     const res = await fetch(mediaIdOrUrl)
-    const arrayBuffer = await res.arrayBuffer()
-    return Buffer.from(arrayBuffer)
+    if (!res.ok) throw new Error(`Failed to download media: ${res.status}`)
+    return Buffer.from(await res.arrayBuffer())
   }
-  throw new Error('AiSensy media download not fully configured. Awaiting payload format.')
+
+  if (!CAMPAIGN_API_KEY) throw new Error('AISENSY_API_KEY not set.')
+
+  const trimmed = mediaIdOrUrl.trim()
+  if (!trimmed) throw new Error('Empty media ID.')
+
+  const endpoints = [
+    `https://backend.aisensy.com/campaign/t1/api/v2/media/${encodeURIComponent(trimmed)}?apiKey=${CAMPAIGN_API_KEY}`,
+    `https://backend.aisensy.com/campaign/t1/api/v2/media?mediaId=${encodeURIComponent(trimmed)}`,
+  ]
+
+  let lastError: Error | null = null
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url)
+      if (res.ok) return Buffer.from(await res.arrayBuffer())
+      lastError = new Error(`Media download failed: ${res.status} for ${url}`)
+    } catch (e) {
+      lastError = e instanceof Error ? e : new Error(String(e))
+    }
+  }
+
+  throw lastError ?? new Error('Media download failed.')
 }

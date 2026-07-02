@@ -67,8 +67,10 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   await incrementViewCount(property.id).catch(err => console.error('Failed to increment view count', err))
 
 
-  const waLink = property.owner.phone
-    ? `https://wa.me/${property.owner.phone.replace(/[^0-9]/g, '')}?text=Hi, I'm interested in: ${property.title}`
+  const waLink = property.owner?.phone
+    ? `https://wa.me/${property.owner.phone.replace(/[^0-9]/g, '')}?text=Hi, I'm interested in: ${encodeURIComponent(property.title)}`
+    : (property as any).ownerPhone
+    ? `https://wa.me/${((property as any).ownerPhone as string).replace(/[^0-9]/g, '')}?text=Hi, I'm interested in: ${encodeURIComponent(property.title)}`
     : null
 
   const propertySchema = {
@@ -245,6 +247,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 property.bedrooms && { label: 'Bedrooms', value: property.bedrooms },
                 property.bathrooms && { label: 'Bathrooms', value: property.bathrooms },
                 property.areaSqft && { label: 'Area', value: `${property.areaSqft} sqft` },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ].filter(Boolean).map((spec: any, i: number, arr: any[]) => (
                 <div key={spec.label} style={{
                   padding: '20px 28px',
@@ -312,9 +315,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 Listed By
               </p>
               <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', color: 'var(--ink)', marginBottom: '4px' }}>
-                {property.owner.name ?? 'Broker'}
+                {property.owner?.name ?? 'Listed via WhatsApp'}
               </p>
-              {property.owner.email && (
+              {property.owner?.email && (
                 <p style={{ fontSize: '0.8rem', color: 'var(--ink-muted)' }}>{property.owner.email}</p>
               )}
 

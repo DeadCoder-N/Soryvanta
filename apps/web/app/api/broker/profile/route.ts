@@ -26,9 +26,12 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'WhatsApp number is required' }, { status: 400 })
   }
 
+  // Normalize phone — strip everything except digits
+  const normalizedPhone = phone.replace(/\D/g, '')
+
   // Check if phone is already taken by another user
   const existing = await prisma.user.findFirst({
-    where: { phone, NOT: { id: session.user.id } },
+    where: { phone: normalizedPhone, NOT: { id: session.user.id } },
   })
   if (existing) {
     return NextResponse.json({ error: 'That phone number is already registered to another account' }, { status: 409 })
@@ -36,7 +39,7 @@ export async function PUT(req: Request) {
 
   const updated = await prisma.user.update({
     where: { id: session.user.id },
-    data: { name, phone },
+    data: { name, phone: normalizedPhone },
     select: { id: true, name: true, email: true, phone: true },
   })
 

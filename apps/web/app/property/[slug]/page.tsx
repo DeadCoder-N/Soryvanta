@@ -90,7 +90,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
       availability: 'https://schema.org/InStock',
       seller: {
         '@type': 'Person',
-        name: property.owner.name ?? 'Broker',
+        name: property.owner?.name ?? 'Broker',
       },
     },
     address: {

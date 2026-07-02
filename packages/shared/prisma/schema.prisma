@@ -21,7 +21,6 @@ model User {
   whatsappMessages  WhatsappMessage[]
   sessions          Session[]
   accounts          Account[]
-  conversations     ConversationState[]
 }
 
 model Account {
@@ -82,12 +81,13 @@ model Property {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
-  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner     User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   images    Image[]
   leads     Lead[]
   analytics Analytics?
 
   @@index([ownerId])
+  @@index([ownerPhone])
   @@index([city])
   @@index([status])
 }
@@ -177,8 +177,6 @@ model ConversationState {
   state         String
   context       Json?
   lastMessageAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   }
 
   const generated = await generateListing({ rawMessage })
-  const property = await createListing(session.user.id, generated, imageUrls, rawMessage)
+  const property = await createListing('web', generated, imageUrls, rawMessage, session.user.id)
 
   return NextResponse.json(property, { status: 201 })
 }

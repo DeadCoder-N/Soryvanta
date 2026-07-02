@@ -4,6 +4,7 @@ const CAMPAIGN_API_KEY = process.env.AISENSY_API_KEY!
 const PROJECT_API_KEY = process.env.AISENSY_PROJECT_API_KEY!
 const PROJECT_ID = process.env.AISENSY_PROJECT_ID!
 const PROJECT_API_BASE = 'https://apis.aisensy.com/project-apis/v1'
+const PROJECT_API_BASE_V2 = 'https://apis.aisensy.com/project-apis/v2'
 
 function extractFromAiSensy(body: Record<string, any>): {
   phone: string
@@ -88,30 +89,36 @@ export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
 
   // Strategy 1: Project API with contactId (best — session reply, no template needed)
   if (msg.contactId && PROJECT_API_KEY && PROJECT_ID) {
-    try {
-      const res = await fetch(`${PROJECT_API_BASE}/message/send`, {
-        method: 'POST',
-        headers: {
-          'X-AiSensy-Project-API-Pwd': PROJECT_API_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          project_id: PROJECT_ID,
-          contact_id: msg.contactId,
-          message: {
-            type: 'text',
-            text: msg.body,
+    // Try multiple known endpoint variants
+    const endpoints = [
+      { base: PROJECT_API_BASE_V2, path: '/messages' },
+      { base: PROJECT_API_BASE, path: '/messages' },
+      { base: PROJECT_API_BASE, path: '/message/send' },
+    ]
+    for (const { base, path } of endpoints) {
+      try {
+        const res = await fetch(`${base}${path}`, {
+          method: 'POST',
+          headers: {
+            'X-AiSensy-Project-API-Pwd': PROJECT_API_KEY,
+            'Content-Type': 'application/json',
           },
-        }),
-      })
-      const resText = await res.text()
-      if (res.ok) {
-        console.log('Message sent via Project API')
-        return
+          body: JSON.stringify({
+            project_id: PROJECT_ID,
+            contact_id: msg.contactId,
+            type: 'text',
+            message: msg.body,
+          }),
+        })
+        const resText = await res.text()
+        console.log(`Project API [${base}${path}]:`, res.status, resText.slice(0, 200))
+        if (res.ok) {
+          console.log('Message sent via Project API')
+          return
+        }
+      } catch (e) {
+        console.log(`Project API error [${base}${path}]:`, e)
       }
-      console.log('Project API failed:', res.status, resText)
-    } catch (e) {
-      console.log('Project API error:', e)
     }
   }
 

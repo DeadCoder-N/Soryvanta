@@ -2,7 +2,6 @@ import type { NextAuthConfig } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './db'
-import './next-auth.d'
 
 export const authConfig: NextAuthConfig = {
   trustHost: process.env.NODE_ENV === 'production' 

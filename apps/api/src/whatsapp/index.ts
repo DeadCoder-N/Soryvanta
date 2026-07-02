@@ -19,11 +19,18 @@ function extractFromAiSensy(body: Record<string, any>): {
     const msg = body.data?.message ?? body.data
     if (!msg) return null
 
-    // Skip system-generated messages (Auto Closed, etc.)
-    if (msg.sender === 'SYSTEM') return null
+    // Skip non-user messages (system, bot, agent, outbound echoes)
+    if (msg.sender !== 'USER') return null
 
-    const phone = String(msg.phone_number ?? msg.from ?? msg.sender ?? '').replace(/\D/g, '')
+    // Skip outbound message echoes (ROOM_MESSAGE = message sent by the bot)
+    if (msg.message_type === 'ROOM_MESSAGE') return null
+
+    const phone = String(msg.phone_number ?? msg.from ?? '').replace(/\D/g, '')
     if (phone.length < 10) return null
+
+    // Skip if phone matches our own business number (outbound echo)
+    const ownNumber = process.env.AISENSY_PHONE_NUMBER?.replace(/\D/g, '') ?? ''
+    if (ownNumber && phone === ownNumber) return null
 
     const contactId = String(msg.contact_id ?? '')
 

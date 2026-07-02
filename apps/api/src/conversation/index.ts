@@ -64,7 +64,7 @@ export async function processConversationalMessage(
     }
 
     await setConversationState(userId, 'ACCUMULATING', { accumulatedText: message, imageUrls: context.imageUrls })
-    return "Got it. Send more details or photos. When you're done, send: done"
+    return "Noted. Keep going — add more details, photos, price, location, anything relevant. When you are done, send: done"
   }
 
   if (existing.state === 'ACCUMULATING') {
@@ -80,9 +80,9 @@ export async function processConversationalMessage(
     await setConversationState(userId, 'ACCUMULATING', { accumulatedText: updatedText, imageUrls: context.imageUrls })
 
     if (newImageUrls.length > 0) {
-      return `Got ${newImageUrls.length} photo${newImageUrls.length > 1 ? 's' : ''}. Send more details or photos. When done, send: done`
+      return `${newImageUrls.length} photo${newImageUrls.length > 1 ? 's' : ''} received. Add more or send details. When done, send: done`
     }
-    return 'Got it. Send more details or photos. When done, send: done'
+    return 'Received. Keep adding — price, location, size, photos. Send done when ready.'
   }
 
   if (existing.state === 'GENERATING') {

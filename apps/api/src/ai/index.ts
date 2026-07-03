@@ -34,7 +34,7 @@ export async function generateListing(input: ListingGenerationInput): Promise<Ge
     console.log('Claude input images:', imageUrls)
 
     const msg = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-5-sonnet-20240620',
       max_tokens: 2048,
       system: `You are an expert luxury real estate copywriter and data extractor. Your task is to extract information from messy, informal text messages from brokers and generate a highly polished, professional property listing.
 Output ONLY the requested JSON data using the provided tool.

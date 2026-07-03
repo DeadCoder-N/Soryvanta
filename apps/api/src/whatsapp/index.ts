@@ -80,7 +80,8 @@ function extractFromAiSensy(body: Record<string, any>): {
     if (typeof content === 'string') {
       text = content
     } else if (typeof content === 'object') {
-      text = String(content.text ?? content.body ?? content.caption ?? '')
+      const raw = content.text ?? content.body ?? content.caption ?? ''
+      text = raw && raw !== 'undefined' ? String(raw) : ''
     }
 
     const fromName = String(msg.userName ?? msg.user_name ?? msg.contact_name ?? 'User')

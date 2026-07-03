@@ -42,11 +42,13 @@ function extractFromAiSensy(body: Record<string, any>): {
       text = String(content.text ?? content.body ?? content.caption ?? '')
     }
 
-    if (!text) return null
-
     const fromName = String(msg.userName ?? msg.user_name ?? msg.contact_name ?? 'User')
 
     const mediaUrls: string[] = []
+    // AiSensy sends image URL directly in content.url
+    if (typeof content.url === 'string' && content.url.startsWith('http')) {
+      mediaUrls.push(content.url)
+    }
     if (Array.isArray(content.media)) {
       for (const m of content.media) {
         if (typeof m === 'string') mediaUrls.push(m)
@@ -61,6 +63,12 @@ function extractFromAiSensy(body: Record<string, any>): {
     if (Array.isArray(msg.media_urls)) {
       for (const u of msg.media_urls) mediaUrls.push(u)
     }
+
+    // Drop message only if no text AND no media
+    if (!text && mediaUrls.length === 0) return null
+
+    // If photo with no caption, use placeholder so conversation state is updated
+    if (!text) text = '[photo]'
 
     return { phone, text, fromName, contactId, mediaUrls }
   } catch (e) {

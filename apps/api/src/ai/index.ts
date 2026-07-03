@@ -7,6 +7,7 @@ const anthropic = new Anthropic({
 
 export async function generateListing(input: ListingGenerationInput): Promise<GeneratedListing> {
   const raw = input.rawMessage
+  const imageUrls = input.imageUrls ?? []
 
   if (!process.env.ANTHROPIC_API_KEY) {
     console.warn('ANTHROPIC_API_KEY not set. Falling back to mock generator.')
@@ -14,6 +15,21 @@ export async function generateListing(input: ListingGenerationInput): Promise<Ge
   }
 
   try {
+    // Build message content — text + images if available
+    const userContent: any[] = []
+
+    for (const url of imageUrls) {
+      userContent.push({
+        type: 'image',
+        source: { type: 'url', url },
+      })
+    }
+
+    userContent.push({
+      type: 'text',
+      text: raw || 'Please analyze the property images above and generate a listing.',
+    })
+
     const msg = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
@@ -21,7 +37,7 @@ export async function generateListing(input: ListingGenerationInput): Promise<Ge
 Output ONLY the requested JSON data using the provided tool.
 If some information is missing (like bedrooms, bathrooms, exact price, or area), make a highly educated guess based on the context, city, or standard real estate configurations.
 Keep the description elegant, highlighting luxury, comfort, and premium lifestyle. Use correct spelling and grammar regardless of the input.`,
-      messages: [{ role: 'user', content: raw }],
+      messages: [{ role: 'user', content: userContent }],
       tools: [{
         name: 'extract_property_details',
         description: 'Extract and format the property details into a structured listing.',

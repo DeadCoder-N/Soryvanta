@@ -98,7 +98,7 @@ export async function POST(req: Request) {
       }
 
       const rawMessage = accumulatedText || msg.body
-      const generated = await generateListing({ rawMessage })
+      const generated = await generateListing({ rawMessage, imageUrls })
 
       // createListing: ownerPhone always set, ownerId only if registered
       const property = await createListing(digits, generated, imageUrls, rawMessage, user?.id)

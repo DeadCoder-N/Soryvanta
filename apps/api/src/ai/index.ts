@@ -35,7 +35,7 @@ export async function generateListing(input: ListingGenerationInput): Promise<Ge
 
     const msg = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
+      max_tokens: 2048,
       system: `You are an expert luxury real estate copywriter and data extractor. Your task is to extract information from messy, informal text messages from brokers and generate a highly polished, professional property listing.
 Output ONLY the requested JSON data using the provided tool.
 If some information is missing (like bedrooms, bathrooms, exact price, or area), make a highly educated guess based on the context, city, or standard real estate configurations.

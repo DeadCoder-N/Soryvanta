@@ -80,7 +80,9 @@ Keep the description elegant, highlighting luxury, comfort, and premium lifestyl
     
     throw new Error('Claude did not return tool usage.')
   } catch (error) {
-    console.error('Anthropic API Error:', error)
+    console.error('Anthropic API Error:', JSON.stringify(error))
+    console.error('Anthropic API Error message:', (error as any)?.message)
+    console.error('Anthropic API Error status:', (error as any)?.status)
     console.warn('Falling back to mock generator.')
     return mockGenerateListing(input)
   }

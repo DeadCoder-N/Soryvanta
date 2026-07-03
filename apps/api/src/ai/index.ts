@@ -30,6 +30,9 @@ export async function generateListing(input: ListingGenerationInput): Promise<Ge
       text: raw || 'Please analyze the property images above and generate a listing.',
     })
 
+    console.log('Claude input text:', raw)
+    console.log('Claude input images:', imageUrls)
+
     const msg = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
@@ -64,6 +67,7 @@ Keep the description elegant, highlighting luxury, comfort, and premium lifestyl
     })
 
     const toolUse = msg.content.find(c => c.type === 'tool_use')
+    console.log('Claude raw output:', JSON.stringify(msg.content))
     if (toolUse && toolUse.type === 'tool_use') {
       const data = toolUse.input as any
       return {

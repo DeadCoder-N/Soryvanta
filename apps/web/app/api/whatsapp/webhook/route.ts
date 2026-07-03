@@ -76,6 +76,7 @@ export async function POST(req: Request) {
     )
 
     console.log('Flow result:', flowResult)
+    console.log('Media URLs in this message:', msg.mediaUrls)
 
     if (flowResult === 'GENERATING') {
       await sendMessage({ to: msg.waId, contactId: msg.contactId, body: 'Generating your listing with AI... Please wait a moment.' })
@@ -86,11 +87,14 @@ export async function POST(req: Request) {
       const accumulatedImageIds = context.imageUrls ?? []
       const allMediaIds = [...accumulatedImageIds, ...(msg.mediaUrls ?? [])]
 
+      console.log('All media to process:', allMediaIds)
       const imageUrls: string[] = []
       for (const mediaId of allMediaIds) {
         try {
+          console.log('Downloading media:', mediaId)
           const buffer = await downloadMedia(mediaId)
           const { url } = await uploadImage(buffer)
+          console.log('Uploaded to Cloudinary:', url)
           imageUrls.push(url)
         } catch (err) {
           console.error('Failed to process image:', err)

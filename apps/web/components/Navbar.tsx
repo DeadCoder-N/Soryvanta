@@ -2,135 +2,142 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
+import { useTheme } from 'next-themes'
 
 export default function Navbar() {
   const { data: session } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+  const { theme, setTheme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const isDark = !mounted || theme === 'dark'
 
   return (
     <header style={{
-      background: 'var(--warm-white)',
-      borderBottom: '2px solid var(--logo-gold)',
       position: 'sticky', top: 0, zIndex: 50,
-      transition: 'box-shadow 0.2s ease',
+      background: scrolled ? (isDark ? 'rgba(15,14,11,0.92)' : 'rgba(255,255,255,0.92)') : 'var(--surface-1)',
+      backdropFilter: scrolled ? 'blur(16px)' : 'none',
+      borderBottom: `1px solid ${scrolled ? 'var(--border-md)' : 'var(--border)'}`,
+      transition: 'background 0.3s, border-color 0.3s, backdrop-filter 0.3s',
     }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem', height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}
-          className="btn-press">
-          <Image src="/Brisvora.png" alt="Brisvora" width={68} height={68} style={{ objectFit: 'contain', display: 'block' }} />
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Image src="/Brisvora.png" alt="Brisvora" width={40} height={40} style={{ objectFit: 'contain' }} />
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
+            Brisvora
+          </span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-          <Link href="/"
-            className="nav-link"
-            style={{
-              fontSize: '0.75rem',
-              color: pathname === '/' ? 'var(--ink)' : 'var(--ink-soft)',
-              letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none',
-              fontWeight: pathname === '/' ? 500 : 400,
-              transition: 'color 0.2s',
-            }}>
+        <nav className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Link href="/" className="btn-ghost nav-link"
+            style={{ color: pathname === '/' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
             Properties
           </Link>
+
           {session?.user ? (
-            <Link href="/dashboard"
-              className="btn-press"
-              style={{
-                background: 'var(--logo-gold)', color: 'var(--warm-white)',
-                fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase',
-                padding: '10px 22px', textDecoration: 'none',
-              }}>
+            <Link href="/dashboard" className="btn-primary" style={{ padding: '9px 20px', fontSize: '0.78rem' }}>
               Dashboard
             </Link>
           ) : (
             <>
-              <Link href="/login"
-                className="nav-link"
-                style={{
-                  fontSize: '0.75rem',
-                  color: pathname === '/login' ? 'var(--ink)' : 'var(--ink-soft)',
-                  letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none',
-                  transition: 'color 0.2s',
-                }}>
+              <Link href="/login" className="btn-ghost"
+                style={{ color: pathname === '/login' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                 Sign In
               </Link>
-              <Link href="/register"
-                className="btn-press"
-                style={{
-                  background: 'var(--logo-gold)', color: 'var(--warm-white)',
-                  fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase',
-                  padding: '10px 22px', textDecoration: 'none',
-                }}>
-                List Property
+              <Link href="/register" className="btn-primary" style={{ padding: '9px 20px', fontSize: '0.78rem' }}>
+                Get Started
               </Link>
             </>
           )}
-        </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="nav-mobile"
-          onClick={() => setMenuOpen(o => !o)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'none' }}
-          aria-label="Toggle menu"
-        >
-          <div style={{ width: '22px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <span style={{
-              display: 'block', height: '2px', background: 'var(--ink)',
-              transition: 'transform 0.25s ease, opacity 0.25s ease',
-              transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none',
-            }} />
-            <span style={{
-              display: 'block', height: '2px', background: 'var(--ink)',
-              transition: 'transform 0.25s ease, opacity 0.25s ease',
-              transform: menuOpen ? 'rotate(-45deg)' : 'none',
-            }} />
-            <span style={{
-              display: 'block', height: '2px', background: 'var(--ink)',
-              transition: 'opacity 0.25s ease',
-              opacity: menuOpen ? 0 : 1,
-            }} />
-          </div>
-        </button>
+          {/* Theme toggle */}
+          <button
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            className="theme-toggle"
+            aria-label="Toggle theme"
+          >
+            {isDark ? '☀' : '☾'}
+          </button>
+        </nav>
+
+        {/* Mobile hamburger + theme toggle */}
+        <div className="nav-mobile" style={{ display: 'none', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            className="theme-toggle"
+            aria-label="Toggle theme"
+          >
+            {isDark ? '☀' : '☾'}
+          </button>
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--text-primary)' }}
+            aria-label="Toggle menu"
+          >
+            <div style={{ width: '20px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {[0, 1, 2].map(i => (
+                <span key={i} style={{
+                  display: 'block', height: '2px',
+                  background: 'var(--text-primary)',
+                  borderRadius: '2px',
+                  transition: 'transform 0.25s ease, opacity 0.25s ease',
+                  transform: menuOpen
+                    ? i === 0 ? 'rotate(45deg) translate(4px, 4px)'
+                    : i === 2 ? 'rotate(-45deg) translate(4px, -4px)'
+                    : 'none'
+                    : 'none',
+                  opacity: menuOpen && i === 1 ? 0 : 1,
+                }} />
+              ))}
+            </div>
+          </button>
+        </div>
       </div>
 
-      {/* Mobile dropdown — animated */}
-      <div
-        className="nav-mobile"
-        style={{
-          background: 'var(--warm-white)',
-          borderTop: '1px solid var(--linen-dk)',
-          overflow: 'hidden',
-          maxHeight: menuOpen ? '320px' : '0',
-          opacity: menuOpen ? 1 : 0,
-          transition: 'max-height 0.32s cubic-bezier(0.22,1,0.36,1), opacity 0.25s ease',
-          display: 'flex', flexDirection: 'column',
-        }}
-      >
-        <div style={{ padding: '20px 1.5rem', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Link href="/" onClick={() => setMenuOpen(false)}
-            style={{ fontSize: '0.8rem', color: pathname === '/' ? 'var(--ink)' : 'var(--ink-soft)', letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', fontWeight: pathname === '/' ? 500 : 400 }}>
+      {/* Mobile menu */}
+      <div className="nav-mobile" style={{
+        overflow: 'hidden',
+        maxHeight: menuOpen ? '280px' : '0',
+        opacity: menuOpen ? 1 : 0,
+        transition: 'max-height 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.25s ease',
+        display: 'flex', flexDirection: 'column',
+        borderTop: menuOpen ? '1px solid var(--border)' : 'none',
+        background: 'var(--surface-1)',
+      }}>
+        <div style={{ padding: '16px 1.5rem 20px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <Link href="/" onClick={() => setMenuOpen(false)} className="btn-ghost"
+            style={{ justifyContent: 'flex-start', color: pathname === '/' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
             Properties
           </Link>
           {session?.user ? (
-            <Link href="/dashboard" onClick={() => setMenuOpen(false)}
-              style={{ fontSize: '0.8rem', color: 'var(--logo-gold)', letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
+            <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="btn-ghost"
+              style={{ justifyContent: 'flex-start', color: 'var(--gold)' }}>
               Dashboard
             </Link>
           ) : (
             <>
-              <Link href="/login" onClick={() => setMenuOpen(false)}
-                style={{ fontSize: '0.8rem', color: 'var(--ink-soft)', letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              <Link href="/login" onClick={() => setMenuOpen(false)} className="btn-ghost"
+                style={{ justifyContent: 'flex-start' }}>
                 Sign In
               </Link>
               <Link href="/register" onClick={() => setMenuOpen(false)}
-                style={{ fontSize: '0.8rem', color: 'var(--logo-gold)', letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
-                List Property
+                className="btn-primary"
+                style={{ marginTop: '8px', justifyContent: 'center' }}>
+                Get Started
               </Link>
             </>
           )}

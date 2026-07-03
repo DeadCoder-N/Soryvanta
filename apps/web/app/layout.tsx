@@ -111,7 +111,7 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${dmSans.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"

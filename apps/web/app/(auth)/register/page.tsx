@@ -5,16 +5,6 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  border: '1px solid var(--linen-dk)',
-  background: 'var(--linen)',
-  color: 'var(--ink)',
-  padding: '13px 16px',
-  fontSize: '0.875rem',
-  transition: 'border-color 0.2s',
-}
-
 export default function RegisterPage() {
   const router = useRouter()
   const [error, setError] = useState('')
@@ -22,19 +12,13 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setError('')
-    setLoading(true)
+    setError(''); setLoading(true)
     const form = new FormData(e.currentTarget)
     const phone = (form.get('phone') as string).replace(/[^0-9+]/g, '')
     const res = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: form.get('name'),
-        email: form.get('email'),
-        password: form.get('password'),
-        phone,
-      }),
+      body: JSON.stringify({ name: form.get('name'), email: form.get('email'), password: form.get('password'), phone }),
     })
     if (!res.ok) {
       const data = await res.json()
@@ -42,85 +26,66 @@ export default function RegisterPage() {
       setLoading(false)
       return
     }
-    await signIn('credentials', {
-      email: form.get('email'),
-      password: form.get('password'),
-      redirect: false,
-    })
+    await signIn('credentials', { email: form.get('email'), password: form.get('password'), redirect: false })
     router.push('/dashboard')
   }
 
   return (
-    <>
-      <p style={{ fontSize: '0.62rem', color: 'var(--mauve)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: '20px' }}>
-        Get Started
-      </p>
-      <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.25rem', color: 'var(--ink)', fontWeight: 400, marginBottom: '8px' }}>
-        Create account
-      </h1>
-      <p style={{ fontSize: '0.85rem', color: 'var(--ink-muted)', marginBottom: '40px' }}>
-        Start listing properties in minutes
-      </p>
+    <div className="animate-fade-up">
+      <div style={{ marginBottom: '32px' }}>
+        <span className="badge badge-gold" style={{ marginBottom: '16px', display: 'inline-flex' }}>Free to start</span>
+        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: 'var(--text-primary)', fontWeight: 400, marginBottom: '8px' }}>
+          Create account
+        </h1>
+        <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Start listing properties in minutes</p>
+      </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {[
+          { name: 'name', label: 'Full Name', type: 'text', placeholder: 'Rahul Sharma', required: true },
+          { name: 'email', label: 'Email', type: 'email', placeholder: 'you@example.com', required: true },
+        ].map(f => (
+          <div key={f.name}>
+            <label style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+              {f.label}
+            </label>
+            <input name={f.name} type={f.type} required={f.required} placeholder={f.placeholder} className="input-modern" />
+          </div>
+        ))}
+
         <div>
-          <label style={{ fontSize: '0.68rem', color: 'var(--ink-soft)', letterSpacing: '0.14em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
-            Full Name
-          </label>
-          <input name="name" type="text" required style={inputStyle}
-            onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-            onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
-        </div>
-        <div>
-          <label style={{ fontSize: '0.68rem', color: 'var(--ink-soft)', letterSpacing: '0.14em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
-            Email
-          </label>
-          <input name="email" type="email" required style={inputStyle}
-            onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-            onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
-        </div>
-        <div>
-          <label style={{ fontSize: '0.68rem', color: 'var(--ink-soft)', letterSpacing: '0.14em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+          <label style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
             WhatsApp Number
           </label>
-          <input name="phone" type="tel" required placeholder="919876543210" style={inputStyle}
-            onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-            onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
-          <p style={{ fontSize: '0.68rem', color: 'var(--ink-muted)', marginTop: '6px' }}>
+          <input name="phone" type="tel" required placeholder="919876543210" className="input-modern" />
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '6px' }}>
             With country code, no spaces — e.g. 919876543210
           </p>
         </div>
+
         <div>
-          <label style={{ fontSize: '0.68rem', color: 'var(--ink-soft)', letterSpacing: '0.14em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+          <label style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
             Password
           </label>
-          <input name="password" type="password" required minLength={8} style={inputStyle}
-            onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-            onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+          <input name="password" type="password" required minLength={8} placeholder="Min 8 characters" className="input-modern" />
         </div>
 
         {error && (
-          <p style={{ fontSize: '0.8rem', color: 'var(--gold)', background: 'rgba(184,134,11,0.08)', padding: '10px 14px' }}>
-            {error}
-          </p>
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 'var(--radius-md)', padding: '12px 14px' }}>
+            <p style={{ fontSize: '0.82rem', color: '#f87171' }}>{error}</p>
+          </div>
         )}
 
-        <button type="submit" disabled={loading} style={{
-          background: 'var(--ink)', color: 'var(--warm-white)',
-          padding: '14px', fontSize: '0.72rem', letterSpacing: '0.16em',
-          textTransform: 'uppercase', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-          opacity: loading ? 0.6 : 1, marginTop: '4px',
-        }}>
+        <button type="submit" disabled={loading} className="btn-primary"
+          style={{ padding: '14px', fontSize: '0.85rem', marginTop: '4px', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
           {loading ? 'Creating account...' : 'Create Account'}
         </button>
       </form>
 
-      <p style={{ fontSize: '0.8rem', color: 'var(--ink-muted)', marginTop: '28px', textAlign: 'center' }}>
+      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '24px', textAlign: 'center' }}>
         Already have an account?{' '}
-        <Link href="/login" style={{ color: 'var(--ink)', borderBottom: '1px solid var(--ink)', paddingBottom: '1px', textDecoration: 'none' }}>
-          Sign in
-        </Link>
+        <Link href="/login" style={{ color: 'var(--gold)', textDecoration: 'none' }}>Sign in</Link>
       </p>
-    </>
+    </div>
   )
 }

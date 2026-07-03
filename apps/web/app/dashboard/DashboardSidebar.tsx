@@ -7,75 +7,60 @@ import { useState } from 'react'
 import SignOutButton from './SignOutButton'
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: '▦' },
-  { href: '/dashboard/listings/new', label: 'New Listing', icon: '+' },
-  { href: '/dashboard/leads', label: 'Leads', icon: '◎' },
-  { href: '/dashboard/profile', label: 'Profile', icon: '⚙' },
+  { href: '/dashboard', label: 'Overview', icon: '⊞', exact: true },
+  { href: '/dashboard/listings/new', label: 'New Listing', icon: '+', exact: false },
+  { href: '/dashboard/leads', label: 'Leads', icon: '◎', exact: false },
+  { href: '/dashboard/profile', label: 'Profile', icon: '⚙', exact: false },
 ]
 
 export default function DashboardSidebar({ email, phone }: { email?: string | null; phone?: string | null }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  const sidebarContent = (
+  const sidebar = (
     <aside style={{
-      width: '220px', flexShrink: 0,
-      background: 'var(--warm-white)',
-      borderRight: '1px solid var(--linen-dk)',
+      width: '240px', flexShrink: 0,
+      background: 'var(--surface-1)',
+      borderRight: '1px solid var(--border)',
       display: 'flex', flexDirection: 'column',
-      height: '100vh',
-      overflowY: 'auto',
+      height: '100vh', overflowY: 'auto',
     }}>
-      {/* Logo */}
-      <div style={{ padding: '16px 20px', borderBottom: '3px solid var(--logo-gold)' }}>
-        <Link href="/" style={{ textDecoration: 'none', display: 'block' }} className="btn-press">
-          <Image src="/Brisvora.png" alt="Brisvora" width={72} height={72} style={{ objectFit: 'contain', display: 'block' }} />
+      {/* Logo + user */}
+      <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid var(--border)' }}>
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+          <Image src="/Brisvora.png" alt="Brisvora" width={32} height={32} style={{ objectFit: 'contain' }} />
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1rem', color: 'var(--text-primary)' }}>Brisvora</span>
         </Link>
-        <p style={{ fontSize: '0.68rem', color: 'var(--ink-muted)', marginTop: '4px' }} className="truncate">
-          {email}
-        </p>
-        {phone ? (
-          <p style={{ fontSize: '0.65rem', color: 'var(--logo-green)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span>✓</span> WhatsApp linked
-          </p>
-        ) : (
-          <Link href="/dashboard/profile" style={{ textDecoration: 'none' }}>
-            <p style={{ fontSize: '0.65rem', color: 'var(--gold)', marginTop: '2px', transition: 'opacity 0.2s' }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
-              onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
-              ⚠ No WhatsApp — add now
-            </p>
-          </Link>
-        )}
+
+        {/* User info */}
+        <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 12px' }}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }} className="truncate">{email}</p>
+          {phone ? (
+            <span className="badge badge-green" style={{ fontSize: '0.62rem' }}>
+              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80' }} />
+              WhatsApp linked
+            </span>
+          ) : (
+            <Link href="/dashboard/profile" style={{ textDecoration: 'none' }}>
+              <span className="badge badge-gold" style={{ fontSize: '0.62rem', cursor: 'pointer' }}>
+                ⚠ Link WhatsApp
+              </span>
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '20px 12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '8px 10px 4px' }}>
+          Menu
+        </p>
         {navItems.map(item => {
-          const isActive = item.href === '/dashboard'
-            ? pathname === '/dashboard'
-            : pathname.startsWith(item.href)
+          const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href)
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                padding: '10px 12px', textDecoration: 'none',
-                fontSize: '0.8rem', letterSpacing: '0.04em',
-                transition: 'background 0.18s ease, color 0.18s ease, border-color 0.18s ease',
-                background: isActive ? 'var(--linen)' : 'transparent',
-                color: isActive ? 'var(--ink)' : 'var(--ink-soft)',
-                borderLeft: isActive ? '2px solid var(--logo-gold)' : '2px solid transparent',
-                borderRadius: '0 4px 4px 0',
-              }}
-            >
-              <span style={{
-                fontSize: '0.75rem',
-                color: isActive ? 'var(--logo-gold)' : 'var(--logo-green)',
-                transition: 'color 0.18s ease',
-              }}>{item.icon}</span>
+            <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
+              className={`sidebar-item${isActive ? ' active' : ''}`}>
+              <span style={{ fontSize: '0.85rem', width: '18px', textAlign: 'center' }}>{item.icon}</span>
               {item.label}
             </Link>
           )
@@ -83,7 +68,7 @@ export default function DashboardSidebar({ email, phone }: { email?: string | nu
       </nav>
 
       {/* Sign out */}
-      <div style={{ padding: '16px 12px', borderTop: '1px solid var(--linen-dk)' }}>
+      <div style={{ padding: '12px 10px 16px', borderTop: '1px solid var(--border)' }}>
         <SignOutButton />
       </div>
     </aside>
@@ -91,63 +76,49 @@ export default function DashboardSidebar({ email, phone }: { email?: string | nu
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <div className="dashboard-sidebar" style={{ display: 'flex' }}>
-        {sidebarContent}
-      </div>
+      <div className="dashboard-sidebar" style={{ display: 'flex' }}>{sidebar}</div>
 
       {/* Mobile top bar */}
       <div className="dashboard-mobile-bar" style={{
-        display: 'none',
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: 'var(--warm-white)', borderBottom: '2px solid var(--logo-gold)',
-        padding: '0 1rem', height: '56px',
-        alignItems: 'center', justifyContent: 'space-between',
+        display: 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        background: 'var(--surface-1)', borderBottom: '1px solid var(--border)',
+        padding: '0 1rem', height: '56px', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          <Image src="/Brisvora.png" alt="Brisvora" width={44} height={44} style={{ objectFit: 'contain' }} />
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Image src="/Brisvora.png" alt="Brisvora" width={32} height={32} style={{ objectFit: 'contain' }} />
         </Link>
-        <button
-          onClick={() => setOpen(o => !o)}
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: '8px', color: 'var(--ink)',
-            transition: 'opacity 0.2s',
-          }}
-          aria-label="Toggle menu"
-        >
-          <div style={{ width: '22px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <span style={{ display: 'block', height: '2px', background: 'var(--ink)', transition: 'transform 0.25s ease', transform: open ? 'rotate(45deg) translate(5px,5px)' : 'none' }} />
-            <span style={{ display: 'block', height: '2px', background: 'var(--ink)', transition: 'transform 0.25s ease', transform: open ? 'rotate(-45deg)' : 'none' }} />
-            <span style={{ display: 'block', height: '2px', background: 'var(--ink)', transition: 'opacity 0.25s ease', opacity: open ? 0 : 1 }} />
+        <button onClick={() => setOpen(o => !o)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--text-primary)' }}
+          aria-label="Toggle menu">
+          <div style={{ width: '20px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {[0, 1, 2].map(i => (
+              <span key={i} style={{
+                display: 'block', height: '2px', background: 'var(--text-primary)', borderRadius: '2px',
+                transition: 'transform 0.25s, opacity 0.25s',
+                transform: open ? (i === 0 ? 'rotate(45deg) translate(4px,4px)' : i === 2 ? 'rotate(-45deg) translate(4px,-4px)' : 'none') : 'none',
+                opacity: open && i === 1 ? 0 : 1,
+              }} />
+            ))}
           </div>
         </button>
       </div>
 
-      {/* Mobile overlay */}
-      <div
-        style={{
-          position: 'fixed', inset: 0, zIndex: 99,
-          background: 'rgba(0,0,0,0.4)',
-          opacity: open ? 1 : 0,
-          pointerEvents: open ? 'auto' : 'none',
-          transition: 'opacity 0.25s ease',
-        }}
-        onClick={() => setOpen(false)}
-      />
+      {/* Overlay */}
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 99,
+        background: 'rgba(0,0,0,0.6)',
+        opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
+        transition: 'opacity 0.25s',
+      }} onClick={() => setOpen(false)} />
 
       {/* Mobile drawer */}
-      <div
-        className="dashboard-mobile-bar"
-        style={{
-          display: 'none',
-          position: 'fixed', top: 0, left: 0, bottom: 0,
-          width: '260px', zIndex: 100,
-          transform: open ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'transform 0.28s cubic-bezier(0.22,1,0.36,1)',
-        }}
-      >
-        {sidebarContent}
+      <div className="dashboard-mobile-bar" style={{
+        display: 'none', position: 'fixed', top: 0, left: 0, bottom: 0,
+        width: '260px', zIndex: 100,
+        transform: open ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.28s cubic-bezier(0.16,1,0.3,1)',
+      }}>
+        {sidebar}
       </div>
     </>
   )

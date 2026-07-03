@@ -13,27 +13,68 @@ function extractFromAiSensy(body: Record<string, any>): {
   mediaUrls: string[]
 } | null {
   try {
+    // --- WhatsApp Cloud API format (object: whatsapp_business_account) ---
+    if (body.object === 'whatsapp_business_account') {
+      const changes = body.entry?.[0]?.changes?.[0]?.value
+      if (!changes) return null
+
+      // Skip status updates (sent/delivered/read)
+      if (changes.statuses && !changes.messages) return null
+
+      const waMsg = changes.messages?.[0]
+      if (!waMsg) return null
+
+      // Only process inbound user messages
+      if (waMsg.from === changes.metadata?.phone_number_id) return null
+
+      const phone = String(waMsg.from ?? '').replace(/\D/g, '')
+      if (phone.length < 10) return null
+
+      const ownNumber = process.env.AISENSY_PHONE_NUMBER?.replace(/\D/g, '') ?? ''
+      if (ownNumber && phone === ownNumber) return null
+
+      const contactId = changes.contacts?.[0]?.wa_id ?? phone
+      const fromName = changes.contacts?.[0]?.profile?.name ?? 'User'
+
+      let text = ''
+      const mediaUrls: string[] = []
+
+      if (waMsg.type === 'text') {
+        text = waMsg.text?.body ?? ''
+      } else if (waMsg.type === 'image') {
+        text = waMsg.image?.caption ?? ''
+        if (waMsg.image?.id) mediaUrls.push(waMsg.image.id)
+        if (waMsg.image?.url) mediaUrls.push(waMsg.image.url)
+      } else if (waMsg.type === 'video') {
+        text = waMsg.video?.caption ?? ''
+        if (waMsg.video?.id) mediaUrls.push(waMsg.video.id)
+      } else if (waMsg.type === 'document') {
+        text = waMsg.document?.caption ?? waMsg.document?.filename ?? ''
+      }
+
+      if (!text && mediaUrls.length === 0) return null
+      if (!text) text = '[photo]'
+
+      return { phone, text, fromName, contactId, mediaUrls }
+    }
+
+    // --- AiSensy Project API format (topic: message.created) ---
     const topic = body.topic ?? body.event ?? body.data?.topic
     if (topic !== 'message.created') return null
 
     const msg = body.data?.message ?? body.data
     if (!msg) return null
 
-    // Skip non-user messages (system, bot, agent, outbound echoes)
     if (msg.sender !== 'USER') return null
-
-    // Skip outbound message echoes (ROOM_MESSAGE = message sent by the bot)
     if (msg.message_type === 'ROOM_MESSAGE') return null
 
     const phone = String(msg.phone_number ?? msg.from ?? '').replace(/\D/g, '')
     if (phone.length < 10) return null
 
-    // Skip if phone matches our own business number (outbound echo)
     const ownNumber = process.env.AISENSY_PHONE_NUMBER?.replace(/\D/g, '') ?? ''
     if (ownNumber && phone === ownNumber) return null
 
     const contactId = String(msg.contact_id ?? '')
-
     const content = msg.message_content ?? msg.content ?? {}
     let text = ''
     if (typeof content === 'string') {
@@ -45,10 +86,7 @@ function extractFromAiSensy(body: Record<string, any>): {
     const fromName = String(msg.userName ?? msg.user_name ?? msg.contact_name ?? 'User')
 
     const mediaUrls: string[] = []
-    // AiSensy sends image URL directly in content.url
-    if (typeof content.url === 'string' && content.url.startsWith('http')) {
-      mediaUrls.push(content.url)
-    }
+    if (typeof content.url === 'string' && content.url.startsWith('http')) mediaUrls.push(content.url)
     if (Array.isArray(content.media)) {
       for (const m of content.media) {
         if (typeof m === 'string') mediaUrls.push(m)
@@ -56,18 +94,11 @@ function extractFromAiSensy(body: Record<string, any>): {
         else if (m?.id) mediaUrls.push(m.id)
       }
     }
-    if (typeof content.media === 'string' && content.media.startsWith('http')) {
-      mediaUrls.push(content.media)
-    }
+    if (typeof content.media === 'string' && content.media.startsWith('http')) mediaUrls.push(content.media)
     if (msg.media_url) mediaUrls.push(msg.media_url)
-    if (Array.isArray(msg.media_urls)) {
-      for (const u of msg.media_urls) mediaUrls.push(u)
-    }
+    if (Array.isArray(msg.media_urls)) for (const u of msg.media_urls) mediaUrls.push(u)
 
-    // Drop message only if no text AND no media
     if (!text && mediaUrls.length === 0) return null
-
-    // If photo with no caption, use placeholder so conversation state is updated
     if (!text) text = '[photo]'
 
     return { phone, text, fromName, contactId, mediaUrls }

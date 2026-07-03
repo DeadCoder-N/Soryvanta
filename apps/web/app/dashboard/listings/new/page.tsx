@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export default function NewListingPage() {
   const router = useRouter()
@@ -9,9 +10,10 @@ export default function NewListingPage() {
   const [error, setError] = useState('')
   const [imageUrls, setImageUrls] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? [])
+  const uploadFiles = useCallback(async (files: File[]) => {
     if (!files.length) return
     setUploading(true)
     const urls: string[] = []
@@ -26,6 +28,21 @@ export default function NewListingPage() {
     }
     setImageUrls(prev => [...prev, ...urls])
     setUploading(false)
+  }, [])
+
+  function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
+    uploadFiles(Array.from(e.target.files ?? []))
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOver(false)
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'))
+    uploadFiles(files)
+  }
+
+  function removeImage(url: string) {
+    setImageUrls(prev => prev.filter(u => u !== url))
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -49,7 +66,7 @@ export default function NewListingPage() {
   }
 
   return (
-    <div style={{ maxWidth: '640px' }}>
+    <div style={{ maxWidth: '640px' }} className="animate-fade-up">
       <p style={{ fontSize: '0.62rem', color: 'var(--mauve)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: '12px' }}>
         New Listing
       </p>
@@ -96,44 +113,99 @@ export default function NewListingPage() {
           <label style={{ fontSize: '0.68rem', color: 'var(--ink-soft)', letterSpacing: '0.14em', textTransform: 'uppercase', display: 'block', marginBottom: '10px' }}>
             Property Images
           </label>
-          <div style={{ border: '1px dashed var(--linen-dk)', padding: '28px', textAlign: 'center', background: 'var(--warm-white)' }}>
+
+          {/* Drop zone */}
+          <div
+            className={`upload-zone${dragOver ? ' drag-over' : ''}`}
+            style={{
+              border: '2px dashed var(--linen-dk)',
+              padding: '36px 24px',
+              textAlign: 'center',
+              background: 'var(--warm-white)',
+              cursor: 'pointer',
+            }}
+            onClick={() => inputRef.current?.click()}
+            onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+          >
             <input
+              ref={inputRef}
               type="file"
               accept="image/*"
               multiple
-              onChange={handleImageUpload}
+              onChange={handleFileInput}
               style={{ display: 'none' }}
-              id="image-upload"
             />
-            <label htmlFor="image-upload" style={{ cursor: 'pointer' }}>
-              <p style={{ fontSize: '0.8rem', color: 'var(--ink-soft)', marginBottom: '6px' }}>Click to upload images</p>
-              <p style={{ fontSize: '0.72rem', color: 'var(--ink-muted)' }}>JPEG, PNG supported</p>
-            </label>
+            <div style={{ fontSize: '1.8rem', marginBottom: '10px', opacity: 0.35 }}>⬆</div>
+            {uploading ? (
+              <p style={{ fontSize: '0.82rem', color: 'var(--logo-gold)' }}>Uploading...</p>
+            ) : (
+              <>
+                <p style={{ fontSize: '0.82rem', color: 'var(--ink-soft)', marginBottom: '4px' }}>
+                  Drop images here or <span style={{ color: 'var(--logo-gold)', borderBottom: '1px solid var(--logo-gold)' }}>browse</span>
+                </p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--ink-muted)' }}>JPEG, PNG — multiple files supported</p>
+              </>
+            )}
           </div>
-          {uploading && (
-            <p style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', marginTop: '8px' }}>Uploading...</p>
+
+          {/* Image preview grid */}
+          {imageUrls.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(96px, 1fr))', gap: '8px', marginTop: '12px' }}>
+              {imageUrls.map((url, i) => (
+                <div key={url}
+                  className="animate-scale-in"
+                  style={{
+                    position: 'relative', paddingTop: '75%', background: 'var(--linen-md)',
+                    animationDelay: `${i * 0.05}s`,
+                  }}>
+                  <Image src={url} alt={`Upload ${i + 1}`} fill style={{ objectFit: 'cover' }} />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(url)}
+                    style={{
+                      position: 'absolute', top: '4px', right: '4px',
+                      background: 'rgba(0,0,0,0.65)', border: 'none', color: '#fff',
+                      width: '22px', height: '22px', cursor: 'pointer', fontSize: '0.7rem',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.85)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.65)')}
+                    aria-label="Remove image"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
+
           {imageUrls.length > 0 && (
             <p style={{ fontSize: '0.75rem', color: 'var(--logo-green)', marginTop: '8px' }}>
-              ✓ {imageUrls.length} image{imageUrls.length > 1 ? 's' : ''} uploaded
+              ✓ {imageUrls.length} image{imageUrls.length > 1 ? 's' : ''} ready
             </p>
           )}
         </div>
 
         {error && (
-          <p style={{ fontSize: '0.8rem', color: 'var(--gold)', background: 'rgba(184,134,11,0.08)', padding: '12px 16px' }}>
+          <p className="animate-fade-in" style={{ fontSize: '0.8rem', color: 'var(--gold)', background: 'rgba(184,134,11,0.08)', padding: '12px 16px', borderLeft: '3px solid var(--gold)' }}>
             {error}
           </p>
         )}
 
-        <button type="submit" disabled={loading || uploading} style={{
-          background: loading || uploading ? 'var(--linen-dk)' : 'var(--ink)',
-          color: 'var(--warm-white)',
-          padding: '16px', fontSize: '0.72rem', letterSpacing: '0.16em',
-          textTransform: 'uppercase', border: 'none',
-          cursor: loading || uploading ? 'not-allowed' : 'pointer',
-        }}>
-          {loading ? 'Generating with AI...' : 'Generate Listing'}
+        <button type="submit" disabled={loading || uploading}
+          className="btn-press"
+          style={{
+            background: loading || uploading ? 'var(--linen-dk)' : 'var(--ink)',
+            color: 'var(--warm-white)',
+            padding: '16px', fontSize: '0.72rem', letterSpacing: '0.16em',
+            textTransform: 'uppercase', border: 'none',
+            cursor: loading || uploading ? 'not-allowed' : 'pointer',
+            transition: 'background 0.2s',
+          }}>
+          {loading ? 'Generating with AI...' : uploading ? 'Uploading images...' : 'Generate Listing'}
         </button>
       </form>
     </div>

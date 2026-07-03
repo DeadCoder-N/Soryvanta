@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, DM_Sans } from 'next/font/google'
-import { SessionProvider } from 'next-auth/react'
+import Providers from '@/components/Providers'
 import './globals.css'
 
 const playfair = Playfair_Display({
@@ -123,7 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body suppressHydrationWarning>
-        <SessionProvider>{children}</SessionProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

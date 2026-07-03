@@ -92,8 +92,9 @@ export async function POST(req: Request) {
       for (const mediaId of allMediaIds) {
         try {
           console.log('Downloading media:', mediaId)
+          const isVideo = mediaId.includes('/video/')
           const buffer = await downloadMedia(mediaId)
-          const { url } = await uploadImage(buffer)
+          const { url } = await uploadImage(buffer, 'brisvora/properties', isVideo ? 'video' : 'image')
           console.log('Uploaded to Cloudinary:', url)
           imageUrls.push(url)
         } catch (err) {

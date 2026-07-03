@@ -25,6 +25,7 @@ export default function ProfilePage() {
     fetch('/api/broker/profile')
       .then(r => r.json())
       .then(data => {
+        if (!data || data.error) { setFetching(false); return }
         setName(data.name ?? '')
         setEmail(data.email ?? '')
         setPhone(data.phone ?? '')

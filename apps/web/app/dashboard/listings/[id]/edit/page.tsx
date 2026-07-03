@@ -10,11 +10,10 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
   const { id } = await params
   const listing = await prisma.property.findUnique({
     where: { id, ownerId: session.user.id },
+    include: { images: { orderBy: { order: 'asc' }, select: { id: true, url: true } } },
   })
 
   if (!listing) notFound()
 
-  // Convert nullable fields to undefined to satisfy React props if necessary, 
-  // but it's easier to just pass the plain object and handle nulls in the form.
   return <EditListingForm listing={listing} />
 }

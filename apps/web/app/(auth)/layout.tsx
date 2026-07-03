@@ -2,9 +2,9 @@ import Image from 'next/image'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+    <div className="auth-grid" style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
       {/* Left — brand panel */}
-      <div style={{
+      <div className="auth-brand" style={{
         background: 'var(--bark)',
         padding: '56px',
         display: 'flex',
@@ -45,9 +45,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '56px',
+        padding: '48px 1.5rem',
       }}>
         <div style={{ width: '100%', maxWidth: '380px' }}>
+          {/* Mobile logo (hidden on desktop via auth-brand visibility) */}
+          <div className="auth-mobile-logo" style={{ marginBottom: '32px', display: 'none' }}>
+            <Image src="/Brisvora.png" alt="Brisvora" width={60} height={60} style={{ objectFit: 'contain' }} />
+          </div>
           {children}
         </div>
       </div>

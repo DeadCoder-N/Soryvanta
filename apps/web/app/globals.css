@@ -1,5 +1,149 @@
 @import "tailwindcss";
 
+/* ── Keyframes ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; }
+  to   { opacity: 1; max-height: 400px; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes drawerSlide {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Animation utilities ── */
+.animate-fade-up   { animation: fadeInUp 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+.animate-fade-in   { animation: fadeIn 0.4s ease both; }
+.animate-scale-in  { animation: scaleIn 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+.animate-slide-up  { animation: slideUp 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+.animate-count-up  { animation: countUp 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-150 { animation-delay: 0.15s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-250 { animation-delay: 0.25s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* ── Skeleton loader ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--linen-md) 25%, var(--linen) 50%, var(--linen-md) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 2px;
+}
+
+/* ── Card hover ── */
+.card-lift {
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(26,21,8,0.10);
+}
+
+/* ── Button press ── */
+.btn-press {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.btn-press:hover  { opacity: 0.88; }
+.btn-press:active { transform: scale(0.97); }
+
+/* ── Image crossfade ── */
+.img-fade {
+  transition: opacity 0.35s ease;
+}
+
+/* ── Drawer ── */
+.drawer-open {
+  animation: drawerSlide 0.28s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Inline hover link (used in server components) ── */
+.hover-ink {
+  color: var(--ink-muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--linen-dk);
+  padding-bottom: 1px;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.hover-ink:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.hover-soft {
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.hover-soft:hover { color: var(--ink); }
+
+/* ── Nav underline ── */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 1px;
+  background: var(--logo-gold);
+  transition: width 0.25s ease;
+}
+.nav-link:hover::after { width: 100%; }
+
+/* ── Stat card ── */
+.stat-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26,21,8,0.08);
+}
+
+/* ── Upload zone ── */
+.upload-zone {
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--logo-gold) !important;
+  background: rgba(184,134,11,0.04) !important;
+}
+
 :root {
   --linen:      #FBF5E6;
   --linen-md:   #F2E6C8;
@@ -59,4 +203,45 @@ input, select, textarea, button {
 
 input:focus, select:focus, textarea:focus {
   outline: none;
+}
+
+/* ── Responsive utilities ── */
+@media (max-width: 768px) {
+  .auth-mobile-logo { display: block !important; }
+
+  .nav-desktop { display: none !important; }
+  .nav-mobile  { display: flex !important; }
+
+  .hero-grid        { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .stats-grid       { grid-template-columns: 1fr !important; }
+  .search-grid      { grid-template-columns: 1fr 1fr !important; }
+  .search-grid-full { grid-template-columns: 1fr !important; }
+  .listings-grid    { grid-template-columns: 1fr !important; }
+  .cta-grid         { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .property-grid    { grid-template-columns: 1fr !important; }
+  .auth-grid        { grid-template-columns: 1fr !important; }
+  .auth-brand       { display: none !important; }
+  .dashboard-sidebar{ display: none !important; }
+  .dashboard-sidebar.open { display: flex !important; position: fixed; inset: 0; z-index: 100; width: 260px !important; }
+  .dashboard-mobile-bar { display: flex !important; }
+  .stats-cards      { grid-template-columns: 1fr !important; }
+  .dashboard-main   { padding: 72px 1rem 2rem !important; }
+  .edit-grid-2      { grid-template-columns: 1fr !important; }
+  .edit-grid-3      { grid-template-columns: 1fr 1fr !important; }
+  .property-sidebar       { display: none !important; }
+  .property-mobile-contact { display: flex !important; }
+  /* Add bottom padding so content clears the sticky contact bar */
+  .property-page-content { padding-bottom: 80px !important; }
+  .specs-row        { flex-wrap: wrap !important; }
+  .thumbnail-strip  { display: none !important; }
+}
+
+@media (min-width: 769px) {
+  .nav-mobile { display: none !important; }
+  .dashboard-mobile-bar { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  .search-grid { grid-template-columns: 1fr !important; }
+  .edit-grid-3 { grid-template-columns: 1fr !important; }
 }

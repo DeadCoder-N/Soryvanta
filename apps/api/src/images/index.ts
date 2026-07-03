@@ -8,14 +8,15 @@ cloudinary.config({
 
 export async function uploadImage(
   buffer: Buffer,
-  folder = 'brisvora/properties'
+  folder = 'brisvora/properties',
+  resourceType: 'image' | 'video' | 'auto' = 'auto'
 ): Promise<{ url: string; thumbnailUrl: string }> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder,
         transformation: [{ quality: 'auto', fetch_format: 'auto' }],
-        resource_type: 'image',
+        resource_type: resourceType,
       },
       (error, result) => {
         if (error || !result) return reject(error)

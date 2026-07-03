@@ -88,6 +88,11 @@ function extractFromAiSensy(body: Record<string, any>): {
 
     const mediaUrls: string[] = []
     if (typeof content.url === 'string' && content.url.startsWith('http')) mediaUrls.push(content.url)
+    // Also check video_content
+    const videoContent = msg.video_content ?? (msg.message_type === 'VIDEO' ? content : null)
+    if (videoContent && typeof videoContent.url === 'string' && videoContent.url.startsWith('http')) {
+      if (!mediaUrls.includes(videoContent.url)) mediaUrls.push(videoContent.url)
+    }
     if (Array.isArray(content.media)) {
       for (const m of content.media) {
         if (typeof m === 'string') mediaUrls.push(m)

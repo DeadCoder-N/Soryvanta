@@ -12,7 +12,7 @@ const inputStyle: React.CSSProperties = {
   transition: 'border-color 0.2s',
 }
 
-export default function LeadForm({ propertyId }: { propertyId: string }) {
+export default function LeadForm({ propertyId, onSent }: { propertyId: string; onSent?: () => void }) {
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -33,6 +33,7 @@ export default function LeadForm({ propertyId }: { propertyId: string }) {
     })
     setLoading(false)
     setSent(true)
+    onSent?.()
   }
 
   if (sent) {

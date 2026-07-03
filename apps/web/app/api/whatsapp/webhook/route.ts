@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true })
     }
 
-    console.log('Parsed:', { waId: msg.waId, body: msg.body, contactId: msg.contactId })
+    console.log('Parsed:', JSON.stringify({ waId: msg.waId, body: msg.body, contactId: msg.contactId, mediaUrls: msg.mediaUrls }))
 
     // Look up registered user — optional, not required
     const phone = msg.waId

@@ -13,7 +13,7 @@ const navItems = [
   { href: '/dashboard/profile', label: 'Profile', icon: '⚙', exact: false },
 ]
 
-export default function DashboardSidebar({ email, phone }: { email?: string | null; phone?: string | null }) {
+export default function DashboardSidebar({ email, phone, role }: { email?: string | null; phone?: string | null; role?: string | null }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
@@ -66,6 +66,16 @@ export default function DashboardSidebar({ email, phone }: { email?: string | nu
           )
         })}
       </nav>
+
+      {/* Admin panel link */}
+      {(role === 'ADMIN' || role === 'SUPER_ADMIN') && (
+        <div style={{ padding: '8px 10px 0', borderTop: '1px solid var(--border)' }}>
+          <Link href="/admin" className="sidebar-item" style={{ color: role === 'SUPER_ADMIN' ? '#f87171' : 'var(--gold)' }}>
+            <span style={{ fontSize: '0.85rem', width: '18px', textAlign: 'center' }}>⚡</span>
+            Admin Panel
+          </Link>
+        </div>
+      )}
 
       {/* Sign out */}
       <div style={{ padding: '12px 10px 16px', borderTop: '1px solid var(--border)' }}>

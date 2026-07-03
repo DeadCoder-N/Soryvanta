@@ -148,6 +148,7 @@ model WhatsappMessage {
 enum Role {
   BROKER
   ADMIN
+  SUPER_ADMIN
 }
 
 enum PropertyType {

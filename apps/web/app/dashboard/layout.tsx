@@ -9,12 +9,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { phone: true, email: true },
+    select: { phone: true, email: true, role: true },
   })
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--linen)' }}>
-      <DashboardSidebar email={user?.email} phone={user?.phone} />
+      <DashboardSidebar email={user?.email} phone={user?.phone} role={user?.role} />
 
       {/* Main content — padded top on mobile for the fixed bar */}
       <main style={{ flex: 1, padding: '48px', overflowX: 'auto' } as React.CSSProperties}

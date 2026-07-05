@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -10,29 +10,25 @@ type View = 'login' | 'register'
 export default function AuthPage({ initial }: { initial: View }) {
   const router = useRouter()
   const [view, setView] = useState<View>(initial)
-  const [curtain, setCurtain] = useState<'idle' | 'sweep-in' | 'sweep-out'>('idle')
+  const [animating, setAnimating] = useState(false)
+  const [entered, setEntered] = useState(false)
 
   const [loginError, setLoginError] = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
   const [regError, setRegError] = useState('')
   const [regLoading, setRegLoading] = useState(false)
 
+  useEffect(() => {
+    const t = setTimeout(() => setEntered(true), 60)
+    return () => clearTimeout(t)
+  }, [])
+
   function switchTo(target: View) {
-    if (target === view || curtain !== 'idle') return
-
-    // Phase 1: gold curtain sweeps IN (left → right covers screen) — 400ms
-    setCurtain('sweep-in')
-
-    // Phase 2: at peak coverage swap content — 420ms
-    setTimeout(() => {
-      setView(target)
-      window.history.replaceState(null, '', target === 'login' ? '/login' : '/register')
-      // Phase 3: curtain sweeps OUT (continues right → off screen) — 400ms
-      setCurtain('sweep-out')
-    }, 420)
-
-    // Phase 4: done
-    setTimeout(() => setCurtain('idle'), 840)
+    if (target === view || animating) return
+    setAnimating(true)
+    setView(target)
+    window.history.replaceState(null, '', target === 'login' ? '/login' : '/register')
+    setTimeout(() => setAnimating(false), 700)
   }
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
@@ -60,122 +56,247 @@ export default function AuthPage({ initial }: { initial: View }) {
     router.push('/')
   }
 
-  const isLogin = view === 'login'
+  // login → content on left (0%), register → content on right (50%)
+  const contentLeft = view === 'login' ? '0%' : '50%'
 
   return (
     <>
       <style>{`
-        @keyframes curtainIn {
-          from { transform: translateX(-100%); }
-          to   { transform: translateX(0%); }
+        .auth-root {
+          min-height: 100vh;
+          background: var(--bg);
+          position: relative;
+          overflow: hidden;
         }
-        @keyframes curtainOut {
-          from { transform: translateX(0%); }
-          to   { transform: translateX(100%); }
-        }
-        .curtain-sweep-in  { animation: curtainIn  0.42s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
-        .curtain-sweep-out { animation: curtainOut 0.42s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
 
-        .auth-content-fade-in {
-          animation: contentFadeIn 0.3s ease 0.1s both;
+        /* Both forms sit fixed in their half */
+        .form-half {
+          position: absolute;
+          top: 0; bottom: 0;
+          width: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 48px 1.5rem;
         }
-        @keyframes contentFadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to   { opacity: 1; transform: translateY(0); }
+        .form-half-left  { left: 0; }
+        .form-half-right { left: 50%; }
+
+        /* Content panel slides over the forms */
+        .content-panel {
+          position: absolute;
+          top: 0; bottom: 0;
+          width: 50%;
+          background: var(--surface-1);
+          border-right: 1px solid var(--border);
+          padding: 48px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          overflow: hidden;
+          z-index: 10;
+          transition: left 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        /* Page load entrance */
+        .content-enter {
+          animation: contentSlideIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .form-enter-right {
+          animation: formSlideIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+          opacity: 0;
+        }
+        .form-enter-left {
+          animation: formSlideInLeft 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+          opacity: 0;
+        }
+        @keyframes contentSlideIn {
+          from { opacity: 0; transform: translateX(-60px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes formSlideIn {
+          from { opacity: 0; transform: translateX(60px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes formSlideInLeft {
+          from { opacity: 0; transform: translateX(-60px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Gold glint sweep */
+        @keyframes glintSweep {
+          0%   { transform: translateX(-120%) skewX(-18deg); }
+          100% { transform: translateX(320%)  skewX(-18deg); }
+        }
+        .glint { animation: glintSweep 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        /* Staggered field entrance */
+        @keyframes fieldIn {
+          from { opacity: 0; transform: translateX(24px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        .field-stagger {
+          opacity: 0;
+          animation: fieldIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Gold border trace on focus */
+        .gold-input-wrap { position: relative; }
+        .gold-input-wrap::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: var(--radius-md, 8px);
+          border: 1.5px solid var(--gold);
+          opacity: 0;
+          transition: opacity 0.2s;
+          pointer-events: none;
+        }
+        .gold-input-wrap:focus-within::after {
+          opacity: 1;
+          animation: borderTrace 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes borderTrace {
+          from { clip-path: inset(0 100% 100% 0); }
+          to   { clip-path: inset(0 0% 0% 0); }
         }
       `}</style>
 
-      <div style={{ minHeight: '100vh', background: 'var(--bg)', position: 'relative', overflow: 'hidden' }}>
+      <div className="auth-root" style={{ minHeight: '100vh' }}>
 
-        {/* Gold curtain overlay */}
-        {curtain !== 'idle' && (
-          <div
-            className={curtain === 'sweep-in' ? 'curtain-sweep-in' : 'curtain-sweep-out'}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 100,
-              background: 'linear-gradient(135deg, var(--gold) 0%, #a07800 50%, var(--gold) 100%)',
-              pointerEvents: 'none',
-            }}
-          />
+        {/* Gold glint sweep — full screen */}
+        {animating && (
+          <div className="glint" style={{
+            position: 'fixed', top: 0, left: 0,
+            width: '35%', height: '100%',
+            zIndex: 50, pointerEvents: 'none',
+            background: 'linear-gradient(90deg, transparent, rgba(201,150,14,0.08) 30%, rgba(245,208,110,0.22) 50%, rgba(201,150,14,0.08) 70%, transparent)',
+          }} />
         )}
 
-        {/* Layout */}
-        <div
-          key={view}
-          className={curtain === 'sweep-out' ? 'auth-content-fade-in' : ''}
-          style={{
-            minHeight: '100vh',
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-          }}
+        {/* Register form — always on LEFT half */}
+        <div className={`form-half form-half-left${entered ? ' form-enter-left' : ''}`}
+          style={{ visibility: view === 'login' ? 'hidden' : 'visible' }}
         >
-          {/* Brand panel — left on login, right on register */}
-          <div style={{ order: isLogin ? 1 : 2, background: 'var(--surface-1)', borderRight: isLogin ? '1px solid var(--border)' : 'none', borderLeft: isLogin ? 'none' : '1px solid var(--border)', padding: '48px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', bottom: '-100px', left: '-100px', width: '500px', height: '500px', background: 'radial-gradient(ellipse, rgba(201,150,14,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
-            <div style={{ position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '48px' }}>
-                <Image src="/Brisvora.png" alt="Brisvora" width={36} height={36} style={{ objectFit: 'contain' }} />
-                <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Brisvora</span>
-              </div>
-              <h2 style={{ fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 2.5vw, 2.5rem)', fontWeight: 400, lineHeight: 1.2, marginBottom: '20px' }}>
-                Turn a WhatsApp<br />message into a<br />
-                <span style={{ color: 'var(--gold)' }}>premium listing.</span>
-              </h2>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.8 }}>
-                Send property details via WhatsApp.<br />AI creates the listing. Share the URL.
-              </p>
-            </div>
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {['Send WhatsApp message', 'AI generates listing', 'Share the URL'].map((s, i) => (
-                <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--gold-dim)', border: '1px solid var(--gold-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 600, flexShrink: 0 }}>{i + 1}</div>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{s}</p>
-                </div>
-              ))}
-            </div>
-            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', position: 'relative' }}>© 2026 Brisvora</p>
-          </div>
-
-          {/* Form panel */}
-          <div style={{ order: isLogin ? 2 : 1, background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 1.5rem' }}>
-            <div style={{ width: '100%', maxWidth: '400px' }}>
-              {isLogin
-                ? <LoginForm onSwitch={switchTo} onSubmit={handleLogin} error={loginError} loading={loginLoading} />
-                : <RegisterForm onSwitch={switchTo} onSubmit={handleRegister} error={regError} loading={regLoading} />
-              }
-            </div>
+          <div style={{ width: '100%', maxWidth: '400px' }}>
+            <RegisterForm onSwitch={switchTo} onSubmit={handleRegister} error={regError} loading={regLoading} />
           </div>
         </div>
+
+        {/* Login form — always on RIGHT half */}
+        <div className={`form-half form-half-right${entered ? ' form-enter-right' : ''}`}
+          style={{ visibility: view === 'register' ? 'hidden' : 'visible' }}
+        >
+          <div style={{ width: '100%', maxWidth: '400px' }}>
+            <LoginForm onSwitch={switchTo} onSubmit={handleLogin} error={loginError} loading={loginLoading} />
+          </div>
+        </div>
+
+        {/* Content panel slides left↔right like a curtain */}
+        <div
+          className={`content-panel${entered ? ' content-enter' : ''}`}
+          style={{ left: contentLeft, opacity: entered ? undefined : 0 }}
+        >
+          <div style={{ position: 'absolute', bottom: '-100px', left: '-100px', width: '500px', height: '500px', background: 'radial-gradient(ellipse, rgba(201,150,14,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '48px' }}>
+              <Image src="/Brisvora.png" alt="Brisvora" width={36} height={36} style={{ objectFit: 'contain' }} />
+              <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Brisvora</span>
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 2.5vw, 2.5rem)', fontWeight: 400, lineHeight: 1.2, marginBottom: '20px' }}>
+              Turn a WhatsApp<br />message into a<br />
+              <span style={{ color: 'var(--gold)' }}>premium listing.</span>
+            </h2>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.8 }}>
+              Send property details via WhatsApp.<br />AI creates the listing. Share the URL.
+            </p>
+          </div>
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {['Send WhatsApp message', 'AI generates listing', 'Share the URL'].map((s, i) => (
+              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--gold-dim)', border: '1px solid var(--gold-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 600, flexShrink: 0 }}>{i + 1}</div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{s}</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', position: 'relative' }}>© 2026 Brisvora</p>
+        </div>
+
       </div>
     </>
   )
 }
 
-function LoginForm({ onSwitch, onSubmit, error, loading }: { onSwitch: (v: View) => void; onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; error: string; loading: boolean }) {
+function TypingInput({ placeholder, name, type, required, minLength }: {
+  placeholder: string; name: string; type: string; required?: boolean; minLength?: number
+}) {
+  const [displayed, setDisplayed] = useState('')
+  const [focused, setFocused] = useState(false)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  function startTyping() {
+    setFocused(true)
+    if (displayed.length > 0) return
+    let i = 0
+    intervalRef.current = setInterval(() => {
+      i++
+      setDisplayed(placeholder.slice(0, i))
+      if (i >= placeholder.length) clearInterval(intervalRef.current!)
+    }, 38)
+  }
+
+  function stopTyping() {
+    setFocused(false)
+    clearInterval(intervalRef.current!)
+    setDisplayed('')
+  }
+
+  return (
+    <div className="gold-input-wrap">
+      <input
+        name={name}
+        type={type}
+        required={required}
+        minLength={minLength}
+        placeholder={focused ? displayed : placeholder}
+        className="input-modern"
+        onFocus={startTyping}
+        onBlur={stopTyping}
+        style={{ width: '100%' }}
+      />
+    </div>
+  )
+}
+
+function LoginForm({ onSwitch, onSubmit, error, loading }: {
+  onSwitch: (v: View) => void; onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; error: string; loading: boolean
+}) {
+  const fields = [
+    { label: 'Email',    name: 'email',    type: 'email',    placeholder: 'you@example.com' },
+    { label: 'Password', name: 'password', type: 'password', placeholder: '••••••••' },
+  ]
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
+      <div className="field-stagger" style={{ marginBottom: '32px', animationDelay: '0ms' }}>
         <span className="badge badge-muted" style={{ marginBottom: '16px', display: 'inline-flex' }}>Welcome back</span>
         <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: 'var(--text-primary)', fontWeight: 400, marginBottom: '8px' }}>Sign in</h1>
         <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Access your broker dashboard</p>
       </div>
       <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div>
-          <label style={labelStyle}>Email</label>
-          <input name="email" type="email" required className="input-modern" placeholder="you@example.com" />
-        </div>
-        <div>
-          <label style={labelStyle}>Password</label>
-          <input name="password" type="password" required className="input-modern" placeholder="••••••••" />
-        </div>
+        {fields.map((f, i) => (
+          <div key={f.name} className="field-stagger" style={{ animationDelay: `${(i + 1) * 70}ms` }}>
+            <label style={labelStyle}>{f.label}</label>
+            <TypingInput name={f.name} type={f.type} placeholder={f.placeholder} required />
+          </div>
+        ))}
         {error && <ErrorBox msg={error} />}
-        <button type="submit" disabled={loading} className="btn-primary" style={{ padding: '14px', fontSize: '0.85rem', marginTop: '4px', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
-          {loading ? 'Signing in...' : 'Sign In'}
-        </button>
+        <div className="field-stagger" style={{ animationDelay: '210ms' }}>
+          <button type="submit" disabled={loading} className="btn-primary" style={{ padding: '14px', fontSize: '0.85rem', width: '100%', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </div>
       </form>
-      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '24px', textAlign: 'center' }}>
+      <p className="field-stagger" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '24px', textAlign: 'center', animationDelay: '260ms' }}>
         No account?{' '}
         <button onClick={() => onSwitch('register')} style={linkBtnStyle}>Register here</button>
       </p>
@@ -183,38 +304,38 @@ function LoginForm({ onSwitch, onSubmit, error, loading }: { onSwitch: (v: View)
   )
 }
 
-function RegisterForm({ onSwitch, onSubmit, error, loading }: { onSwitch: (v: View) => void; onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; error: string; loading: boolean }) {
+function RegisterForm({ onSwitch, onSubmit, error, loading }: {
+  onSwitch: (v: View) => void; onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; error: string; loading: boolean
+}) {
+  const fields = [
+    { label: 'Full Name',        name: 'name',     type: 'text',     placeholder: 'Rahul Sharma' },
+    { label: 'Email',            name: 'email',    type: 'email',    placeholder: 'you@example.com' },
+    { label: 'WhatsApp Number',  name: 'phone',    type: 'tel',      placeholder: '919876543210' },
+    { label: 'Password',         name: 'password', type: 'password', placeholder: 'Min 8 characters' },
+  ]
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
+      <div className="field-stagger" style={{ marginBottom: '28px', animationDelay: '0ms' }}>
         <span className="badge badge-gold" style={{ marginBottom: '16px', display: 'inline-flex' }}>Free to start</span>
         <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: 'var(--text-primary)', fontWeight: 400, marginBottom: '8px' }}>Create account</h1>
         <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Start listing properties in minutes</p>
       </div>
-      <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div>
-          <label style={labelStyle}>Full Name</label>
-          <input name="name" type="text" required placeholder="Rahul Sharma" className="input-modern" />
-        </div>
-        <div>
-          <label style={labelStyle}>Email</label>
-          <input name="email" type="email" required placeholder="you@example.com" className="input-modern" />
-        </div>
-        <div>
-          <label style={labelStyle}>WhatsApp Number</label>
-          <input name="phone" type="tel" required placeholder="919876543210" className="input-modern" />
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '6px' }}>With country code, no spaces — e.g. 919876543210</p>
-        </div>
-        <div>
-          <label style={labelStyle}>Password</label>
-          <input name="password" type="password" required minLength={8} placeholder="Min 8 characters" className="input-modern" />
-        </div>
+      <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '13px' }}>
+        {fields.map((f, i) => (
+          <div key={f.name} className="field-stagger" style={{ animationDelay: `${(i + 1) * 60}ms` }}>
+            <label style={labelStyle}>{f.label}</label>
+            <TypingInput name={f.name} type={f.type} placeholder={f.placeholder} required minLength={f.name === 'password' ? 8 : undefined} />
+            {f.name === 'phone' && <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '5px' }}>With country code — e.g. 919876543210</p>}
+          </div>
+        ))}
         {error && <ErrorBox msg={error} />}
-        <button type="submit" disabled={loading} className="btn-primary" style={{ padding: '14px', fontSize: '0.85rem', marginTop: '4px', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
-          {loading ? 'Creating account...' : 'Create Account'}
-        </button>
+        <div className="field-stagger" style={{ animationDelay: '320ms' }}>
+          <button type="submit" disabled={loading} className="btn-primary" style={{ padding: '14px', fontSize: '0.85rem', width: '100%', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
+            {loading ? 'Creating account...' : 'Create Account'}
+          </button>
+        </div>
       </form>
-      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '24px', textAlign: 'center' }}>
+      <p className="field-stagger" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '20px', textAlign: 'center', animationDelay: '370ms' }}>
         Already have an account?{' '}
         <button onClick={() => onSwitch('login')} style={linkBtnStyle}>Sign in</button>
       </p>

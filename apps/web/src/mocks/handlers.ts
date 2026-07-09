@@ -116,18 +116,6 @@ export const MOCK_ANALYTICS = {
 
 export const handlers = [
 
-  // ── Auth ──
-  http.post('/api/register', async ({ request }) => {
-    const body = await request.json() as Record<string, string>
-    if (!body.email || !body.password) {
-      return HttpResponse.json({ error: 'Email and password are required' }, { status: 400 })
-    }
-    if (body.email === 'existing@brisvora.com') {
-      return HttpResponse.json({ error: 'Email already registered' }, { status: 409 })
-    }
-    return HttpResponse.json({ id: 'user_new', email: body.email }, { status: 201 })
-  }),
-
   // ── Broker Listings ──
   http.get('/api/broker/listings', () => {
     return HttpResponse.json(MOCK_LISTINGS)

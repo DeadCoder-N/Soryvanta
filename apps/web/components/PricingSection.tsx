@@ -250,7 +250,7 @@ export default function PricingSection() {
       }}>
         {/* ── Header ── */}
         <div style={{ textAlign: 'center', marginBottom: 'clamp(2.5rem,5vw,4rem)' }}>
-          <div className={visible && !reduced.current ? 'animate-fade-up' : ''} style={{ marginBottom: 'clamp(0.65rem,1.2vw,0.9rem)' }}>
+          <div className={visible && !reduced ? 'animate-fade-up' : ''} style={{ marginBottom: 'clamp(0.65rem,1.2vw,0.9rem)' }}>
             <span style={{
               fontFamily: "'Cinzel', serif",
               fontSize: 'clamp(0.5rem,0.85vw,0.58rem)',
@@ -263,7 +263,7 @@ export default function PricingSection() {
           <div className="gold-divider" style={{ margin: '0 auto clamp(0.85rem,1.6vw,1.2rem)' }} />
           <h2
             id="pricing-heading"
-            className={visible && !reduced.current ? 'animate-fade-up delay-100' : ''}
+            className={visible && !reduced ? 'animate-fade-up delay-100' : ''}
             style={{
               fontFamily: "'Playfair Display', var(--font-serif), serif",
               fontSize: 'clamp(1.8rem,3.8vw,3rem)',
@@ -279,7 +279,7 @@ export default function PricingSection() {
             }}>Scale Without Limits.</span>
           </h2>
           <p
-            className={visible && !reduced.current ? 'animate-fade-up delay-200' : ''}
+            className={visible && !reduced ? 'animate-fade-up delay-200' : ''}
             style={{
               fontFamily: "'DM Sans', var(--font-sans), sans-serif",
               fontSize: 'clamp(0.85rem,1.3vw,1rem)',
@@ -289,7 +289,7 @@ export default function PricingSection() {
           >
             Whether you are an individual broker or a growing business, Brisvora offers flexible plans designed to support every stage of growth.
           </p>
-          <div className={visible && !reduced.current ? 'animate-fade-up delay-300' : ''} style={{ marginTop: 'clamp(1rem,2vw,1.5rem)' }}>
+          <div className={visible && !reduced ? 'animate-fade-up delay-300' : ''} style={{ marginTop: 'clamp(1rem,2vw,1.5rem)' }}>
             <Link
               href="/pricing"
               style={{
@@ -312,7 +312,7 @@ export default function PricingSection() {
 
         {/* ── Billing Toggle ── */}
         <div
-          className={visible && !reduced.current ? 'animate-fade-up delay-150' : ''}
+          className={visible && !reduced ? 'animate-fade-up delay-150' : ''}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -386,7 +386,7 @@ export default function PricingSection() {
             return (
               <div
                 key={plan.id}
-                className={visible && !reduced.current ? 'animate-fade-up' : ''}
+                className={visible && !reduced ? 'animate-fade-up' : ''}
                 style={{
                   animationDelay: `${i * 80 + 200}ms`,
                   position: 'relative',
@@ -599,7 +599,7 @@ export default function PricingSection() {
         {/* ── Feature Comparison ── */}
         <div style={{ marginBottom: 'clamp(3rem,6vw,5rem)' }}>
           <p
-            className={visible && !reduced.current ? 'animate-fade-up' : ''}
+            className={visible && !reduced ? 'animate-fade-up' : ''}
             style={{
               fontFamily: "'Cinzel', serif",
               fontSize: 'clamp(0.48rem,0.78vw,0.56rem)',
@@ -668,7 +668,7 @@ export default function PricingSection() {
             {FEATURES.map((f, i) => (
               <div
                 key={f.label}
-                className={visible && !reduced.current ? 'animate-fade-up' : ''}
+                className={visible && !reduced ? 'animate-fade-up' : ''}
                 style={{
                   animationDelay: `${i * 30 + 200}ms`,
                   display: 'grid',
@@ -735,7 +735,7 @@ export default function PricingSection() {
           style={{ marginBottom: 'clamp(3rem,6vw,5rem)' }}
         >
           <p
-            className={visible && !reduced.current ? 'animate-fade-up' : ''}
+            className={visible && !reduced ? 'animate-fade-up' : ''}
             style={{
               fontFamily: "'Cinzel', serif",
               fontSize: 'clamp(0.48rem,0.78vw,0.56rem)',
@@ -747,7 +747,7 @@ export default function PricingSection() {
             ROI Calculator
           </p>
           <p
-            className={visible && !reduced.current ? 'animate-fade-up delay-100' : ''}
+            className={visible && !reduced ? 'animate-fade-up delay-100' : ''}
             style={{
               fontFamily: "'Playfair Display', serif",
               fontSize: 'clamp(1.1rem,2vw,1.5rem)',
@@ -963,7 +963,7 @@ export default function PricingSection() {
         {/* ── FAQ ── */}
         <div style={{ marginBottom: 'clamp(3rem,6vw,5rem)', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto' }}>
           <p
-            className={visible && !reduced.current ? 'animate-fade-up' : ''}
+            className={visible && !reduced ? 'animate-fade-up' : ''}
             style={{
               fontFamily: "'Cinzel', serif",
               fontSize: 'clamp(0.48rem,0.78vw,0.56rem)',
@@ -981,7 +981,7 @@ export default function PricingSection() {
               return (
                 <div
                   key={faq.q}
-                  className={visible && !reduced.current ? 'animate-fade-up' : ''}
+                  className={visible && !reduced ? 'animate-fade-up' : ''}
                   style={{
                     animationDelay: `${i * 60 + 200}ms`,
                     background: 'var(--surface-2)',
@@ -1056,7 +1056,7 @@ export default function PricingSection() {
             {TRUST_ELEMENTS.map((t, i) => (
               <div
                 key={t.label}
-                className={visible && !reduced.current ? 'animate-fade-up' : ''}
+                className={visible && !reduced ? 'animate-fade-up' : ''}
                 style={{
                   animationDelay: `${i * 40 + 200}ms`,
                   display: 'inline-flex',
@@ -1092,7 +1092,7 @@ export default function PricingSection() {
 
         {/* ── CTA ── */}
         <div
-          className={visible && !reduced.current ? 'animate-fade-up delay-300' : ''}
+          className={visible && !reduced ? 'animate-fade-up delay-300' : ''}
           style={{ textAlign: 'center' }}
         >
           <div style={{

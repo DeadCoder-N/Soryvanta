@@ -41,14 +41,21 @@ enum MessageDirection {
   OUTBOUND
 }
 
+enum OtpPurpose {
+  PHONE_VERIFICATION
+  LOGIN
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String    @unique
   phone         String?   @unique
+  countryCode   String    @default("+91")              // NEW: Country dial code for phone
+  phoneVerified Boolean   @default(false)               // NEW: Whether phone is OTP-verified
   passwordHash  String?
   role          Role      @default(BROKER)
-  plan          Plan      @default(STARTER)        // NEW: Maps to pricing tier
+  plan          Plan      @default(STARTER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -56,6 +63,7 @@ model User {
   whatsappMessages  WhatsappMessage[]
   sessions          Session[]
   accounts          Account[]
+  otps              OtpVerification[]
 }
 
 model Account {
@@ -113,8 +121,8 @@ model Property {
   features    String[]
   amenities   String[]
   rawInput    String?
-  mockDataUrl String?                   // NEW: URL to Flask mock JSON for fallback
-  mediaJson   Json?                     // NEW: [{url, type, caption, order}] images+videos
+  mockDataUrl String?                   // URL to Flask mock JSON for fallback
+  mediaJson   Json?                     // [{url, type, caption, order}] images+videos
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
@@ -136,7 +144,7 @@ model Image {
   thumbnailUrl String?
   caption      String?
   order        Int      @default(0)
-  mediaType    String   @default("image")          // NEW: "image" | "video"
+  mediaType    String   @default("image")          // "image" | "video"
   createdAt    DateTime @default(now())
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
@@ -149,8 +157,8 @@ model Lead {
   propertyId  String
   name        String?
   phone       String?
-  countryCode String   @default("+91")             // NEW: Country dial code
-  tokenCount  Int      @default(0)                 // NEW: Message char count for analytics
+  countryCode String   @default("+91")             // Country dial code
+  tokenCount  Int      @default(0)                 // Message char count for analytics
   message     String?
   source      String   @default("whatsapp")
   createdAt   DateTime @default(now())
@@ -159,7 +167,7 @@ model Lead {
 
   @@index([propertyId])
   @@index([phone])
-  @@unique([propertyId, phone, createdAt])          // NEW: Duplicate prevention
+  @@unique([propertyId, phone, createdAt])          // Duplicate prevention
 }
 
 model Analytics {
@@ -194,5 +202,24 @@ model ConversationState {
   context       Json?
   lastMessageAt DateTime @default(now())
 
+  @@index([userId])
+}
+
+// NEW: OTP Verification for phone number verification
+model OtpVerification {
+  id        String     @id @default(cuid())
+  userId    String?
+  phone     String
+  countryCode String   @default("+91")
+  otp       String
+  purpose   OtpPurpose @default(PHONE_VERIFICATION)
+  attempts  Int        @default(0)
+  expiresAt DateTime
+  verified  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([phone])
   @@index([userId])
 }

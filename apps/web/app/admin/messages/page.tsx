@@ -7,6 +7,11 @@ const directionStyle: Record<string, { bg: string; color: string }> = {
   OUTBOUND: { bg: 'var(--gold-dim)', color: 'var(--gold-light)' },
 }
 
+type Message = {
+  id: string; waId: string; direction: string; status?: string | null
+  content: string; timestamp: Date; user?: { name: string | null; email: string } | null
+}
+
 export default function AdminMessagesPage() {
   const [messages, setMessages] = useState<any[]>([])
   const [total, setTotal] = useState(0)
@@ -68,7 +73,7 @@ export default function AdminMessagesPage() {
                 </tr>
               </thead>
               <tbody>
-                {messages.map((m: any) => {
+                {messages.map((m: Message) => {
                   const ds = directionStyle[m.direction] ?? directionStyle.INBOUND
                   return (
                     <tr key={m.id} className="table-row" style={{ borderBottom: '1px solid var(--border)' }}>

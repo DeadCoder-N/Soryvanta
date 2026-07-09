@@ -12,6 +12,12 @@ const statusStyle: Record<string, { bg: string; color: string }> = {
   INACTIVE: { bg: 'var(--surface-3)', color: 'var(--text-muted)' },
 }
 
+type Property = {
+  id: string; title: string; city: string; price: number; status: string; type: string; slug: string
+  images?: { url: string }[]; owner?: { name: string | null; email: string } | null
+  analytics?: { viewCount: number } | null; _count?: { leads: number }
+}
+
 export default function AdminPropertiesPage() {
   const [properties, setProperties] = useState<any[]>([])
   const [total, setTotal] = useState(0)
@@ -112,7 +118,7 @@ export default function AdminPropertiesPage() {
                 </tr>
               </thead>
               <tbody>
-                {properties.map((p: any) => {
+                {properties.map((p: Property) => {
                   const st = statusStyle[p.status] ?? statusStyle.INACTIVE
                   return (
                     <tr key={p.id} className="table-row" style={{ borderBottom: '1px solid var(--border)' }}>

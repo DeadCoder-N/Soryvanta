@@ -2,14 +2,9 @@ import { auth } from '@/auth'
 import Link from 'next/link'
 import { formatPrice } from '@brisvora/shared'
 
-async function getStats() {
-  const res = await fetch(`${process.env.NEXTAUTH_URL ?? 'http://localhost:3000'}/api/admin`, {
-    cache: 'no-store',
-    headers: { cookie: '' },
-  }).catch(() => null)
-  if (!res?.ok) return null
-  return res.json()
-}
+type GroupByResult = { status?: string; type?: string; _count: number }
+type RecentUser = { id: string; name: string | null; email: string; role: string; createdAt: Date }
+type RecentProperty = { id: string; title: string; city: string; price: number; status: string; type: string; slug: string; createdAt: Date; owner: { name: string | null; email: string } | null }
 
 export default async function AdminOverviewPage() {
   const session = await auth()
@@ -22,7 +17,7 @@ export default async function AdminOverviewPage() {
     activeProperties, totalViews,
     brokerCount, adminCount, superAdminCount,
     recentUsers, recentProperties,
-    propertiesByType, propertiesByStatus,
+    propertiesByStatus,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.property.count(),
@@ -44,7 +39,6 @@ export default async function AdminOverviewPage() {
         owner: { select: { name: true, email: true } },
       },
     }),
-    prisma.property.groupBy({ by: ['type'], _count: true }),
     prisma.property.groupBy({ by: ['status'], _count: true }),
   ])
 
@@ -122,7 +116,7 @@ export default async function AdminOverviewPage() {
           <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
             Properties by Status
           </p>
-          {propertiesByStatus.map((s: any) => (
+          {propertiesByStatus.map((s: GroupByResult) => (
             <div key={s.status} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <span style={{ fontSize: '0.82rem', color: statusColor[s.status] ?? 'var(--text-secondary)' }}>{s.status}</span>
               <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.2rem', color: 'var(--text-primary)' }}>{s._count}</span>
@@ -139,7 +133,7 @@ export default async function AdminOverviewPage() {
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1rem', color: 'var(--text-primary)', fontWeight: 400 }}>Recent Users</h2>
             <Link href="/admin/users" className="btn-ghost" style={{ padding: '5px 10px', fontSize: '0.72rem' }}>View all →</Link>
           </div>
-          {recentUsers.map((u: any) => (
+          {recentUsers.map((u: RecentUser) => (
             <div key={u.id} className="table-row" style={{ padding: '12px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-primary)', marginBottom: '2px' }}>{u.email}</p>
@@ -158,7 +152,7 @@ export default async function AdminOverviewPage() {
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1rem', color: 'var(--text-primary)', fontWeight: 400 }}>Recent Properties</h2>
             <Link href="/admin/properties" className="btn-ghost" style={{ padding: '5px 10px', fontSize: '0.72rem' }}>View all →</Link>
           </div>
-          {recentProperties.map((p: any) => (
+          {recentProperties.map((p: RecentProperty) => (
             <div key={p.id} className="table-row" style={{ padding: '12px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ minWidth: 0 }}>
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-primary)', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</p>

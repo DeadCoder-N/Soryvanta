@@ -164,12 +164,12 @@ export default function PricingSection() {
   const [roiListings, setRoiListings] = useState(20)
   const [roiHours,    setRoiHours]    = useState(5)
   const [roiVisible,  setRoiVisible]  = useState(false)
+  const [reduced, setReduced] = useState(false)
   const ref     = useRef<HTMLElement>(null)
   const roiRef  = useRef<HTMLDivElement>(null)
-  const reduced = useRef(false)
 
   useEffect(() => {
-    reduced.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect() } },
       { threshold: 0.06 }

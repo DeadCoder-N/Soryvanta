@@ -37,10 +37,9 @@ const COUNTRIES = [
 ]
 
 function EnquiryForm({
-  propertyId, propertySlug, state, setState, onClose
+  propertyId, state, setState, onClose
 }: {
   propertyId: string
-  propertySlug: string
   state: 'idle' | 'loading' | 'success' | 'error'
   setState: (s: 'idle' | 'loading' | 'success' | 'error') => void
   onClose: () => void
@@ -111,31 +110,6 @@ function EnquiryForm({
       </button>
     </form>
   )
-}
-
-// ── Inline Mock Data (Level 3 fallback — always renders) ──────────
-const FALLBACK_MOCK: ClientProperty = {
-  id: 'fallback',
-  slug: 'fallback',
-  ownerPhone: '918850908790',
-  title: '2 BHK Apartment in Bandra West, Mumbai',
-  description: 'A beautifully designed 2 BHK apartment in the upscale Bandra West area of Mumbai. This 850 sqft flat offers two spacious bedrooms, modern living room with city views, and a fully modular kitchen.',
-  address: 'Bandra West, Mumbai',
-  city: 'Mumbai',
-  price: 12000000,
-  priceLabel: '₹1.2 Cr',
-  bedrooms: 2,
-  bathrooms: 2,
-  areaSqft: 850,
-  type: 'APARTMENT',
-  status: 'ACTIVE',
-  features: ['Modular Kitchen', 'Vitrified Flooring', 'False Ceiling', 'Power Backup', 'Video Door Phone'],
-  amenities: ['Swimming Pool', 'Gym', 'Garden', 'Parking', 'Security'],
-  rawInput: null,
-  mockDataUrl: null,
-  mediaJson: null,
-  seoTitle: '2 BHK Apartment in Mumbai | Brisvora',
-  waLink: 'https://wa.me/?text=Check%20this%20property',
 }
 
 export default function ApartmentClient({ property: initialProperty }: { property: ClientProperty }) {
@@ -410,7 +384,6 @@ export default function ApartmentClient({ property: initialProperty }: { propert
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: '#C9A84C', margin: '0 0 20px' }}>Interested?</h3>
             <EnquiryForm
               propertyId={property.id}
-              propertySlug={property.slug}
               state={enquiryState}
               setState={setEnquiryState}
               onClose={() => { setShowEnquiry(false); setEnquiryState('idle') }}

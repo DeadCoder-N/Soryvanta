@@ -1,12 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { server } from '../src/mocks/server'
 import { http, HttpResponse } from 'msw'
-import {
-  MOCK_LISTINGS,
-  MOCK_LEADS,
-  MOCK_ANALYTICS,
-  edgeCaseHandlers,
-} from '../src/mocks/handlers'
 
 // ── Helper ────────────────────────────────────────────────────────────────────
 const BASE = 'http://localhost:3000'

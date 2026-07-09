@@ -9,7 +9,7 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, email: true, phone: true },
+    select: { name: true, email: true, phone: true, countryCode: true, phoneVerified: true },
   })
 
   return NextResponse.json(user)
@@ -39,8 +39,8 @@ export async function PUT(req: Request) {
 
   const updated = await prisma.user.update({
     where: { id: session.user.id },
-    data: { name, phone: normalizedPhone },
-    select: { id: true, name: true, email: true, phone: true },
+    data: { name, phone: normalizedPhone, phoneVerified: false }, // Reset verification on phone change
+    select: { id: true, name: true, email: true, phone: true, countryCode: true, phoneVerified: true },
   })
 
   return NextResponse.json(updated)

@@ -3,6 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
+type Lead = {
+  id: string; name: string | null; phone: string | null; source: string
+  message?: string | null; createdAt: Date
+  property?: { title: string; city: string; slug: string; owner?: { name: string | null; email: string } | null } | null
+}
+
 export default function AdminLeadsPage() {
   const [leads, setLeads] = useState<any[]>([])
   const [total, setTotal] = useState(0)
@@ -56,7 +62,7 @@ export default function AdminLeadsPage() {
                 </tr>
               </thead>
               <tbody>
-                {leads.map((l: any) => (
+                {leads.map((l: Lead) => (
                   <tr key={l.id} className="table-row" style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '14px 16px' }}>
                       <p style={{ color: 'var(--text-primary)', marginBottom: '2px' }}>{l.name ?? '—'}</p>

@@ -53,7 +53,7 @@ export default function AboutPage() {
             color: 'var(--text-primary)', lineHeight: 1.5, fontWeight: 400,
             marginBottom: 'clamp(1.5rem,3vw,2.5rem)',
           }}>
-            "To give every business owner in India access to the same AI-powered growth tools that only large companies could afford before."
+            &ldquo;To give every business owner in India access to the same AI-powered growth tools that only large companies could afford before.&rdquo;
           </p>
           <p style={{
             fontSize: 'clamp(0.85rem,1.3vw,1rem)',

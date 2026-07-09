@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import PhoneInput from '@/components/PhoneInput'
+import type { PhoneInputValue } from '@/components/PhoneInput'
+import { getFullPhone } from '@/components/PhoneInput'
 
 type View = 'login' | 'register'
 
@@ -17,6 +20,9 @@ export default function AuthPage({ initial }: { initial: View }) {
   const [loginLoading, setLoginLoading] = useState(false)
   const [regError, setRegError] = useState('')
   const [regLoading, setRegLoading] = useState(false)
+
+  // Register phone state with country code
+  const [regPhone, setRegPhone] = useState<PhoneInputValue>({ countryCode: '+91', phone: '' })
 
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 60)
@@ -45,11 +51,18 @@ export default function AuthPage({ initial }: { initial: View }) {
     e.preventDefault()
     setRegError(''); setRegLoading(true)
     const form = new FormData(e.currentTarget)
-    const phone = (form.get('phone') as string).replace(/[^0-9+]/g, '')
+    const phone = getFullPhone(regPhone)
+    const countryCode = regPhone.countryCode
     const res = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: form.get('name'), email: form.get('email'), password: form.get('password'), phone }),
+      body: JSON.stringify({
+        name: form.get('name'),
+        email: form.get('email'),
+        password: form.get('password'),
+        phone,
+        countryCode,
+      }),
     })
     if (!res.ok) { setRegError((await res.json()).error ?? 'Registration failed'); setRegLoading(false); return }
     await signIn('credentials', { email: form.get('email'), password: form.get('password'), redirect: false })
@@ -349,12 +362,32 @@ function LoginForm({ onSwitch, onSubmit, error, loading }: {
 function RegisterForm({ onSwitch, onSubmit, error, loading }: {
   onSwitch: (v: View) => void; onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; error: string; loading: boolean
 }) {
+  const [phoneValue, setPhoneValue] = useState<PhoneInputValue>({ countryCode: '+91', phone: '' })
+  const [phoneError, setPhoneError] = useState<string | null>(null)
+
   const fields = [
     { label: 'Full Name',        name: 'name',     type: 'text',     placeholder: 'Rahul Sharma' },
     { label: 'Email',            name: 'email',    type: 'email',    placeholder: 'you@example.com' },
-    { label: 'WhatsApp Number',  name: 'phone',    type: 'tel',      placeholder: '919876543210' },
     { label: 'Password',         name: 'password', type: 'password', placeholder: 'Min 8 characters' },
   ]
+
+  function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const digits = phoneValue.phone.replace(/\D/g, '')
+    if (!digits || digits.length < 7) {
+      setPhoneError('Enter a valid phone number')
+      return
+    }
+    setPhoneError(null)
+    // Store phone in a hidden input so FormData picks it up
+    const hiddenInput = document.createElement('input')
+    hiddenInput.type = 'hidden'
+    hiddenInput.name = 'phone'
+    hiddenInput.value = getFullPhone(phoneValue)
+    e.currentTarget.appendChild(hiddenInput)
+    onSubmit(e)
+  }
+
   return (
     <div>
       <div className="field-stagger" style={{ marginBottom: '28px', animationDelay: '0ms' }}>
@@ -365,14 +398,26 @@ function RegisterForm({ onSwitch, onSubmit, error, loading }: {
         </h1>
         <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Start listing properties in minutes</p>
       </div>
-      <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
         {fields.map((f, i) => (
           <div key={f.name} className="field-stagger" style={{ animationDelay: `${(i + 1) * 60}ms` }}>
             <label style={labelStyle}>{f.label}</label>
             <TypingInput name={f.name} type={f.type} placeholder={f.placeholder} required minLength={f.name === 'password' ? 8 : undefined} />
-            {f.name === 'phone' && <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '5px' }}>With country code — e.g. 919876543210</p>}
           </div>
         ))}
+        {/* Phone with country code dropdown */}
+        <div className="field-stagger" style={{ animationDelay: `${(fields.length + 1) * 60}ms` }}>
+          <PhoneInput
+            value={phoneValue}
+            onChange={setPhoneValue}
+            error={phoneError}
+            label="WhatsApp Number"
+            placeholder="Enter phone number"
+          />
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '5px' }}>
+            Your WhatsApp number for AI listing generation
+          </p>
+        </div>
         {error && <ErrorBox msg={error} />}
         <div className="field-stagger" style={{ animationDelay: '320ms' }}>
           <button type="submit" disabled={loading} className="btn-primary" style={{

@@ -21,10 +21,7 @@ export default function AuthPage({ initial }: { initial: View }) {
   const [regError, setRegError] = useState('')
   const [regLoading, setRegLoading] = useState(false)
 
-  // Register phone state with country code
-  const [regPhone, setRegPhone] = useState<PhoneInputValue>({ countryCode: '+91', phone: '' })
-
-  useEffect(() => {
+useEffect(() => {
     const t = setTimeout(() => setEntered(true), 60)
     return () => clearTimeout(t)
   }, [])
@@ -47,12 +44,12 @@ export default function AuthPage({ initial }: { initial: View }) {
     else router.push('/')
   }
 
-  async function handleRegister(e: React.FormEvent<HTMLFormElement>) {
+  async function handleRegister(e: React.FormEvent<HTMLFormElement>, phoneVal: PhoneInputValue) {
     e.preventDefault()
     setRegError(''); setRegLoading(true)
     const form = new FormData(e.currentTarget)
-    const phone = getFullPhone(regPhone)
-    const countryCode = regPhone.countryCode
+    const phone = getFullPhone(phoneVal)
+    const countryCode = phoneVal.countryCode
     const res = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -200,6 +197,7 @@ export default function AuthPage({ initial }: { initial: View }) {
         >
           <div style={{ width: '100%', maxWidth: '400px' }}>
             <RegisterForm onSwitch={switchTo} onSubmit={handleRegister} error={regError} loading={regLoading} />
+
           </div>
         </div>
 
@@ -360,7 +358,10 @@ function LoginForm({ onSwitch, onSubmit, error, loading }: {
 }
 
 function RegisterForm({ onSwitch, onSubmit, error, loading }: {
-  onSwitch: (v: View) => void; onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; error: string; loading: boolean
+  onSwitch: (v: View) => void
+  onSubmit: (e: React.FormEvent<HTMLFormElement>, phone: PhoneInputValue) => void
+  error: string
+  loading: boolean
 }) {
   const [phoneValue, setPhoneValue] = useState<PhoneInputValue>({ countryCode: '+91', phone: '' })
   const [phoneError, setPhoneError] = useState<string | null>(null)
@@ -379,13 +380,7 @@ function RegisterForm({ onSwitch, onSubmit, error, loading }: {
       return
     }
     setPhoneError(null)
-    // Store phone in a hidden input so FormData picks it up
-    const hiddenInput = document.createElement('input')
-    hiddenInput.type = 'hidden'
-    hiddenInput.name = 'phone'
-    hiddenInput.value = getFullPhone(phoneValue)
-    e.currentTarget.appendChild(hiddenInput)
-    onSubmit(e)
+    onSubmit(e, phoneValue)
   }
 
   return (

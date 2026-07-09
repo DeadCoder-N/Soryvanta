@@ -18,29 +18,57 @@ export default function LeadForm({ propertyId, onSent }: { propertyId: string; o
 
   if (sent) {
     return (
-      <div style={{ background: 'var(--green-dim)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 'var(--radius-lg)', padding: '28px', textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem', marginBottom: '10px' }}>✅</div>
-        <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--text-primary)', marginBottom: '6px' }}>Enquiry Sent!</p>
-        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>The broker will contact you shortly.</p>
+      <div style={{ textAlign: 'center', padding: '12px 0' }}>
+        <div style={{ fontSize: '2rem', color: '#c9a84c', marginBottom: '10px' }}>✓</div>
+        <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.15rem', color: '#fff', marginBottom: '6px' }}>Enquiry Sent!</p>
+        <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)' }}>The broker will contact you shortly.</p>
       </div>
     )
   }
 
   return (
-    <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '24px' }}>
-      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '18px' }}>
-        Send Enquiry
-      </p>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <input name="name" placeholder="Your name" required className="input-modern" />
-        <input name="phone" placeholder="Phone number" type="tel" className="input-modern" />
-        <textarea name="message" placeholder="Message (optional)" rows={3}
-          className="input-modern" style={{ resize: 'none' }} />
-        <button type="submit" disabled={loading} className="btn-primary"
-          style={{ padding: '13px', fontSize: '0.82rem', marginTop: '4px', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
-          {loading ? 'Sending...' : 'Send Enquiry'}
-        </button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <input
+        name="name" placeholder="Your name" required
+        style={{
+          width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.15)',
+          color: '#fff', padding: '13px 16px', fontSize: '0.9rem', borderRadius: '8px', outline: 'none',
+          transition: 'border-color 0.2s, box-shadow 0.2s',
+        }}
+        onFocus={e => { e.currentTarget.style.borderColor = '#c9a84c'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(201,168,76,0.15)' }}
+        onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.boxShadow = 'none' }}
+      />
+      <input
+        name="phone" placeholder="Phone number" type="tel" required
+        style={{
+          width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.15)',
+          color: '#fff', padding: '13px 16px', fontSize: '0.9rem', borderRadius: '8px', outline: 'none',
+          transition: 'border-color 0.2s, box-shadow 0.2s',
+        }}
+        onFocus={e => { e.currentTarget.style.borderColor = '#c9a84c'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(201,168,76,0.15)' }}
+        onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.boxShadow = 'none' }}
+      />
+      <textarea
+        name="message" placeholder="Message (optional)" rows={3}
+        style={{
+          width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.15)',
+          color: '#fff', padding: '13px 16px', fontSize: '0.9rem', borderRadius: '8px', outline: 'none',
+          resize: 'none', transition: 'border-color 0.2s, box-shadow 0.2s', fontFamily: 'inherit',
+        }}
+        onFocus={e => { e.currentTarget.style.borderColor = '#c9a84c'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(201,168,76,0.15)' }}
+        onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.boxShadow = 'none' }}
+      />
+      <button
+        type="submit" disabled={loading}
+        style={{
+          width: '100%', padding: '14px', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.08em',
+          textTransform: 'uppercase', color: '#0a0a0a', cursor: loading ? 'not-allowed' : 'pointer',
+          background: 'linear-gradient(135deg, #c9a84c, #f0d080)', border: 'none', borderRadius: '8px',
+          opacity: loading ? 0.7 : 1, marginTop: '4px',
+        }}
+      >
+        {loading ? 'Sending...' : 'Send Enquiry'}
+      </button>
+    </form>
   )
 }

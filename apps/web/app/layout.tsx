@@ -76,37 +76,32 @@ export const metadata: Metadata = {
   verification: {
     google: 'YNk-8h8-mk-a2Rm-5M9CTiVBuC8mCxwQoqI1RmVCcHo',
   },
-}
-
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Brisvora',
-  url: 'https://brisvora.vercel.app',
-  logo: 'https://brisvora.vercel.app/Brisvora.png',
-  description: 'AI-powered luxury property listing platform for Indian real estate brokers.',
-  foundingDate: '2026',
-  sameAs: [
-    'https://twitter.com/brisvora',
-    'https://linkedin.com/company/brisvora',
-  ],
-  contactPoint: {
-    '@type': 'ContactPoint',
-    contactType: 'customer support',
-    email: 'support@brisvora.in',
-  },
-}
-
-const websiteSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'Brisvora',
-  url: 'https://brisvora.vercel.app',
-  description: 'India\'s premier AI-powered property listing platform.',
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: 'https://brisvora.vercel.app?city={search_term_string}&type={search_term_string}&bedrooms={search_term_string}',
-    'query-input': 'required name=search_term_string',
+  other: {
+    'application/ld+json': JSON.stringify([
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Brisvora',
+        url: 'https://brisvora.vercel.app',
+        logo: 'https://brisvora.vercel.app/Brisvora.png',
+        description: 'AI-powered luxury property listing platform for Indian real estate brokers.',
+        foundingDate: '2026',
+        sameAs: ['https://twitter.com/brisvora', 'https://linkedin.com/company/brisvora'],
+        contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'support@brisvora.in' },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Brisvora',
+        url: 'https://brisvora.vercel.app',
+        description: "India's premier AI-powered property listing platform.",
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: 'https://brisvora.vercel.app?city={search_term_string}',
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    ]),
   },
 }
 
@@ -115,14 +110,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${playfair.variable} ${dmSans.variable}`} suppressHydrationWarning>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
       </head>
       <body suppressHydrationWarning>
         <Providers session={session}>{children}</Providers>

@@ -17,51 +17,103 @@ export default function DashboardSidebar({ email, phone, role }: { email?: strin
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  const sidebar = (
+  const sidebar = (isDrawer = false) => (
     <aside style={{
-      width: '240px', flexShrink: 0,
+      width: '250px', flexShrink: 0,
       background: 'var(--surface-1)',
       borderRight: '1px solid var(--border)',
       display: 'flex', flexDirection: 'column',
       height: '100vh', overflowY: 'auto',
     }}>
       {/* Logo + user */}
-      <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid var(--border)' }}>
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <Image src="/Brisvora.png" alt="Brisvora" width={32} height={32} style={{ objectFit: 'contain' }} />
-          <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1rem', color: 'var(--text-primary)' }}>Brisvora</span>
-        </Link>
+      <div style={{ padding: isDrawer ? '16px 18px 18px' : '24px 18px 18px', borderBottom: '1px solid var(--border)' }}>
+        {!isDrawer && (
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '10px',
+              background: 'linear-gradient(135deg, var(--gold-dim), rgba(201,168,76,0.05))',
+              border: '1px solid var(--gold-border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Image src="/Brisvora.png" alt="Brisvora" width={26} height={26} className="logo-img" style={{ objectFit: 'contain' }} />
+            </div>
+            <span style={{
+              fontFamily: 'var(--font-serif)', fontSize: '1rem',
+              color: 'var(--text-primary)', letterSpacing: '0.04em',
+            }}>
+              Brisvora
+              <span style={{ color: 'var(--gold)', fontSize: '0.5rem', verticalAlign: 'super', marginLeft: '1px' }}>™</span>
+            </span>
+          </Link>
+        )}
 
         {/* User info */}
-        <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 12px' }}>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }} className="truncate">{email}</p>
+        <div style={{
+          background: 'var(--surface-2)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-md)',
+          padding: '12px',
+        }}>
+          <p style={{
+            fontSize: '0.75rem', color: 'var(--text-secondary)',
+            marginBottom: '6px', display: '-webkit-box', WebkitLineClamp: 1,
+            overflow: 'hidden',
+          }}>{email}</p>
           {phone ? (
-            <span className="badge badge-green" style={{ fontSize: '0.62rem' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              fontSize: '0.6rem', color: '#4ade80',
+              background: 'var(--green-dim)', border: '1px solid rgba(74,222,128,0.2)',
+              padding: '3px 10px', borderRadius: '30px',
+            }}>
               <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80' }} />
               WhatsApp linked
-            </span>
+            </div>
           ) : (
             <Link href="/dashboard/profile" style={{ textDecoration: 'none' }}>
-              <span className="badge badge-gold" style={{ fontSize: '0.62rem', cursor: 'pointer' }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                fontSize: '0.6rem', color: 'var(--gold)',
+                background: 'var(--gold-dim)', border: '1px solid var(--gold-border)',
+                padding: '3px 10px', borderRadius: '30px', cursor: 'pointer',
+              }}>
                 ⚠ Link WhatsApp
-              </span>
+              </div>
             </Link>
           )}
         </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '8px 10px 4px' }}>
+      <nav style={{ flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <p style={{
+          fontSize: '0.55rem', letterSpacing: '0.15em', textTransform: 'uppercase',
+          color: 'var(--text-muted)', fontFamily: "'Cinzel', serif",
+          padding: '8px 12px 6px',
+        }}>
           Menu
         </p>
         {navItems.map(item => {
           const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href)
           return (
             <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
-              className={`sidebar-item${isActive ? ' active' : ''}`}>
-              <span style={{ fontSize: '0.85rem', width: '18px', textAlign: 'center' }}>{item.icon}</span>
+              className="sidebar-item"
+              style={{
+                background: isActive ? 'var(--gold-dim)' : 'transparent',
+                color: isActive ? 'var(--gold-light)' : 'var(--text-secondary)',
+                borderColor: isActive ? 'var(--gold-border)' : 'transparent',
+                fontWeight: isActive ? 500 : 400,
+              }}>
+              <span style={{ fontSize: '0.85rem', width: '18px', textAlign: 'center', opacity: isActive ? 1 : 0.5 }}>{item.icon}</span>
               {item.label}
+              {isActive && (
+                <span style={{
+                  marginLeft: 'auto',
+                  width: '4px', height: '4px', borderRadius: '50%',
+                  background: 'var(--gold)',
+                  boxShadow: '0 0 6px var(--gold)',
+                }} />
+              )}
             </Link>
           )
         })}
@@ -69,8 +121,13 @@ export default function DashboardSidebar({ email, phone, role }: { email?: strin
 
       {/* Admin panel link */}
       {(role === 'ADMIN' || role === 'SUPER_ADMIN') && (
-        <div style={{ padding: '8px 10px 0', borderTop: '1px solid var(--border)' }}>
-          <Link href="/admin" className="sidebar-item" style={{ color: role === 'SUPER_ADMIN' ? '#f87171' : 'var(--gold)' }}>
+        <div style={{ padding: '8px 12px', borderTop: '1px solid var(--border)' }}>
+          <Link href="/admin"
+            className="sidebar-item"
+            style={{
+              color: role === 'SUPER_ADMIN' ? '#f87171' : 'var(--gold)',
+              fontSize: '0.78rem',
+            }}>
             <span style={{ fontSize: '0.85rem', width: '18px', textAlign: 'center' }}>⚡</span>
             Admin Panel
           </Link>
@@ -78,7 +135,7 @@ export default function DashboardSidebar({ email, phone, role }: { email?: strin
       )}
 
       {/* Sign out */}
-      <div style={{ padding: '12px 10px 16px', borderTop: '1px solid var(--border)' }}>
+      <div style={{ padding: '12px 12px 20px', borderTop: '1px solid var(--border)' }}>
         <SignOutButton />
       </div>
     </aside>
@@ -86,16 +143,19 @@ export default function DashboardSidebar({ email, phone, role }: { email?: strin
 
   return (
     <>
-      <div className="dashboard-sidebar" style={{ display: 'flex' }}>{sidebar}</div>
+      <div className="dashboard-sidebar" style={{ display: 'flex' }}>{sidebar()}</div>
 
       {/* Mobile top bar */}
       <div className="dashboard-mobile-bar" style={{
         display: 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: 'var(--surface-1)', borderBottom: '1px solid var(--border)',
-        padding: '0 1rem', height: '56px', alignItems: 'center', justifyContent: 'space-between',
+        background: 'var(--glass-bg)',
+        backdropFilter: 'var(--glass-blur)',
+        borderBottom: '1px solid var(--glass-border)',
+        padding: '0 1rem', height: '56px',
+        alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Image src="/Brisvora.png" alt="Brisvora" width={32} height={32} style={{ objectFit: 'contain' }} />
+          <Image src="/Brisvora.png" alt="Brisvora" width={28} height={28} className="logo-img" style={{ objectFit: 'contain' }} />
         </Link>
         <button onClick={() => setOpen(o => !o)}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--text-primary)' }}
@@ -124,11 +184,11 @@ export default function DashboardSidebar({ email, phone, role }: { email?: strin
       {/* Mobile drawer */}
       <div className="dashboard-mobile-bar" style={{
         display: 'none', position: 'fixed', top: 0, left: 0, bottom: 0,
-        width: '260px', zIndex: 100,
+        width: '270px', zIndex: 100,
         transform: open ? 'translateX(0)' : 'translateX(-100%)',
         transition: 'transform 0.28s cubic-bezier(0.16,1,0.3,1)',
       }}>
-        {sidebar}
+        {sidebar(true)}
       </div>
     </>
   )

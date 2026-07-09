@@ -1120,6 +1120,300 @@ flowchart TD
 
 ---
 
+## 13. Master Reactive System Architecture — Event Propagation & State Update Flow
+
+This diagram shows the **complete reactive interaction** across the entire platform — how every event triggers cascading state updates, how components react to changes in real-time, and how the system maintains perfect consistency across all layers.
+
+```mermaid
+flowchart TB
+    %% ─── EVENT ORIGINS ───────────────────────────────────────────────────
+    subgraph "🌐 EVENT SOURCES (Triggers)"
+        direction TB
+        E1("📱 Broker WhatsApp<br/>'2 BHK in Mumbai, ₹50L'")
+        E2("👤 Buyer Lead Form<br/>'Interested in this property'")
+        E3("🗺️ Buyer Page Visit<br/>GET /apartment/luxury-2bhk")
+        E4("🔐 User Registration<br/>+91 9999999999")
+        E5("⚙️ Admin Action<br/>Update/Delete/Override")
+    end
+
+    %% ─── EVENT PROCESSING LAYER (Vercel) ─────────────────────────────────
+    subgraph "⚡ EVENT PROCESSING (Vercel — Next.js 16)"
+        direction TB
+        WH["Webhook Handler<br/>POST /api/whatsapp/webhook"]
+        LH["Lead Handler<br/>POST /api/leads"]
+        PH["Page Handler<br/>Server Component SSR"]
+        RH["Register Handler<br/>POST /api/register"]
+        UH["Upload Handler<br/>POST /api/upload"]
+        AH["Admin Handler<br/>PUT /api/admin/*"]
+    end
+
+    E1 --> WH
+    E2 --> LH
+    E3 --> PH
+    E4 --> RH
+    E5 --> AH
+
+    %% ─── BUSINESS LOGIC LAYER (apps/api) ──────────────────────────────────
+    subgraph "🧠 BUSINESS LOGIC (apps/api — Internal TS Library)"
+        direction TB
+        AI_FALLBACK["🤖 3-Level Fallback Chain<br/>Claude 3.5 → Regex → Flask"]
+        DUPE_PROP["🔍 Property Dup Detection<br/>phone+city+price+BHK ≤ 24hrs"]
+        DUPE_LEAD["🔍 Lead Dup Detection<br/>propertyId+phone ≤ 24hrs"]
+        DUPE_USER["🔍 User Dup Detection<br/>email/phone already exists"]
+        OTP_FLOW["🔐 OTP Flow<br/>send → verify → phoneVerified"]
+        CONV_STATE["💭 Conversation State Machine<br/>GREETING → ACCUMULATING → GENERATING"]
+        MEDIA_PROC["🖼️ Media Processing<br/>Cloudinary Upload → mediaJson"]
+        ANALYTICS["📊 Analytics Pipeline<br/>viewCount++ → inquiryCount++"]
+    end
+
+    WH --> CONV_STATE
+    CONV_STATE -->|GENERATING| AI_FALLBACK
+    WH --> DUPE_PROP
+    DUPE_PROP -->|Pass| AI_FALLBACK
+    DUPE_PROP -->|Block| E1
+
+    LH --> DUPE_LEAD
+    DUPE_LEAD -->|Pass| LEADS["📋 Lead Sanitization<br/>tokenCount, countryCode"]
+    DUPE_LEAD -->|Block: Already enquired| E2
+
+    PH --> ANALYTICS
+    PH --> RENDER_FALLBACK["📄 3-Level Render Fallback<br/>DB → Flask Mock → TS Hardcoded"]
+
+    RH --> DUPE_USER
+    DUPE_USER -->|Pass| OTP_FLOW
+    DUPE_USER -->|Block: 409 Conflict| E4
+
+    E5 --> AH
+
+    %% ─── DATA PERSISTENCE LAYER ──────────────────────────────────────────
+    subgraph "🗄️ DATA PERSISTENCE (packages/shared + Supabase)"
+        direction TB
+        DB_PROPERTY["🏠 Property<br/>+ slug · mockDataUrl · mediaJson · plan"]
+        DB_USER["👤 User<br/>+ phone · countryCode · phoneVerified · role · plan"]
+        DB_LEAD["📋 Lead<br/>+ propertyId · phone · countryCode · tokenCount"]
+        DB_IMAGE["🖼️ Image<br/>+ url · mediaType: image|video · order"]
+        DB_ANALYTICS["📊 Analytics<br/>+ viewCount · inquiryCount"]
+        DB_OTP["🔐 OtpVerification<br/>+ otp · expiresAt · attempts · verified"]
+        DB_CONV["💭 ConversationState<br/>+ state · context"]
+        DB_MSG["💬 WhatsappMessage<br/>+ content · direction"]
+    end
+
+    AI_FALLBACK -->|createListing| DB_PROPERTY
+    AI_FALLBACK --> DB_IMAGE
+    DUPE_PROP --> DB_PROPERTY
+    LEADS --> DB_LEAD
+    DUPE_LEAD --> DB_LEAD
+    ANALYTICS --> DB_ANALYTICS
+    OTP_FLOW --> DB_OTP
+    OTP_FLOW -->|phoneVerified=true| DB_USER
+    DUPE_USER --> DB_USER
+    CONV_STATE --> DB_CONV
+    CONV_STATE --> DB_MSG
+    MEDIA_PROC --> DB_IMAGE
+    MEDIA_PROC --> DB_PROPERTY
+    AH --> DB_PROPERTY
+    AH --> DB_USER
+    AH --> DB_LEAD
+
+    %% ─── REACTIVE UI LAYER (Continuously Re-renders) ──────────────────────
+    subgraph "🔄 REACTIVE UI (apps/web — Dashboard Components)"
+        direction TB
+        UI_GROWTH["📈 Growth OS<br/>Pending tasks · AI credits<br/>Quick actions · Activity feed"]
+        UI_LISTINGS["🏠 Listings Panel<br/>Real-time property list<br/>Status · Views · Enquiries"]
+        UI_LEADS["👥 Leads Panel<br/>Enquiry stream<br/>Source · Token count · Time"]
+        UI_ANALYTICS["📊 Analytics Dashboard<br/>Views chart · Inquiries chart<br/>Conversion rate"]
+        UI_PROFILE["👤 Profile Page<br/>Phone · Country code<br/>Verify OTP button"]
+        UI_ACTIVITY["📜 Activity Log<br/>Webhook events · Errors<br/>State transitions"]
+    end
+
+    DB_PROPERTY -->|useSWR revalidation| UI_LISTINGS
+    DB_PROPERTY --> UI_GROWTH
+    DB_LEAD -->|useSWR revalidation| UI_LEADS
+    DB_LEAD --> UI_ANALYTICS
+    DB_ANALYTICS --> UI_ANALYTICS
+    DB_ANALYTICS --> UI_LISTINGS
+    DB_USER --> UI_PROFILE
+    DB_USER --> UI_GROWTH
+    DB_CONV --> UI_ACTIVITY
+    DB_MSG --> UI_ACTIVITY
+
+    %% ─── EXTERNAL SERVICE REACTIONS ──────────────────────────────────────
+    subgraph "🔗 EXTERNAL SERVICE REACTIONS"
+        direction TB
+        SEND_WA["📱 AiSensy Send<br/>OTP · Listing URL · Reply"]
+        WEBHOOK_WA["📱 AiSensy Webhook<br/>Inbound message → Event"]
+        CLOUD_UPLOAD["☁️ Cloudinary Upload<br/>Image · Video · Auto-detect"]
+        ANTHROPIC_API["🧠 Anthropic API<br/>Claude 3.5 Sonnet"]
+        FLASK_MOCK["🐍 Flask Mock API<br/>GET /api/mock/{type}/{bhk}"]
+        SEO_PIPELINE["🔍 SEO Pipeline<br/>JSON-LD · OG · Twitter Cards"]
+        REDIRECT_301["🔄 Legacy Redirect<br/>property/[slug] → 301 → type route"]
+    end
+
+    OTP_FLOW --> SEND_WA
+    AI_FALLBACK --> SEND_WA
+    WH --> WEBHOOK_WA
+    MEDIA_PROC --> CLOUD_UPLOAD
+    AI_FALLBACK -->|Level 1| ANTHROPIC_API
+    AI_FALLBACK -->|Level 3| FLASK_MOCK
+    PH --> SEO_PIPELINE
+    PH --> REDIRECT_301
+    SEND_WA -->|OTP delivered| UI_PROFILE
+    SEND_WA -->|URL shared| UI_LISTINGS
+
+    %% ─── REACTIVE CASCADE LABELS ─────────────────────────────────────────
+    CASCADE1("⚡ REACTIVE CASCADE:<br/>WhatsApp → Webhook → Conversation → Fallback → DB → UI → WhatsApp Reply")
+    CASCADE2("⚡ REACTIVE CASCADE:<br/>Page Visit → SSR → DB/Fallback → Render → Analytics++ → SEO Pipeline")
+    CASCADE3("⚡ REACTIVE CASCADE:<br/>Lead Form → Dup Check → Lead DB → Analytics++ → Broker Dashboard UI")
+
+    CASCADE1 -.->|"Event Chain 1"| WH
+    CASCADE2 -.->|"Event Chain 2"| PH
+    CASCADE3 -.->|"Event Chain 3"| LH
+
+    %% ─── STYLES ──────────────────────────────────────────────────────────
+    style E1 fill:#15803D,color:#fff,stroke:#15803D
+    style E2 fill:#C9A84C,color:#000,stroke:#C9A84C
+    style E3 fill:#C9A84C,color:#000,stroke:#C9A84C
+    style E4 fill:#60a5fa,color:#fff,stroke:#60a5fa
+    style E5 fill:#f87171,color:#fff,stroke:#f87171
+    style WH fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
+    style LH fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
+    style PH fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
+    style RH fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
+    style AI_FALLBACK fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style DUPE_PROP fill:#1e1b18,color:#f87171,stroke:#f87171
+    style DUPE_LEAD fill:#1e1b18,color:#f87171,stroke:#f87171
+    style DUPE_USER fill:#1e1b18,color:#f87171,stroke:#f87171
+    style CONV_STATE fill:#1e1b18,color:#60a5fa,stroke:#60a5fa
+    style OTP_FLOW fill:#1e1b18,color:#60a5fa,stroke:#60a5fa
+    style CASCADE1 fill:#15803D,color:#fff,stroke:#15803D
+    style CASCADE2 fill:#15803D,color:#fff,stroke:#15803D
+    style CASCADE3 fill:#15803D,color:#fff,stroke:#15803D
+    style SEND_WA fill:#15803D,color:#fff,stroke:#15803D
+    style WEBHOOK_WA fill:#15803D,color:#fff,stroke:#15803D
+    style FLASK_MOCK fill:#4169E1,color:#fff,stroke:#4169E1
+    style ANTHROPIC_API fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style SEO_PIPELINE fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style UI_GROWTH fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style UI_LISTINGS fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style UI_LEADS fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style UI_ANALYTICS fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style UI_PROFILE fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style UI_ACTIVITY fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+```
+
+### Reactive Cascade 1: WhatsApp Listing Generation
+
+```
+Broker sends "2 BHK in Mumbai, ₹50L" on WhatsApp
+    │
+    ▼
+AiSensy Webhook → POST /api/whatsapp/webhook (instant <100ms)
+    │
+    ▼
+Conversation State Machine: GREETING → ACCUMULATING → GENERATING
+    │
+    ▼
+Duplicate Detection: phone+city+price+BHK within 24hrs?
+    ├── YES → ⛔ "Property already exists" → Reply to Broker
+    └── NO → 3-Level Fallback Chain
+              ├── Level 1: Claude 3.5 Sonnet (if API key present)
+              ├── Level 2: Regex Mock (no API key needed)
+              └── Level 3: Flask JSON Mock API (always works)
+    │
+    ▼
+createListing() → Supabase (Property + Images + mockDataUrl)
+    │
+    ▼
+sendMessage() → Broker gets URL on WhatsApp
+    │
+    ▼
+Dashboard UI REACTS: useSWR revalidates → New listing appears in real-time
+    │
+    ▼
+Analytics UI REACTS: Listing count increments → Chart updates
+    │
+    ▼
+Buyer visits URL → Property page renders with fallback chain
+```
+
+### Reactive Cascade 2: Buyer Page Visit & Enquiry
+
+```
+Buyer visits /apartment/luxury-2bhk
+    │
+    ▼
+Server Component SSR: getListingBySlug()
+    │
+    ▼
+3-Level Render Fallback: DB → Flask Mock → TS Hardcoded
+    │
+    ▼
+React Component REACTS: ApartmentClient renders with data
+    │
+    ▼
+SEO Pipeline REACTS: Metadata → JSON-LD → OG → Twitter Cards
+    │
+    ▼
+Analytics Pipeline REACTS: viewCount++ → Dashboard chart updates
+    │
+    ▼
+Buyer fills Lead Form (with country code + token counter)
+    │
+    ▼
+POST /api/leads → Duplicate Detection
+    ├── YES → ⛔ "Already enquired"
+    └── NO → createLead() → Supabase
+    │
+    ▼
+Leads Dashboard UI REACTS: New lead appears in real-time
+    │
+    ▼
+Analytics Dashboard REACTS: inquiryCount++ → Conversion rate updates
+    │
+    ▼
+Broker is notified → Can reply via WhatsApp
+```
+
+### Reactive Cascade 3: User Registration & OTP
+
+```
+Broker registers: Selects 🇮🇳 +91, enters 9999999999
+    │
+    ▼
+POST /api/register → Duplicate Detection
+    ├── YES → ⛔ 409 Conflict "Email/phone in use"
+    └── NO → CREATE User with countryCode
+    │
+    ▼
+Profile UI REACTS: Shows phone + countryCode + "Verify" button
+    │
+    ▼
+Broker clicks "Verify via WhatsApp"
+    │
+    ▼
+POST /api/otp/send → createOtp() → DB (expires 10min)
+    │
+    ▼
+AiSensy Send REACTS: OTP delivered on WhatsApp
+    │
+    ▼
+Broker enters 6-digit code → POST /api/otp/verify
+    │
+    ▼
+OTP Validation: Valid? Expired? Too many attempts?
+    ├── VALID → phoneVerified = true → UI REACTS: green checkmark
+    ├── EXPIRED → ⛔ "Request new OTP"
+    └── INVALID → ⛔ Retry (max 3 attempts)
+    │
+    ▼
+Dashboard UI REACTS: Phone verified → Full access unlocked
+    │
+    ▼
+Broker can now generate listings via WhatsApp
+```
+
+---
+
 ## Async Webhook Processing Architecture (Future)
 
 ```

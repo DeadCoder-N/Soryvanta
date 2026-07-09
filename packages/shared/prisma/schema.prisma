@@ -13,13 +13,6 @@ enum Role {
   SUPER_ADMIN
 }
 
-enum Plan {
-  STARTER
-  PROFESSIONAL
-  BUSINESS
-  ENTERPRISE
-}
-
 enum PropertyType {
   APARTMENT
   HOUSE
@@ -55,7 +48,7 @@ model User {
   phoneVerified Boolean   @default(false)               // NEW: Whether phone is OTP-verified
   passwordHash  String?
   role          Role      @default(BROKER)
-  plan          Plan      @default(STARTER)
+  plan          String?   @default("STARTER")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { IcoClose, IcoCamera, IcoCheck } from '@/components/Icons'
 
 interface Listing {
   id: string
@@ -21,16 +22,18 @@ interface Listing {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  border: '1px solid var(--linen-dk)',
-  background: 'var(--warm-white)',
-  color: 'var(--ink)',
+  border: '1px solid var(--border-md)',
+  background: 'var(--surface-3)',
+  color: 'var(--text-primary)',
   padding: '13px 16px',
   fontSize: '0.875rem',
-  transition: 'border-color 0.2s',
+  borderRadius: 'var(--radius-md)',
+  transition: 'border-color 0.2s, box-shadow 0.2s',
+  outline: 'none',
 }
 
 const labelStyle: React.CSSProperties = {
-  fontSize: '0.68rem', color: 'var(--ink-soft)', letterSpacing: '0.14em',
+  fontSize: '0.68rem', color: 'var(--text-secondary)', letterSpacing: '0.14em',
   textTransform: 'uppercase', display: 'block', marginBottom: '10px',
 }
 
@@ -124,15 +127,14 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
   ]
 
   return (
-    <div style={{ maxWidth: '720px' }}>
-      <p style={{ fontSize: '0.62rem', color: 'var(--mauve)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: '12px' }}>
-        Edit Listing
-      </p>
-      <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: 'var(--ink)', fontWeight: 400, marginBottom: '8px' }}>
+    <div style={{ maxWidth: '720px' }} className="animate-fade-up">
+      <span className="section-label" style={{ marginBottom: '6px' }}>Edit Listing</span>
+      <div className="gold-divider" style={{ marginBottom: '14px' }} />
+      <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.4rem, 2.5vw, 1.9rem)', color: 'var(--text-primary)', fontWeight: 400, marginBottom: '8px' }}>
         {listing.title}
       </h1>
-      <p style={{ fontSize: '0.85rem', color: 'var(--ink-muted)', marginBottom: '40px', lineHeight: 1.7 }}>
-        Update the details for this property. Changes will immediately reflect on the public listing.
+      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '36px', lineHeight: 1.7 }}>
+        Changes will immediately reflect on the public listing.
       </p>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -141,25 +143,24 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
         <div>
           <label style={labelStyle}>Title</label>
           <input name="title" value={formData.title} onChange={handleChange} required style={inputStyle}
-            onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-            onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+            onFocus={e => { e.target.style.borderColor = 'var(--gold)'; e.target.style.boxShadow = '0 0 0 3px var(--gold-dim)' }}
+            onBlur={e => { e.target.style.borderColor = 'var(--border-md)'; e.target.style.boxShadow = 'none' }} />
         </div>
 
-        {/* Description */}
         <div>
           <label style={labelStyle}>Description</label>
           <textarea name="description" value={formData.description} onChange={handleChange} required rows={5}
             style={{ ...inputStyle, resize: 'none' }}
-            onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-            onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+            onFocus={e => { e.target.style.borderColor = 'var(--gold)'; e.target.style.boxShadow = '0 0 0 3px var(--gold-dim)' }}
+            onBlur={e => { e.target.style.borderColor = 'var(--border-md)'; e.target.style.boxShadow = 'none' }} />
         </div>
 
-        <div className="edit-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div className="edit-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           <div>
-            <label style={labelStyle}>Price (₹)</label>
+            <label style={labelStyle}>Price (&#8377;)</label>
             <input type="number" name="price" value={formData.price} onChange={handleChange} required style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+              onFocus={e => { e.target.style.borderColor = 'var(--gold)'; e.target.style.boxShadow = '0 0 0 3px var(--gold-dim)' }}
+              onBlur={e => { e.target.style.borderColor = 'var(--border-md)'; e.target.style.boxShadow = 'none' }} />
           </div>
           <div>
             <label style={labelStyle}>Property Type</label>
@@ -174,12 +175,12 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
           </div>
         </div>
 
-        <div className="edit-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div className="edit-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           <div>
             <label style={labelStyle}>City</label>
             <input name="city" value={formData.city} onChange={handleChange} required style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+              onFocus={e => { e.target.style.borderColor = 'var(--gold)'; e.target.style.boxShadow = '0 0 0 3px var(--gold-dim)' }}
+              onBlur={e => { e.target.style.borderColor = 'var(--border-md)'; e.target.style.boxShadow = 'none' }} />
           </div>
           <div>
             <label style={labelStyle}>Status</label>
@@ -195,28 +196,28 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
         <div>
           <label style={labelStyle}>Address</label>
           <input name="address" value={formData.address} onChange={handleChange} required style={inputStyle}
-            onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-            onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+            onFocus={e => { e.target.style.borderColor = 'var(--gold)'; e.target.style.boxShadow = '0 0 0 3px var(--gold-dim)' }}
+            onBlur={e => { e.target.style.borderColor = 'var(--border-md)'; e.target.style.boxShadow = 'none' }} />
         </div>
 
-        <div className="edit-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+        <div className="edit-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
           <div>
             <label style={labelStyle}>Bedrooms</label>
             <input type="number" name="bedrooms" value={formData.bedrooms} onChange={handleChange} style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+              onFocus={e => { e.target.style.borderColor = 'var(--gold)'; e.target.style.boxShadow = '0 0 0 3px var(--gold-dim)' }}
+              onBlur={e => { e.target.style.borderColor = 'var(--border-md)'; e.target.style.boxShadow = 'none' }} />
           </div>
           <div>
             <label style={labelStyle}>Bathrooms</label>
             <input type="number" name="bathrooms" value={formData.bathrooms} onChange={handleChange} style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+              onFocus={e => { e.target.style.borderColor = 'var(--gold)'; e.target.style.boxShadow = '0 0 0 3px var(--gold-dim)' }}
+              onBlur={e => { e.target.style.borderColor = 'var(--border-md)'; e.target.style.boxShadow = 'none' }} />
           </div>
           <div>
             <label style={labelStyle}>Area (Sqft)</label>
             <input type="number" name="areaSqft" value={formData.areaSqft} onChange={handleChange} style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = 'var(--mauve)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--linen-dk)')} />
+              onFocus={e => { e.target.style.borderColor = 'var(--gold)'; e.target.style.boxShadow = '0 0 0 3px var(--gold-dim)' }}
+              onBlur={e => { e.target.style.borderColor = 'var(--border-md)'; e.target.style.boxShadow = 'none' }} />
           </div>
         </div>
 
@@ -235,13 +236,13 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
                     onClick={() => img.isNew ? removeNewImage(img.url) : removeExistingImage(img.id)}
                     style={{
                       position: 'absolute', top: '4px', right: '4px',
-                      background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff',
-                      width: '22px', height: '22px', cursor: 'pointer', fontSize: '0.75rem',
+                      background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff',
+                      width: '22px', height: '22px', cursor: 'pointer', borderRadius: '50%',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}
                     aria-label="Remove image"
                   >
-                    ✕
+                    <IcoClose size={10} />
                   </button>
                   {img.isNew && (
                     <div style={{ position: 'absolute', bottom: '4px', left: '4px', background: 'var(--logo-green)', color: '#fff', fontSize: '0.55rem', padding: '2px 6px', letterSpacing: '0.08em' }}>
@@ -254,32 +255,27 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
           )}
 
           {/* Upload area */}
-          <div style={{ border: '1px dashed var(--linen-dk)', padding: '20px', textAlign: 'center', background: 'var(--linen)' }}>
+          <div className="upload-zone" style={{ padding: '24px', textAlign: 'center' }}>
             <input type="file" accept="image/*" multiple onChange={handleImageUpload} style={{ display: 'none' }} id="edit-image-upload" />
-            <label htmlFor="edit-image-upload" style={{ cursor: 'pointer' }}>
-              <p style={{ fontSize: '0.8rem', color: 'var(--ink-soft)', marginBottom: '4px' }}>
+            <label htmlFor="edit-image-upload" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+              <span style={{ color: 'var(--gold)', opacity: 0.7 }}><IcoCamera size={20} /></span>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '2px' }}>
                 {uploading ? 'Uploading...' : 'Click to add more images'}
               </p>
-              <p style={{ fontSize: '0.72rem', color: 'var(--ink-muted)' }}>JPEG, PNG supported</p>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>JPEG, PNG supported</p>
             </label>
           </div>
         </div>
 
         {error && (
-          <p style={{ fontSize: '0.8rem', color: 'var(--gold)', background: 'rgba(184,134,11,0.08)', padding: '12px 16px' }}>
-            {error}
-          </p>
+          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 'var(--radius-md)', padding: '12px 16px' }}>
+            <p style={{ fontSize: '0.82rem', color: '#f87171' }}>{error}</p>
+          </div>
         )}
 
-        <button type="submit" disabled={loading || uploading} style={{
-          background: (loading || uploading) ? 'var(--linen-dk)' : 'var(--ink)',
-          color: 'var(--warm-white)',
-          padding: '16px', fontSize: '0.72rem', letterSpacing: '0.16em',
-          textTransform: 'uppercase', border: 'none',
-          cursor: (loading || uploading) ? 'not-allowed' : 'pointer',
-          marginTop: '8px',
-        }}>
-          {loading ? 'Saving Changes...' : 'Save Changes'}
+        <button type="submit" disabled={loading || uploading} className="btn-primary"
+          style={{ padding: '15px', fontSize: '0.85rem', opacity: loading || uploading ? 0.7 : 1, cursor: loading || uploading ? 'not-allowed' : 'pointer', gap: '8px' }}>
+          {loading ? 'Saving...' : <><IcoCheck size={15} /> Save Changes</>}
         </button>
       </form>
     </div>

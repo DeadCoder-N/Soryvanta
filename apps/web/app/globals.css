@@ -68,6 +68,22 @@
 }
 
 /* ── Animation utilities ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-fade-up, .animate-fade-in, .animate-scale-in,
+  .animate-slide-up, .animate-scale-smooth {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  [style*="animation-delay"] {
+    animation-delay: 0s !important;
+  }
+}
 .animate-fade-up  { animation: fadeInUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
 .animate-fade-in  { animation: fadeIn 0.4s ease both; }
 .animate-scale-in { animation: scaleIn 0.4s cubic-bezier(0.16,1,0.3,1) both; }
@@ -559,7 +575,7 @@ input:focus, select:focus, textarea:focus { outline: none; }
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 28px 24px;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
   position: relative;
   overflow: hidden;
 }
@@ -575,8 +591,69 @@ input:focus, select:focus, textarea:focus { outline: none; }
 .stat-card:hover {
   border-color: var(--border-gold);
   box-shadow: var(--shadow-gold);
+  transform: translateY(-2px);
 }
 .stat-card:hover::before { opacity: 1; }
+
+/* Stat card variants for listings summary */
+.stat-card-sm { padding: 18px 24px; border-radius: var(--radius-md); }
+.stat-card-green { border-color: rgba(74,222,128,0.2); }
+.stat-card-gold { border-color: var(--gold-border); }
+.stat-card-value {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-card-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Empty state shared classes */
+.empty-state-icon {
+  width: 72px; height: 72px;
+  margin: 0 auto 20px;
+  background: var(--gold-dim);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.empty-state-title {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+.empty-state-body {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+/* Listing action button — CSS-only hover, safe for server components */
+.listing-action-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 0.7rem;
+  padding: 7px 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-3);
+  color: var(--text-secondary);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+.listing-action-btn:hover {
+  background: var(--surface-4);
+  color: var(--text-primary);
+  border-color: var(--border-gold);
+}
 
 /* ── Logo filter ── */
 :root, [data-theme="dark"] {
@@ -622,7 +699,13 @@ body::after {
 .line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 
 /* ── Responsive ── */
+@media (max-width: 1024px) {
+  .growth-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
 @media (max-width: 768px) {
+  .growth-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .growth-charts-grid { grid-template-columns: 1fr !important; }
+  .leads-pipeline-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .auth-mobile-logo { display: block !important; }
   .nav-desktop { display: none !important; }
   .nav-mobile  { display: flex !important; }
@@ -639,20 +722,35 @@ body::after {
   .dashboard-mobile-bar { display: flex !important; }
   .stats-cards      { grid-template-columns: 1fr 1fr !important; }
   .dashboard-main   { padding: 72px 1rem 2rem !important; }
+  .dashboard-container { padding: 0 !important; }
   .edit-grid-2      { grid-template-columns: 1fr !important; }
   .edit-grid-3      { grid-template-columns: 1fr 1fr !important; }
+  .dashboard-charts-grid  { grid-template-columns: 1fr !important; }
   .property-sidebar       { display: none !important; }
   .property-mobile-contact { display: flex !important; }
   .property-page-content  { padding-bottom: 88px !important; }
   .specs-row        { flex-wrap: wrap !important; }
   .thumbnail-strip  { display: none !important; }
 }
+@media (min-width: 1400px) {
+  .dashboard-container {
+    max-width: 1280px !important;
+    margin: 0 auto !important;
+    padding: 0 2rem !important;
+  }
+  .dashboard-charts-grid {
+    grid-template-columns: 1.5fr 1fr !important;
+  }
+}
 @media (min-width: 769px) {
   .nav-mobile { display: none !important; }
   .dashboard-mobile-bar { display: none !important; }
 }
 @media (max-width: 480px) {
+  .growth-stats-grid { grid-template-columns: 1fr !important; }
   .listings-grid { grid-template-columns: 1fr !important; }
   .stats-cards   { grid-template-columns: 1fr !important; }
+  .dashboard-charts-grid  { grid-template-columns: 1fr !important; }
   .edit-grid-3   { grid-template-columns: 1fr !important; }
+  .leads-pipeline-grid { grid-template-columns: 1fr 1fr !important; }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { IcoWarning, IcoCheck } from '@/components/Icons'
 
 export default function ProfilePage() {
   const [phone, setPhone] = useState('')
@@ -58,7 +59,9 @@ export default function ProfilePage() {
 
       {!phone && (
         <div style={{ background: 'rgba(201,150,14,0.08)', border: '1px solid var(--gold-border)', borderRadius: 'var(--radius-md)', padding: '14px 16px', marginBottom: '28px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-          <span>⚠️</span>
+          <span style={{ flexShrink: 0, marginTop: '2px', color: 'var(--gold)' }}>
+            <IcoWarning size={16} />
+          </span>
           <p style={{ fontSize: '0.82rem', color: 'var(--gold)', lineHeight: 1.6 }}>
             No WhatsApp number linked. Add your number to create listings via WhatsApp.
           </p>
@@ -99,7 +102,9 @@ export default function ProfilePage() {
         )}
         {success && (
           <div style={{ background: 'var(--green-dim)', border: '1px solid rgba(74,222,128,0.2)', borderRadius: 'var(--radius-md)', padding: '12px 14px' }}>
-            <p style={{ fontSize: '0.82rem', color: '#4ade80' }}>✓ {success}</p>
+            <p style={{ fontSize: '0.82rem', color: '#4ade80', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <IcoCheck size={14} /> {success}
+            </p>
           </div>
         )}
 

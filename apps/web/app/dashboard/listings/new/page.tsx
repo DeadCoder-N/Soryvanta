@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { IcoCamera, IcoCheck, IcoClose, IcoSparkle, IcoUpload } from '@/components/Icons'
 
 export default function NewListingPage() {
   const router = useRouter()
@@ -76,9 +77,19 @@ export default function NewListingPage() {
             onDragLeave={() => setDragOver(false)}
             onDrop={e => { e.preventDefault(); setDragOver(false); uploadFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'))) }}>
             <input ref={inputRef} type="file" accept="image/*" multiple onChange={e => uploadFiles(Array.from(e.target.files ?? []))} style={{ display: 'none' }} />
-            <div style={{ fontSize: '2rem', marginBottom: '10px', opacity: 0.5 }}>📸</div>
+            <div style={{
+              width: '48px', height: '48px', margin: '0 auto 12px',
+              background: 'var(--gold-dim)', borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--gold)', opacity: 0.7,
+            }}>
+              <IcoCamera size={22} />
+            </div>
             {uploading ? (
-              <p style={{ fontSize: '0.85rem', color: 'var(--gold)' }}>Uploading...</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                <IcoUpload size={14} style={{ color: 'var(--gold)', animation: 'pulse-dot 1.2s infinite' }} />
+                <p style={{ fontSize: '0.85rem', color: 'var(--gold)' }}>Uploading...</p>
+              </div>
             ) : (
               <>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
@@ -95,16 +106,17 @@ export default function NewListingPage() {
                 <div key={url} className="animate-scale-in" style={{ position: 'relative', paddingTop: '75%', background: 'var(--surface-3)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', animationDelay: `${i * 0.05}s` }}>
                   <Image src={url} alt="" fill style={{ objectFit: 'cover' }} />
                   <button type="button" onClick={() => setImageUrls(p => p.filter(u => u !== url))}
-                    style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', cursor: 'pointer', fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    ✕
+                    style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    aria-label="Remove image">
+                    <IcoClose size={10} />
                   </button>
                 </div>
               ))}
             </div>
           )}
           {imageUrls.length > 0 && (
-            <p style={{ fontSize: '0.75rem', color: '#4ade80', marginTop: '8px' }}>
-              ✓ {imageUrls.length} image{imageUrls.length > 1 ? 's' : ''} ready
+            <p style={{ fontSize: '0.75rem', color: '#4ade80', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <IcoCheck size={13} /> {imageUrls.length} image{imageUrls.length > 1 ? 's' : ''} ready
             </p>
           )}
         </div>
@@ -117,7 +129,7 @@ export default function NewListingPage() {
 
         <button type="submit" disabled={loading || uploading} className="btn-primary"
           style={{ padding: '15px', fontSize: '0.88rem', opacity: loading || uploading ? 0.7 : 1, cursor: loading || uploading ? 'not-allowed' : 'pointer' }}>
-          {loading ? 'Generating with AI...' : uploading ? 'Uploading...' : '✨ Generate Listing'}
+          {loading ? 'Generating with AI...' : uploading ? 'Uploading...' : <><IcoSparkle size={15} /> Generate Listing</>}
         </button>
       </form>
     </div>

@@ -76,6 +76,33 @@ sendMessage()  →  replies to broker with listing URL
 Buyer visits  https://brisvora.vercel.app/property/[slug]
 ```
 
+```mermaid
+flowchart TD
+    A([📱 Broker sends WhatsApp message]) --> B[AiSensy Webhook
+POST /api/whatsapp/webhook]
+    B --> C[parseInboundMessage
+extracts phone · text · mediaUrls]
+    C --> D{ConversationState}
+    D -->|GREETING| E[Bot introduces itself
+sends welcome message]
+    D -->|ACCUMULATING| F[Collecting property details
+text + photos]
+    D -->|GENERATING| G[generateListing
+Claude 3.5 Sonnet]
+    G -->|No API key| G2[Regex mock fallback]
+    G --> H[createListing
+saves to PostgreSQL]
+    G2 --> H
+    H --> I[sendMessage
+replies with listing URL]
+    I --> J([🏠 Buyer visits property page])
+
+    style A fill:#15803D,color:#fff,stroke:none
+    style J fill:#C9A84C,color:#000,stroke:none
+    style G fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style D fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+```
+
 ---
 
 ## 🛠️ Tech Stack
@@ -462,6 +489,67 @@ ConversationState ────────────────────�
 Account · Session · VerificationToken  →  NextAuth standard models
 ```
 
+```mermaid
+erDiagram
+    User ||--o{ Property : owns
+    User ||--o{ WhatsappMessage : sends
+    User ||--o{ Session : has
+    User ||--o{ Account : has
+    Property ||--o{ Image : has
+    Property ||--o{ Lead : receives
+    Property ||--|| Analytics : tracked_by
+
+    User {
+        string id PK
+        string name
+        string email
+        string phone
+        string passwordHash
+        enum role
+    }
+    Property {
+        string id PK
+        string slug
+        string ownerId FK
+        string title
+        string city
+        int price
+        enum type
+        enum status
+    }
+    Image {
+        string id PK
+        string propertyId FK
+        string url
+        int order
+    }
+    Lead {
+        string id PK
+        string propertyId FK
+        string name
+        string phone
+        string source
+    }
+    Analytics {
+        string id PK
+        string propertyId FK
+        int viewCount
+        int inquiryCount
+    }
+    WhatsappMessage {
+        string id PK
+        string userId FK
+        string content
+        enum direction
+    }
+    ConversationState {
+        string id PK
+        string userId
+        string state
+        json context
+    }
+```
+
 ---
 
 ## 🎨 Brand System
@@ -794,6 +882,62 @@ pnpm coverage
 | MSW for tests | Same mock handlers in browser dev mode and Vitest — no duplication |
 | Turborepo | Parallel builds, incremental caching — fast CI |
 | AiSensy over Meta Cloud API directly | Simpler onboarding, managed infrastructure, no Meta Business verification complexity |
+
+```mermaid
+graph TD
+    subgraph Browser
+        A[📱 Buyer - Public Pages]
+        B[💻 Broker - Dashboard]
+    end
+
+    subgraph Vercel - apps/web
+        C[Next.js App Router]
+        D[API Routes - thin handlers]
+    end
+
+    subgraph apps/api - Internal Library
+        E[ai/index.ts]
+        F[whatsapp/index.ts]
+        G[listings/index.ts]
+        H[leads/index.ts]
+        I[analytics/index.ts]
+    end
+
+    subgraph packages/shared
+        J[Prisma Client Singleton]
+        K[NextAuth Config]
+        L[Types + Utils]
+    end
+
+    subgraph External Services
+        M[🤖 Anthropic Claude]
+        N[💬 AiSensy WhatsApp]
+        O[🖼️ Cloudinary]
+        P[🗄️ Supabase PostgreSQL]
+    end
+
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    D --> G
+    D --> H
+    D --> I
+    E --> M
+    F --> N
+    G --> J
+    H --> J
+    I --> J
+    J --> P
+    D --> O
+
+    style C fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style J fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style M fill:#1e1b18,color:#fff,stroke:#555
+    style N fill:#15803D,color:#fff,stroke:none
+    style P fill:#1e1b18,color:#4169E1,stroke:#4169E1
+```
 
 ---
 

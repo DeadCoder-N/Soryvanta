@@ -8,13 +8,13 @@
 
 **"One Message. Unlimited Growth."**
 
-[![Live](https://img.shields.io/badge/Live-brisvora.vercel.app-C9A84C?style=for-the-badge&logo=vercel&logoColor=black)](https://brisvora.vercel.app)
+[![Live](https://img.shields.io/badge/Live-brisvora.vercel.app-black?style=for-the-badge&logo=vercel&logoColor=white)](https://brisvora.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![Python](https://img.shields.io/badge/Flask-Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://flask.palletsprojects.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://supabase.com)
-[![Tests](https://img.shields.io/badge/Tests-44%20passing-15803D?style=for-the-badge&logo=vitest&logoColor=white)](#testing)
-[![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)](#license)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-black?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![Python](https://img.shields.io/badge/Flask-Python-black?style=for-the-badge&logo=python&logoColor=white)](https://flask.palletsprojects.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-black?style=for-the-badge&logo=postgresql&logoColor=white)](https://supabase.com)
+[![Tests](https://img.shields.io/badge/Tests-44%20passing-black?style=for-the-badge&logo=vitest&logoColor=white)](#testing)
+[![License](https://img.shields.io/badge/License-Private-black?style=for-the-badge)](#license)
 
 </div>
 
@@ -53,25 +53,25 @@ flowchart LR
         APPS["apps/"] --> WEB["web/<br/>Next.js 16 App Router<br/>:3000"]
         APPS --> FLASK["flask-api/<br/>Python Flask Microservice<br/>:5000"]
         APPS --> API["api/<br/>Internal TS Library"]
-        
-        WEB --> WEB_DIRS["app/ · components/ · __tests__/ · public/"]
-        FLASK --> FLASK_DIRS["app.py · routes/ · data/ · tests/"]
-        API --> API_SRC["src/ai · src/listings · src/leads · src/whatsapp"]
-        
+
+        WEB --> WEB_DIRS["app/ | components/ | __tests__/ | public/"]
+        FLASK --> FLASK_DIRS["app.py | routes/ | data/ | tests/"]
+        API --> API_SRC["src/ai | src/listings | src/leads | src/whatsapp"]
+
         PACKAGES["packages/"] --> SHARED["shared/<br/>Prisma Schema + Types + Utils"]
         SHARED --> PRISMA["prisma/schema.prisma"]
         SHARED --> TYPES["src/types/"]
         SHARED --> UTILS["src/utils/"]
-        
-        ROOT["Root Config"] --> FILES["turbo.json · pnpm-workspace.yaml<br/>tsconfig.base.json · .github/workflows"]
+
+        ROOT["Root Config"] --> FILES["turbo.json | pnpm-workspace.yaml<br/>tsconfig.base.json | .github/workflows"]
     end
 
-    style BRISVORA fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style WEB fill:#4169E1,color:#fff,stroke:#4169E1
-    style FLASK fill:#3776AB,color:#fff,stroke:#3776AB
-    style API fill:#15803D,color:#fff,stroke:#15803D
-    style SHARED fill:#C9A84C,color:#000,stroke:#C9A84C
-    style PRISMA fill:#2D3748,color:#fff,stroke:#2D3748
+    style BRISVORA fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style WEB fill:#333,color:#fff,stroke:#fff
+    style FLASK fill:#555,color:#fff,stroke:#fff
+    style API fill:#777,color:#fff,stroke:#fff
+    style SHARED fill:#999,color:#000,stroke:#000
+    style PRISMA fill:#bbb,color:#000,stroke:#000
 ```
 
 ---
@@ -183,12 +183,12 @@ pnpm db:studio        # Prisma Studio at localhost:5555
 
 ## 🌐 All Pages
 
-### Public Property Pages (NEW — SEO Optimized)
+### Public Property Pages
 
 | Route | SEO Title Pattern | Template |
 |---|---|---|
 | `/apartment/[slug]` | "2 BHK Apartment in Mumbai" | 1BHK / 2BHK / 3BHK variants |
-| `/villa/[slug]` | "4 BHK Luxury Villa in Pune" | Premium layout, gold accents |
+| `/villa/[slug]` | "4 BHK Luxury Villa in Pune" | Premium layout |
 | `/plot/[slug]` | "1200 sqft Plot in Bangalore" | Legal section, land-specific |
 | `/commercial/[slug]` | "1800 sqft Office in Delhi" | Business suitability section |
 | `/property/[slug]` | (legacy) | 301 redirects to correct type route |
@@ -223,7 +223,7 @@ pnpm db:studio        # Prisma Studio at localhost:5555
 | Page | URL |
 |---|---|
 | Login | `/login` |
-| Register | `/register` — includes country code dropdown (NEW) |
+| Register | `/register` — includes country code dropdown |
 
 ### Dashboard Pages (🔒 Auth required)
 
@@ -247,13 +247,13 @@ pnpm db:studio        # Prisma Studio at localhost:5555
 | Properties | `/admin/properties` |
 | Leads | `/admin/leads` |
 | Messages | `/admin/messages` |
-| CMS (Super Admin only) | `/admin/cms` — NEW |
+| CMS (Super Admin only) | `/admin/cms` |
 
 ---
 
 ## 🔌 API Reference
 
-### New Mock API Routes (Flask on Render.com)
+### Mock API Routes (Flask on Render.com)
 
 | Method | Endpoint | Purpose |
 |---|---|---|
@@ -265,14 +265,14 @@ pnpm db:studio        # Prisma Studio at localhost:5555
 | `GET` | `/api/mock/commercial` | Mock commercial space data |
 | `GET` | `/health` | Health check |
 
-### Updated Public Routes
+### Public Routes
 
 | Method | URL | Change |
 |---|---|---|
 | `POST` | `/api/leads` | Now accepts `countryCode` + `tokenCount` fields |
 | `POST` | `/api/upload` | Now accepts video files (`resource_type: auto`) |
 
-### Updated Broker Routes
+### Broker Routes
 
 | Method | URL | Change |
 |---|---|---|
@@ -288,11 +288,11 @@ pnpm db:studio        # Prisma Studio at localhost:5555
 ```prisma
 model Property {
   // ... existing fields unchanged
-  
+
   mockDataUrl String?   // NEW: URL to Flask mock JSON for page fallback
   mediaJson   Json?     // NEW: [{ url, type: "image"|"video", caption, order }]
   plan        String?   // NEW: "starter" | "professional" | "business" | "enterprise"
-  
+
   // ... existing relations unchanged
 }
 ```
@@ -302,7 +302,7 @@ model Property {
 ```prisma
 model Image {
   // ... existing fields unchanged
-  
+
   mediaType   String?   // NEW: "image" | "video" — Cloudinary auto-detects
 }
 ```
@@ -312,10 +312,10 @@ model Image {
 ```prisma
 model Lead {
   // ... existing fields unchanged
-  
+
   countryCode String?   // NEW: "+91" (India default), "+1", "+44", etc.
   tokenCount  Int?      // NEW: Character count of enquiry message (0-200)
-  
+
   @@unique([propertyId, phone, createdAt]) // NEW: Duplicate prevention
 }
 ```
@@ -325,14 +325,14 @@ model Lead {
 ```prisma
 model User {
   // ... existing fields unchanged
-  
+
   plan String?   // NEW: "starter" | "professional" | "business" | "enterprise"
 }
 ```
 
 ---
 
-## Key Conventions (Updated)
+## Key Conventions
 
 | Rule | Detail |
 |---|---|
@@ -353,12 +353,12 @@ model User {
 | CMS | Super Admin only — controls schemas, templates, global content |
 | Country dropdown | Default India (+91) on both registration and LeadForm |
 | Video | Optional media type via `Image.mediaType` — Cloudinary auto-detects |
-| Flask deployment | Render.com (free tier) — Docker container, auto-deploy from GitHub |
+| Flask deployment | Render.com — Docker container, auto-deploy from GitHub |
 | CI/CD | GitHub Actions → test both → deploy Vercel + Render in parallel |
 
 ---
 
-## Architecture Decisions (Updated)
+## Architecture Decisions
 
 | Decision | Reason |
 |---|---|
@@ -383,29 +383,29 @@ model User {
 
 ```mermaid
 flowchart TB
-    subgraph VERCEL["☁️ VERCEL — apps/web (Next.js 16)"]
+    subgraph VERCEL["VERCEL — apps/web (Next.js 16)"]
         direction TB
-        PUBLIC["🌐 PUBLIC PAGES<br/>/apartment/[slug]<br/>/villa/[slug]<br/>/plot/[slug]<br/>/commercial/[slug]"]
-        DASHBOARD["📊 DASHBOARD<br/>/dashboard/growth<br/>/dashboard/listings<br/>/dashboard/leads<br/>/dashboard/analytics"]
-        ADMIN["🛡️ ADMIN PANEL<br/>/admin/users<br/>/admin/properties<br/>/admin/leads<br/>/admin/cms"]
-        API_ROUTES["⚡ API ROUTES<br/>/api/leads<br/>/api/upload<br/>/api/whatsapp/webhook<br/>/api/broker/*"]
+        PUBLIC["PUBLIC PAGES<br/>/apartment/[slug]<br/>/villa/[slug]<br/>/plot/[slug]<br/>/commercial/[slug]"]
+        DASHBOARD["DASHBOARD<br/>/dashboard/growth<br/>/dashboard/listings<br/>/dashboard/leads<br/>/dashboard/analytics"]
+        ADMIN["ADMIN PANEL<br/>/admin/users<br/>/admin/properties<br/>/admin/leads<br/>/admin/cms"]
+        API_ROUTES["API ROUTES<br/>/api/leads<br/>/api/upload<br/>/api/whatsapp/webhook<br/>/api/broker/*"]
     end
 
-    subgraph INTERNAL["🧩 INTERNAL LIBRARIES"]
+    subgraph INTERNAL["INTERNAL LIBRARIES"]
         direction TB
-        API_TS["apps/api — Internal TS Library<br/>ai/ · whatsapp/ · listings/<br/>leads/ · images/ · conversation/"]
+        API_TS["apps/api — Internal TS Library<br/>ai/ | whatsapp/ | listings/<br/>leads/ | images/ | conversation/"]
         SHARED_PKG["packages/shared<br/>Prisma Schema + Types + Utils"]
     end
 
-    subgraph EXTERNAL["🔗 EXTERNAL SERVICES"]
+    subgraph EXTERNAL["EXTERNAL SERVICES"]
         direction TB
-        ANTHROPIC["🧠 Anthropic Claude 3.5 Sonnet"]
-        AISENSY["📱 AiSensy WhatsApp API"]
-        SUPABASE["🗄️ Supabase PostgreSQL"]
-        CLOUDINARY["☁️ Cloudinary Media"]
+        ANTHROPIC["Anthropic Claude 3.5 Sonnet"]
+        AISENSY["AiSensy WhatsApp API"]
+        SUPABASE["Supabase PostgreSQL"]
+        CLOUDINARY["Cloudinary Media"]
     end
 
-    subgraph RENDER["🐍 RENDER.COM — apps/flask-api"]
+    subgraph RENDER["RENDER.COM — apps/flask-api"]
         direction TB
         MOCK_API["Mock JSON API<br/>GET /api/mock/{type}/{bhk}"]
         ASYNC_WORKER["Async Worker<br/>Future: ffmpeg transcoding"]
@@ -414,31 +414,31 @@ flowchart TB
     PUBLIC --> API_ROUTES
     DASHBOARD --> API_ROUTES
     ADMIN --> API_ROUTES
-    
+
     API_ROUTES --> API_TS
     API_ROUTES --> SHARED_PKG
-    
+
     API_TS --> ANTHROPIC
     API_TS --> AISENSY
     API_TS --> SUPABASE
     API_TS --> CLOUDINARY
-    
+
     API_TS -->|3rd Fallback Level| MOCK_API
-    
+
     SHARED_PKG --> SUPABASE
 
-    style VERCEL fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style PUBLIC fill:#C9A84C,color:#000,stroke:#C9A84C
-    style DASHBOARD fill:#15803D,color:#fff,stroke:#15803D
-    style ADMIN fill:#DC2626,color:#fff,stroke:#DC2626
-    style API_ROUTES fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style INTERNAL fill:#4169E1,color:#fff,stroke:#4169E1
-    style EXTERNAL fill:#2D3748,color:#fff,stroke:#2D3748
-    style RENDER fill:#3776AB,color:#fff,stroke:#3776AB
-    style ANTHROPIC fill:#C9A84C,color:#000,stroke:#C9A84C
-    style AISENSY fill:#15803D,color:#fff,stroke:#15803D
-    style SUPABASE fill:#4169E1,color:#fff,stroke:#4169E1
-    style CLOUDINARY fill:#f87171,color:#fff,stroke:#f87171
+    style VERCEL fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style PUBLIC fill:#222,color:#fff,stroke:#ccc
+    style DASHBOARD fill:#444,color:#fff,stroke:#ccc
+    style ADMIN fill:#666,color:#fff,stroke:#ccc
+    style API_ROUTES fill:#888,color:#000,stroke:#000
+    style INTERNAL fill:#333,color:#fff,stroke:#fff
+    style EXTERNAL fill:#555,color:#fff,stroke:#fff
+    style RENDER fill:#777,color:#fff,stroke:#fff
+    style ANTHROPIC fill:#999,color:#000,stroke:#000
+    style AISENSY fill:#bbb,color:#000,stroke:#000
+    style SUPABASE fill:#ddd,color:#000,stroke:#000
+    style CLOUDINARY fill:#eee,color:#000,stroke:#000
 ```
 
 ---
@@ -447,57 +447,57 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    subgraph INPUT["📱 Input Sources"]
-        A1["Broker sends WhatsApp<br/>'2 BHK in Mumbai, ₹50L'"]
+    subgraph INPUT["Input Sources"]
+        A1["Broker sends WhatsApp<br/>'2 BHK in Mumbai, INR 50L'"]
     end
 
-    subgraph WEBHOOK["⚡ Webhook Processing"]
+    subgraph WEBHOOK["Webhook Processing"]
         WH["AiSensy Webhook<br/>POST /api/whatsapp/webhook"]
-        PARSE["parseInboundMessage()<br/>Extract phone · text · mediaUrls"]
-        CONV["Conversation State Machine<br/>GREETING → ACCUMULATING → GENERATING"]
+        PARSE["parseInboundMessage()<br/>Extract phone | text | mediaUrls"]
+        CONV["Conversation State Machine<br/>GREETING -> ACCUMULATING -> GENERATING"]
     end
 
-    subgraph FALLBACK["🧠 3-Level Generation Fallback Chain"]
-        L1["🥇 LEVEL 1: Claude 3.5 Sonnet<br/>• Anthropic API tool_use<br/>• Structured JSON extraction<br/>• Hindi/Hinglish supported"]
-        L2["🥈 LEVEL 2: Regex Mock<br/>• No API key needed<br/>• Regex-based extraction<br/>• Works offline"]
-        L3["🥉 LEVEL 3: Flask JSON Mock<br/>• GET /api/mock/{type}/{bhk}<br/>• ALWAYS returns data<br/>• 6 JSON files on Render.com"]
+    subgraph FALLBACK["3-Level Generation Fallback Chain"]
+        L1["LEVEL 1: Claude 3.5 Sonnet<br/>- Anthropic API tool_use<br/>- Structured JSON extraction<br/>- Hindi/Hinglish supported"]
+        L2["LEVEL 2: Regex Mock<br/>- No API key needed<br/>- Regex-based extraction<br/>- Works offline"]
+        L3["LEVEL 3: Flask JSON Mock<br/>- GET /api/mock/{type}/{bhk}<br/>- ALWAYS returns data<br/>- 6 JSON files on Render.com"]
     end
 
-    subgraph PERSIST["🗄️ Data Persistence"]
-        DB_CREATE["createListing() → Supabase"]
-        DB_PROPERTY["🏠 Property record<br/>+ mockDataUrl · mediaJson"]
-        DB_IMAGES["🖼️ Image records<br/>+ mediaType: image|video"]
+    subgraph PERSIST["Data Persistence"]
+        DB_CREATE["createListing() -> Supabase"]
+        DB_PROPERTY["Property record<br/>+ mockDataUrl | mediaJson"]
+        DB_IMAGES["Image records<br/>+ mediaType: image|video"]
     end
 
-    subgraph OUTPUT["📲 Output Delivery"]
+    subgraph OUTPUT["Output Delivery"]
         SEND_WA["sendMessage()<br/>Broker gets shareable URL"]
-        URL["✅ /apartment/luxury-2bhk"]
+        URL["/apartment/luxury-2bhk"]
     end
 
     A1 --> WH
     WH --> PARSE
     PARSE --> CONV
     CONV -->|GENERATING| FALLBACK
-    
+
     L1 -->|Success| PERSIST
     L1 -->|Fail| L2
     L2 -->|Success| PERSIST
     L2 -->|Fail| L3
     L3 -->|Always works| PERSIST
-    
+
     DB_PROPERTY --> SEND_WA
     DB_IMAGES --> SEND_WA
     SEND_WA --> URL
 
-    style INPUT fill:#15803D,color:#fff,stroke:#15803D
-    style WEBHOOK fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style FALLBACK fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style L1 fill:#C9A84C,color:#000,stroke:#C9A84C
-    style L2 fill:#C9A84C,color:#000,stroke:#C9A84C
-    style L3 fill:#4169E1,color:#fff,stroke:#4169E1
-    style PERSIST fill:#15803D,color:#fff,stroke:#15803D
-    style OUTPUT fill:#C9A84C,color:#000,stroke:#C9A84C
-    style URL fill:#15803D,color:#fff,stroke:#15803D
+    style INPUT fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style WEBHOOK fill:#333,color:#fff,stroke:#ccc
+    style FALLBACK fill:#555,color:#fff,stroke:#fff,stroke-width:2px
+    style L1 fill:#777,color:#fff,stroke:#ccc
+    style L2 fill:#999,color:#000,stroke:#000
+    style L3 fill:#bbb,color:#000,stroke:#000
+    style PERSIST fill:#222,color:#fff,stroke:#ccc
+    style OUTPUT fill:#444,color:#fff,stroke:#ccc
+    style URL fill:#666,color:#fff,stroke:#ccc
 ```
 
 ---
@@ -506,47 +506,47 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    subgraph REQUEST["🌐 Browser Request"]
+    subgraph REQUEST["Browser Request"]
         REQ["GET /apartment/[slug]"]
     end
 
-    subgraph SSR["⚙️ Server Component SSR"]
-        SSR_QUERY["getListingBySlug(slug)<br/>→ Supabase DB Query"]
+    subgraph SSR["Server Component SSR"]
+        SSR_QUERY["getListingBySlug(slug)<br/>-> Supabase DB Query"]
     end
 
-    subgraph RENDER_FALLBACK["📄 3-Level Render Fallback Chain"]
-        R_L1["🥇 LEVEL 1: Real DB Data<br/>• Property record exists<br/>• Images in Image[] relation<br/>• Analytics tracked"]
-        R_L2["🥈 LEVEL 2: Flask Mock JSON<br/>• Fetch Property.mockDataUrl<br/>• Same shape as DB data<br/>• Adapter layer transforms"]
-        R_L3["🥉 LEVEL 3: TS Hardcoded<br/>• Inline mock data objects<br/>• Per-type: 3 Apartment + Villa + Plot + Commercial<br/>• NEVERSHOWNING_BLANK_PAGE"]
+    subgraph RENDER_FALLBACK["3-Level Render Fallback Chain"]
+        R_L1["LEVEL 1: Real DB Data<br/>- Property record exists<br/>- Images in Image[] relation<br/>- Analytics tracked"]
+        R_L2["LEVEL 2: Flask Mock JSON<br/>- Fetch Property.mockDataUrl<br/>- Same shape as DB data<br/>- Adapter layer transforms"]
+        R_L3["LEVEL 3: TS Hardcoded<br/>- Inline mock data objects<br/>- Per-type: 3 Apt + Villa + Plot + Commercial<br/>- NEVER shows blank page"]
     end
 
-    subgraph CLIENT["🖥️ Client Component"]
+    subgraph CLIENT["Client Component"]
         RENDER["ApartmentClient / VillaClient<br/>/ PlotClient / CommercialClient"]
-        SEO["🔍 SEO Pipeline<br/>✓ Title + Meta<br/>✓ JSON-LD Schema<br/>✓ Open Graph + Twitter Cards"]
-        ANALYTICS["📊 Analytics<br/>viewCount++"]
+        SEO["SEO Pipeline<br/>- Title + Meta<br/>- JSON-LD Schema<br/>- Open Graph + Twitter Cards"]
+        ANALYTICS["Analytics<br/>viewCount++"]
     end
 
     REQ --> SSR_QUERY
     SSR_QUERY --> RENDER_FALLBACK
-    
+
     R_L1 -->|DB record exists| CLIENT
     R_L1 -->|No DB record| R_L2
     R_L2 -->|Flask responds| CLIENT
     R_L2 -->|Flask down / No URL| R_L3
     R_L3 -->|Always renders| CLIENT
-    
+
     RENDER --> SEO
     RENDER --> ANALYTICS
 
-    style REQUEST fill:#C9A84C,color:#000,stroke:#C9A84C
-    style SSR fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style RENDER_FALLBACK fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style R_L1 fill:#15803D,color:#fff,stroke:#15803D
-    style R_L2 fill:#4169E1,color:#fff,stroke:#4169E1
-    style R_L3 fill:#DC2626,color:#fff,stroke:#DC2626
-    style CLIENT fill:#C9A84C,color:#000,stroke:#C9A84C
-    style SEO fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style ANALYTICS fill:#60a5fa,color:#fff,stroke:#60a5fa
+    style REQUEST fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style SSR fill:#333,color:#fff,stroke:#ccc
+    style RENDER_FALLBACK fill:#555,color:#fff,stroke:#fff,stroke-width:2px
+    style R_L1 fill:#777,color:#fff,stroke:#ccc
+    style R_L2 fill:#999,color:#000,stroke:#000
+    style R_L3 fill:#bbb,color:#000,stroke:#000
+    style CLIENT fill:#222,color:#fff,stroke:#ccc
+    style SEO fill:#444,color:#fff,stroke:#ccc
+    style ANALYTICS fill:#666,color:#fff,stroke:#ccc
 ```
 
 ---
@@ -564,27 +564,27 @@ flowchart LR
         LEGACY["property/[slug]/"]
     end
 
-    subgraph APT_DETAIL["🏠 Apartment"]
+    subgraph APT_DETAIL["Apartment"]
         APT_PAGE["page.tsx<br/>SSR + Metadata + JSON-LD"]
         APT_CLIENT["ApartmentClient.tsx<br/>1BHK / 2BHK / 3BHK variants"]
     end
 
-    subgraph VILLA_DETAIL["🏡 Villa"]
+    subgraph VILLA_DETAIL["Villa"]
         VILLA_PAGE["page.tsx<br/>Premium Layout"]
-        VILLA_CLIENT["VillaClient.tsx<br/>Gold accents · Pool"]
+        VILLA_CLIENT["VillaClient.tsx"]
     end
 
-    subgraph PLOT_DETAIL["🗺️ Plot"]
+    subgraph PLOT_DETAIL["Plot"]
         PLOT_PAGE["page.tsx<br/>Land-specific"]
         PLOT_CLIENT["PlotClient.tsx<br/>Legal section"]
     end
 
-    subgraph COMM_DETAIL["🏢 Commercial"]
+    subgraph COMM_DETAIL["Commercial"]
         COMM_PAGE["page.tsx<br/>Business suitability"]
         COMM_CLIENT["CommercialClient.tsx<br/>Office focus"]
     end
 
-    subgraph LEGACY_DETAIL["🔄 Legacy"]
+    subgraph LEGACY_DETAIL["Legacy"]
         LEGACY_PAGE["page.tsx<br/>301 redirect"]
     end
 
@@ -594,17 +594,17 @@ flowchart LR
     COMMERCIAL --> COMM_DETAIL
     LEGACY --> LEGACY_DETAIL
 
-    style APP fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style APARTMENT fill:#C9A84C,color:#000,stroke:#C9A84C
-    style VILLA fill:#C9A84C,color:#000,stroke:#C9A84C
-    style PLOT fill:#C9A84C,color:#000,stroke:#C9A84C
-    style COMMERCIAL fill:#C9A84C,color:#000,stroke:#C9A84C
-    style LEGACY fill:#DC2626,color:#fff,stroke:#DC2626
-    style APT_PAGE fill:#4169E1,color:#fff,stroke:#4169E1
-    style VILLA_PAGE fill:#4169E1,color:#fff,stroke:#4169E1
-    style PLOT_PAGE fill:#4169E1,color:#fff,stroke:#4169E1
-    style COMM_PAGE fill:#4169E1,color:#fff,stroke:#4169E1
-    style LEGACY_PAGE fill:#DC2626,color:#fff,stroke:#DC2626
+    style APP fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style APARTMENT fill:#333,color:#fff,stroke:#ccc
+    style VILLA fill:#555,color:#fff,stroke:#ccc
+    style PLOT fill:#777,color:#fff,stroke:#ccc
+    style COMMERCIAL fill:#999,color:#000,stroke:#000
+    style LEGACY fill:#bbb,color:#000,stroke:#000
+    style APT_PAGE fill:#222,color:#fff,stroke:#ccc
+    style VILLA_PAGE fill:#444,color:#fff,stroke:#ccc
+    style PLOT_PAGE fill:#666,color:#fff,stroke:#ccc
+    style COMM_PAGE fill:#888,color:#000,stroke:#000
+    style LEGACY_PAGE fill:#aaa,color:#000,stroke:#000
 ```
 
 **Title & Description Pattern:**
@@ -624,24 +624,24 @@ flowchart LR
 flowchart LR
     subgraph FLASK_APP["apps/flask-api/"]
         direction TB
-        ENTRY["app.py<br/>Flask Entry Point · Port 5000"]
-        CONFIG["requirements.txt · Dockerfile<br/>gunicorn · flask-cors"]
-        
+        ENTRY["app.py<br/>Flask Entry Point | Port 5000"]
+        CONFIG["requirements.txt | Dockerfile<br/>gunicorn | flask-cors"]
+
         subgraph ROUTES["routes/"]
             MOCK["mock.py<br/>GET /api/mock/{type}/{bhk}"]
             HEALTH["health.py<br/>GET /health"]
             PROCESSOR["processor.py<br/>Future: Async Worker"]
         end
-        
+
         subgraph DATA["data/"]
-            A1["apartment_1bhk.json<br/>150 sqft · Starter"]
-            A2["apartment_2bhk.json<br/>850 sqft · Family"]
-            A3["apartment_3bhk.json<br/>1200 sqft · Premium"]
-            V["villa.json<br/>3200 sqft · Luxury"]
-            P["plot.json<br/>1200 sqft · Residential"]
-            C["commercial.json<br/>1800 sqft · Office"]
+            A1["apartment_1bhk.json<br/>150 sqft"]
+            A2["apartment_2bhk.json<br/>850 sqft"]
+            A3["apartment_3bhk.json<br/>1200 sqft"]
+            V["villa.json<br/>3200 sqft"]
+            P["plot.json<br/>1200 sqft"]
+            C["commercial.json<br/>1800 sqft"]
         end
-        
+
         TESTS["tests/test_mock.py<br/>Pytest Suite"]
     end
 
@@ -649,23 +649,23 @@ flowchart LR
     MOCK --> DATA
     ENTRY --> TESTS
 
-    style FLASK_APP fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style ENTRY fill:#3776AB,color:#fff,stroke:#3776AB
-    style ROUTES fill:#4169E1,color:#fff,stroke:#4169E1
-    style DATA fill:#C9A84C,color:#000,stroke:#C9A84C
-    style TESTS fill:#15803D,color:#fff,stroke:#15803D
+    style FLASK_APP fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style ENTRY fill:#333,color:#fff,stroke:#ccc
+    style ROUTES fill:#555,color:#fff,stroke:#ccc
+    style DATA fill:#777,color:#fff,stroke:#ccc
+    style TESTS fill:#999,color:#000,stroke:#000
 ```
 
 **API Endpoints:**
 
 ```
-GET /api/mock/apartment/1bhk     → apartment_1bhk.json
-GET /api/mock/apartment/2bhk     → apartment_2bhk.json
-GET /api/mock/apartment/3bhk     → apartment_3bhk.json
-GET /api/mock/villa              → villa.json
-GET /api/mock/plot               → plot.json
-GET /api/mock/commercial         → commercial.json
-GET /health                      → { status: "ok", version: "1.0.0" }
+GET /api/mock/apartment/1bhk     -> apartment_1bhk.json
+GET /api/mock/apartment/2bhk     -> apartment_2bhk.json
+GET /api/mock/apartment/3bhk     -> apartment_3bhk.json
+GET /api/mock/villa              -> villa.json
+GET /api/mock/plot               -> plot.json
+GET /api/mock/commercial         -> commercial.json
+GET /health                      -> { status: "ok", version: "1.0.0" }
 ```
 
 **Each mock JSON contains:**
@@ -674,17 +674,17 @@ GET /health                      → { status: "ok", version: "1.0.0" }
   "title": "2 BHK Apartment in Bandra West, Mumbai",
   "description": "...",
   "price": 12000000,
-  "priceLabel": "₹1.2 Cr",
+  "priceLabel": "Rs 1.2 Cr",
   "bedrooms": 2,
   "bathrooms": 2,
   "areaSqft": 850,
   "city": "Mumbai",
   "address": "Bandra West, Mumbai",
   "type": "APARTMENT",
-  "features": ["Modular Kitchen", "Vitrified Tiles", "False Ceiling", ...],
-  "amenities": ["Swimming Pool", "Gym", "Security", "Garden", ...],
+  "features": ["Modular Kitchen", "Vitrified Tiles", "False Ceiling"],
+  "amenities": ["Swimming Pool", "Gym", "Security", "Garden"],
   "images": [
-    { "url": "https://placehold.co/800x600/1e1b18/C9A84C", "caption": "Living Room", "type": "image" }
+    { "url": "https://placehold.co/800x600", "caption": "Living Room", "type": "image" }
   ],
   "broker": { "name": "Rahul Sharma", "phone": "918850908790", "agency": "Brisvora Realty" },
   "location": { "lat": 19.0596, "lng": 72.8295 }
@@ -766,36 +766,36 @@ erDiagram
 
 ```mermaid
 flowchart LR
-    subgraph PROPERTY["Property (EXISTING)"]
+    subgraph PROPERTY["Property"]
         P_ADD1["+ mockDataUrl String?"]
         P_ADD2["+ mediaJson Json?"]
     end
-    
-    subgraph LEAD["Lead (EXISTING)"]
+
+    subgraph LEAD["Lead"]
         L_ADD1["+ countryCode String?"]
         L_ADD2["+ tokenCount Int?"]
         L_ADD3["@@unique([propertyId, phone, createdAt])"]
     end
-    
-    subgraph USER["User (EXISTING)"]
+
+    subgraph USER["User"]
         U_ADD1["+ plan Plan?"]
     end
-    
-    subgraph IMAGE["Image (EXISTING)"]
+
+    subgraph IMAGE["Image"]
         I_ADD1["+ mediaType String?"]
     end
 
-    style PROPERTY fill:#4169E1,color:#fff,stroke:#4169E1
-    style LEAD fill:#C9A84C,color:#000,stroke:#C9A84C
-    style USER fill:#15803D,color:#fff,stroke:#15803D
-    style IMAGE fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style P_ADD1 fill:#60a5fa,color:#fff,stroke:#60a5fa
-    style P_ADD2 fill:#60a5fa,color:#fff,stroke:#60a5fa
-    style L_ADD1 fill:#fbbf24,color:#000,stroke:#fbbf24
-    style L_ADD2 fill:#fbbf24,color:#000,stroke:#fbbf24
-    style L_ADD3 fill:#DC2626,color:#fff,stroke:#DC2626
-    style U_ADD1 fill:#34d399,color:#000,stroke:#34d399
-    style I_ADD1 fill:#c084fc,color:#fff,stroke:#c084fc
+    style PROPERTY fill:#333,color:#fff,stroke:#ccc
+    style LEAD fill:#555,color:#fff,stroke:#ccc
+    style USER fill:#777,color:#fff,stroke:#ccc
+    style IMAGE fill:#999,color:#000,stroke:#000
+    style P_ADD1 fill:#222,color:#fff,stroke:#ccc
+    style P_ADD2 fill:#222,color:#fff,stroke:#ccc
+    style L_ADD1 fill:#444,color:#fff,stroke:#ccc
+    style L_ADD2 fill:#444,color:#fff,stroke:#ccc
+    style L_ADD3 fill:#666,color:#fff,stroke:#ccc
+    style U_ADD1 fill:#888,color:#000,stroke:#000
+    style I_ADD1 fill:#aaa,color:#000,stroke:#000
 ```
 
 ---
@@ -804,11 +804,11 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    subgraph TRIGGER["🚀 Trigger"]
+    subgraph TRIGGER["Trigger"]
         GIT_PUSH["Git Push to main"]
     end
 
-    subgraph JOB1["🧪 Job 1: Test"]
+    subgraph JOB1["Job 1: Test"]
         direction TB
         INSTALL["pnpm install --no-frozen-lockfile"]
         TYPE_CHECK["pnpm type-check"]
@@ -818,17 +818,17 @@ flowchart LR
         BUILD["pnpm build --filter=web..."]
     end
 
-    subgraph DECISION["✅ All Pass?"]
+    subgraph DECISION["All Pass?"]
         PASS["All Checks Pass"]
-        FAIL["❌ Build Fails"]
+        FAIL["Build Fails"]
     end
 
-    subgraph JOB2["🚀 Job 2: Deploy Web"]
-        VERCEL_DEP["Vercel Deploy Hook<br/>→ brisvora.vercel.app"]
+    subgraph JOB2["Job 2: Deploy Web"]
+        VERCEL_DEP["Vercel Deploy Hook<br/>-> brisvora.vercel.app"]
     end
 
-    subgraph JOB3["🐍 Job 3: Deploy Flask"]
-        RENDER_DEP["Render.com Deploy Hook<br/>→ brisvora-flask.onrender.com"]
+    subgraph JOB3["Job 3: Deploy Flask"]
+        RENDER_DEP["Render.com Deploy Hook<br/>-> brisvora-flask.onrender.com"]
     end
 
     GIT_PUSH --> JOB1
@@ -838,19 +838,19 @@ flowchart LR
     VITEST --> DECISION
     PYTEST --> DECISION
     BUILD --> DECISION
-    
+
     DECISION -->|All pass| JOB2
     DECISION -->|All pass| JOB3
     DECISION -->|Any fail| FAIL
 
-    style TRIGGER fill:#15803D,color:#fff,stroke:#15803D
-    style JOB1 fill:#4169E1,color:#fff,stroke:#4169E1
-    style DECISION fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style FAIL fill:#DC2626,color:#fff,stroke:#DC2626
-    style JOB2 fill:#C9A84C,color:#000,stroke:#C9A84C
-    style JOB3 fill:#3776AB,color:#fff,stroke:#3776AB
-    style VERCEL_DEP fill:#C9A84C,color:#000,stroke:#C9A84C
-    style RENDER_DEP fill:#3776AB,color:#fff,stroke:#3776AB
+    style TRIGGER fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style JOB1 fill:#333,color:#fff,stroke:#ccc
+    style DECISION fill:#555,color:#fff,stroke:#fff,stroke-width:2px
+    style FAIL fill:#999,color:#000,stroke:#000
+    style JOB2 fill:#777,color:#fff,stroke:#ccc
+    style JOB3 fill:#bbb,color:#000,stroke:#000
+    style VERCEL_DEP fill:#222,color:#fff,stroke:#ccc
+    style RENDER_DEP fill:#444,color:#fff,stroke:#ccc
 ```
 
 ---
@@ -859,21 +859,21 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    subgraph CMS["🛡️ CMS CONTROL PANEL (Super Admin Only)"]
+    subgraph CMS["CMS CONTROL PANEL (Super Admin Only)"]
         direction TB
-        
-        SCHEMAS["📋 PROPERTY TYPE SCHEMAS"]
-        TEMPLATES["🎨 TEMPLATE LAYOUTS"]
-        GLOBAL["🌍 GLOBAL CONTENT"]
-        MOCK_CTRL["📁 MOCK DATA MANAGEMENT"]
-        
+
+        SCHEMAS["PROPERTY TYPE SCHEMAS"]
+        TEMPLATES["TEMPLATE LAYOUTS"]
+        GLOBAL["GLOBAL CONTENT"]
+        MOCK_CTRL["MOCK DATA MANAGEMENT"]
+
         subgraph SCHEMAS_DETAIL[" "]
             APT_SCHEMA["Apartment: title, price, BHK,<br/>area, floor, parking"]
             VILLA_SCHEMA["Villa: title, price, BHK,<br/>pool, garden, floors"]
             PLOT_SCHEMA["Plot: title, price, area,<br/>zone, dimensions"]
             COMM_SCHEMA["Commercial: title, price,<br/>area, floor, parking, power"]
         end
-        
+
         subgraph TEMPLATES_DETAIL[" "]
             APT_TEMP["Apartment: hero + specs + features"]
             VILLA_TEMP["Villa: taller hero + premium specs"]
@@ -881,14 +881,14 @@ flowchart LR
             COMM_TEMP["Commercial: hero + business suitability"]
             EDITOR["Section order editor (drag & drop)"]
         end
-        
+
         subgraph GLOBAL_DETAIL[" "]
             LABELS["Section labels / text"]
             CTA["CTA button copies"]
             FEATURES["Feature descriptions"]
             DEFAULT_PHONE["Default country code"]
         end
-        
+
         subgraph MOCK_DETAIL[" "]
             EDIT_JSON["Edit mock JSON inline"]
             PREVIEW["Preview mock rendering"]
@@ -897,20 +897,20 @@ flowchart LR
         end
     end
 
-    CMS --> STORAGE["🗄️ Stored in Supabase CMS table"]
-    STORAGE --> PROPAGATE["⚡ Changes propagate to<br/>all new listings automatically"]
+    CMS --> STORAGE["Stored in Supabase CMS table"]
+    STORAGE --> PROPAGATE["Changes propagate to all new listings"]
 
-    style CMS fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style SCHEMAS fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style TEMPLATES fill:#C9A84C,color:#000,stroke:#C9A84C
-    style GLOBAL fill:#15803D,color:#fff,stroke:#15803D
-    style MOCK_CTRL fill:#4169E1,color:#fff,stroke:#4169E1
-    style SCHEMAS_DETAIL fill:#2D3748,color:#fff,stroke:#2D3748
-    style TEMPLATES_DETAIL fill:#2D3748,color:#fff,stroke:#2D3748
-    style GLOBAL_DETAIL fill:#2D3748,color:#fff,stroke:#2D3748
-    style MOCK_DETAIL fill:#2D3748,color:#fff,stroke:#2D3748
-    style STORAGE fill:#DC2626,color:#fff,stroke:#DC2626
-    style PROPAGATE fill:#15803D,color:#fff,stroke:#15803D
+    style CMS fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style SCHEMAS fill:#333,color:#fff,stroke:#ccc
+    style TEMPLATES fill:#555,color:#fff,stroke:#ccc
+    style GLOBAL fill:#777,color:#fff,stroke:#ccc
+    style MOCK_CTRL fill:#999,color:#000,stroke:#000
+    style SCHEMAS_DETAIL fill:#222,color:#fff,stroke:#ccc
+    style TEMPLATES_DETAIL fill:#444,color:#fff,stroke:#ccc
+    style GLOBAL_DETAIL fill:#666,color:#fff,stroke:#ccc
+    style MOCK_DETAIL fill:#888,color:#000,stroke:#000
+    style STORAGE fill:#bbb,color:#000,stroke:#000
+    style PROPAGATE fill:#ddd,color:#000,stroke:#000
 ```
 
 ---
@@ -919,23 +919,23 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    subgraph ROLES["👤 ROLE HIERARCHY"]
-        SUPER["🔴 SUPER_ADMIN<br/>(You Only)"]
-        ADMIN["🟡 ADMIN<br/>(Professional / Business / Enterprise)"]
-        BROKER["🟢 BROKER<br/>(Starter — Free)"]
-        PUBLIC["⚪ PUBLIC<br/>(No login required)"]
+    subgraph ROLES["ROLE HIERARCHY"]
+        SUPER["SUPER_ADMIN (You Only)"]
+        ADMIN["ADMIN (Professional / Business / Enterprise)"]
+        BROKER["BROKER (Starter - Free)"]
+        PUBLIC["PUBLIC (No login required)"]
     end
 
-    SUPER -->|"Full CMS control · All users/all listings<br/>Plan management · DB seeded only"| ADMIN
+    SUPER -->|"Full CMS control | All users/all listings<br/>Plan management | DB seeded only"| ADMIN
     ADMIN -->|"Own listings & leads<br/>Analytics dashboard"| BROKER
-    BROKER -->|"Basic AI listings (≤10/mo)<br/>Dashboard · WhatsApp · SEO pages"| PUBLIC
+    BROKER -->|"Basic AI listings (<=10/mo)<br/>Dashboard | WhatsApp | SEO pages"| PUBLIC
     PUBLIC -->|"View any property page<br/>Submit lead via LeadForm"| OUT
 
-    subgraph PLANS["💰 PLAN MAPPING"]
-        STARTER["🥉 Starter (FREE)<br/>• 10 AI listings/month<br/>• Basic dashboard<br/>• WhatsApp integration"]
-        PROFESSIONAL["🥈 Professional (₹999/mo)<br/>• Unlimited listings<br/>• Analytics + CRM<br/>• Automation tools"]
-        BUSINESS["🥇 Business (₹2499/mo)<br/>• Multi-user support<br/>• Priority support<br/>• Advanced analytics"]
-        ENTERPRISE["🏆 Enterprise (Custom)<br/>• Custom integrations<br/>• Dedicated support<br/>• SLA guarantee"]
+    subgraph PLANS["PLAN MAPPING"]
+        STARTER["Starter (FREE)<br/>- 10 AI listings/month<br/>- Basic dashboard<br/>- WhatsApp integration"]
+        PROFESSIONAL["Professional (Rs 999/mo)<br/>- Unlimited listings<br/>- Analytics + CRM<br/>- Automation tools"]
+        BUSINESS["Business (Rs 2499/mo)<br/>- Multi-user support<br/>- Priority support<br/>- Advanced analytics"]
+        ENTERPRISE["Enterprise (Custom)<br/>- Custom integrations<br/>- Dedicated support<br/>- SLA guarantee"]
     end
 
     BROKER --> STARTER
@@ -943,16 +943,16 @@ flowchart TB
     ADMIN --> BUSINESS
     SUPER --> ENTERPRISE
 
-    style ROLES fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style SUPER fill:#DC2626,color:#fff,stroke:#DC2626
-    style ADMIN fill:#fbbf24,color:#000,stroke:#fbbf24
-    style BROKER fill:#15803D,color:#fff,stroke:#15803D
-    style PUBLIC fill:#9CA3AF,color:#000,stroke:#9CA3AF
-    style PLANS fill:#2D3748,color:#fff,stroke:#2D3748
-    style STARTER fill:#15803D,color:#fff,stroke:#15803D
-    style PROFESSIONAL fill:#fbbf24,color:#000,stroke:#fbbf24
-    style BUSINESS fill:#4169E1,color:#fff,stroke:#4169E1
-    style ENTERPRISE fill:#C9A84C,color:#000,stroke:#C9A84C
+    style ROLES fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style SUPER fill:#222,color:#fff,stroke:#ccc
+    style ADMIN fill:#444,color:#fff,stroke:#ccc
+    style BROKER fill:#666,color:#fff,stroke:#ccc
+    style PUBLIC fill:#888,color:#000,stroke:#000
+    style PLANS fill:#333,color:#fff,stroke:#ccc
+    style STARTER fill:#555,color:#fff,stroke:#ccc
+    style PROFESSIONAL fill:#777,color:#fff,stroke:#ccc
+    style BUSINESS fill:#999,color:#000,stroke:#000
+    style ENTERPRISE fill:#bbb,color:#000,stroke:#000
 ```
 
 ---
@@ -961,40 +961,40 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    subgraph PROPERTY_LEVEL["🏠 Level 1 — Property (Broker Side)"]
+    subgraph PROPERTY_LEVEL["Level 1 - Property (Broker Side)"]
         direction TB
         P_INPUT["Broker submits via WhatsApp"]
         P_PARSE["parseInboundMessage()"]
-        P_CHECK{"Duplicate Check<br/>Same: phone + city<br/>+ price ±10% + BHK<br/>Within 24hrs?"}
-        P_DUP["⛔ DUPLICATE FOUND<br/>→ 'Property already exists'<br/>→ Suggest editing"]
-        P_NEW["✅ NO DUPLICATE<br/>→ Proceed to Generation"]
-        
+        P_CHECK{"Duplicate Check<br/>Same: phone + city<br/>+ price +/-10% + BHK<br/>Within 24hrs?"}
+        P_DUP["DUPLICATE FOUND<br/>-> 'Property already exists'<br/>-> Suggest editing"]
+        P_NEW["NO DUPLICATE<br/>-> Proceed to Generation"]
+
         P_INPUT --> P_PARSE --> P_CHECK
         P_CHECK -->|Yes| P_DUP
         P_CHECK -->|No| P_NEW
     end
 
-    subgraph LEAD_LEVEL["📋 Level 2 — Lead (Buyer Side)"]
+    subgraph LEAD_LEVEL["Level 2 - Lead (Buyer Side)"]
         direction TB
         L_INPUT["Buyer submits Lead Form"]
-        L_API["POST /api/leads<br/>propertyId · phone · countryCode · message"]
+        L_API["POST /api/leads<br/>propertyId | phone | countryCode | message"]
         L_CHECK{"Duplicate Check<br/>Same: propertyId + phone<br/>Within 24hrs?"}
-        L_DUP["⛔ DUPLICATE FOUND<br/>→ 'Already enquired'<br/>→ Do NOT create Lead"]
-        L_NEW["✅ NO DUPLICATE<br/>→ createLead()<br/>→ Analytics.inquiryCount++"]
-        
+        L_DUP["DUPLICATE FOUND<br/>-> 'Already enquired'<br/>-> Do NOT create Lead"]
+        L_NEW["NO DUPLICATE<br/>-> createLead()<br/>-> Analytics.inquiryCount++"]
+
         L_INPUT --> L_API --> L_CHECK
         L_CHECK -->|Yes| L_DUP
         L_CHECK -->|No| L_NEW
     end
 
-    style PROPERTY_LEVEL fill:#1e1b18,color:#15803D,stroke:#15803D
-    style LEAD_LEVEL fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style P_CHECK fill:#1e1b18,color:#f87171,stroke:#f87171
-    style L_CHECK fill:#1e1b18,color:#f87171,stroke:#f87171
-    style P_DUP fill:#DC2626,color:#fff,stroke:#DC2626
-    style L_DUP fill:#DC2626,color:#fff,stroke:#DC2626
-    style P_NEW fill:#15803D,color:#fff,stroke:#15803D
-    style L_NEW fill:#15803D,color:#fff,stroke:#15803D
+    style PROPERTY_LEVEL fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style LEAD_LEVEL fill:#333,color:#fff,stroke:#fff,stroke-width:2px
+    style P_CHECK fill:#555,color:#fff,stroke:#ccc
+    style L_CHECK fill:#777,color:#fff,stroke:#ccc
+    style P_DUP fill:#999,color:#000,stroke:#000
+    style L_DUP fill:#bbb,color:#000,stroke:#000
+    style P_NEW fill:#222,color:#fff,stroke:#ccc
+    style L_NEW fill:#444,color:#fff,stroke:#ccc
 ```
 
 ---
@@ -1003,38 +1003,38 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    subgraph REGISTER["📝 1. BROKER REGISTRATION (/register)"]
+    subgraph REGISTER["1. BROKER REGISTRATION (/register)"]
         direction TB
-        R_SELECT["🌍 Select Country<br/>🇮🇳 +91 (Default India)"]
-        R_PHONE["📱 Enter 10-digit phone"]
-        R_SAVE["Saved to User.phone:<br/>countryCode + phone<br/>= '919999999999'"]
-        
+        R_SELECT["Select Country<br/>+91 (Default India)"]
+        R_PHONE["Enter 10-digit phone"]
+        R_SAVE["Saved to User.phone:<br/>countryCode + phone = '919999999999'"]
+
         R_SELECT --> R_PHONE --> R_SAVE
     end
 
-    subgraph LEADFORM["📋 2. BUYER LEAD FORM (Property Page)"]
+    subgraph LEADFORM["2. BUYER LEAD FORM (Property Page)"]
         direction TB
-        L_SELECT["🌍 Select Country<br/>🇮🇳 +91 (Default)"]
-        L_PHONE["📱 Enter 10-digit phone"]
-        L_NAME["👤 Enter your name"]
-        L_MESSAGE["✏️ Enter message<br/>Token counter below"]
-        L_TOKEN["📊 TOKEN COUNTER<br/>0 chars → Gray 'Start typing...'<br/>1-50 → Gold 'Great start!'<br/>51-100 → Green 'Good detail!'<br/>100+ → Red 'Too long!'"]
+        L_SELECT["Select Country<br/>+91 (Default)"]
+        L_PHONE["Enter 10-digit phone"]
+        L_NAME["Enter your name"]
+        L_MESSAGE["Enter message<br/>Token counter below"]
+        L_TOKEN["TOKEN COUNTER<br/>0 chars -> Gray 'Start typing...'<br/>1-50 -> Gray 'Great start!'<br/>51-100 -> Gray 'Good detail!'<br/>100+ -> Gray 'Too long!'"]
         L_SAVE["Saved to Lead:<br/>countryCode + phone + tokenCount"]
-        
+
         L_SELECT --> L_PHONE --> L_NAME --> L_MESSAGE --> L_TOKEN --> L_SAVE
     end
 
-    COUNTRIES["🌐 Supported Countries<br/>IN · US · UK · AE · SG<br/>AU · CA · SA · QA · OM · KW · BH"]
+    COUNTRIES["Supported Countries<br/>IN | US | UK | AE | SG<br/>AU | CA | SA | QA | OM | KW | BH"]
 
     REGISTER --> COUNTRIES
     LEADFORM --> COUNTRIES
 
-    style REGISTER fill:#4169E1,color:#fff,stroke:#4169E1
-    style LEADFORM fill:#C9A84C,color:#000,stroke:#C9A84C
-    style L_TOKEN fill:#1e1b18,color:#fff,stroke:#C9A84C
-    style COUNTRIES fill:#15803D,color:#fff,stroke:#15803D
-    style R_SAVE fill:#60a5fa,color:#fff,stroke:#60a5fa
-    style L_SAVE fill:#fbbf24,color:#000,stroke:#fbbf24
+    style REGISTER fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style LEADFORM fill:#333,color:#fff,stroke:#fff,stroke-width:2px
+    style L_TOKEN fill:#555,color:#fff,stroke:#ccc
+    style COUNTRIES fill:#777,color:#fff,stroke:#ccc
+    style R_SAVE fill:#999,color:#000,stroke:#000
+    style L_SAVE fill:#bbb,color:#000,stroke:#000
 ```
 
 ---
@@ -1043,22 +1043,22 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    subgraph UPLOAD["📤 Upload API"]
+    subgraph UPLOAD["Upload API"]
         U_POST["POST /api/upload<br/>resource_type: auto"]
-        CLOUD["☁️ Cloudinary<br/>Auto-detects image vs video"]
+        CLOUD["Cloudinary<br/>Auto-detects image vs video"]
     end
 
-    subgraph DB_MODEL["🗄️ Image Model"]
+    subgraph DB_MODEL["Image Model"]
         IMG["Image {<br/>  mediaType: 'image' | 'video'<br/>  url: String<br/>  thumbnailUrl: String?<br/>  caption: String?<br/>  order: Int<br/>}"]
     end
 
-    subgraph RENDER_LOGIC["🖥️ Render Logic"]
+    subgraph RENDER_LOGIC["Render Logic"]
         RENDER_IF{"media.type === 'video'?"}
         VIDEO["<video controls<br/>  poster={thumbnailUrl}<br/>  <source src={url} />"]
         IMAGE["<Image src={url}<br/>  alt={caption} />"]
     end
 
-    subgraph FUTURE["🔮 Phase 2 — Flask Transcoding"]
+    subgraph FUTURE["Phase 2 - Flask Transcoding"]
         FFMPEG["ffmpeg compression<br/>Multiple resolutions<br/>Thumbnail generation"]
     end
 
@@ -1069,12 +1069,12 @@ flowchart LR
     RENDER_IF -->|No| IMAGE
     FUTURE -.->|Future async| CLOUD
 
-    style UPLOAD fill:#4169E1,color:#fff,stroke:#4169E1
-    style DB_MODEL fill:#C9A84C,color:#000,stroke:#C9A84C
-    style RENDER_LOGIC fill:#1e1b18,color:#fff,stroke:#C9A84C
-    style VIDEO fill:#15803D,color:#fff,stroke:#15803D
-    style IMAGE fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style FUTURE fill:#2D3748,color:#fff,stroke:#2D3748
+    style UPLOAD fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style DB_MODEL fill:#333,color:#fff,stroke:#ccc
+    style RENDER_LOGIC fill:#555,color:#fff,stroke:#fff,stroke-width:2px
+    style VIDEO fill:#777,color:#fff,stroke:#ccc
+    style IMAGE fill:#999,color:#000,stroke:#000
+    style FUTURE fill:#bbb,color:#000,stroke:#000
 ```
 
 ---
@@ -1085,18 +1085,18 @@ This diagram shows the **complete reactive interaction** across the entire platf
 
 ```mermaid
 flowchart TB
-    %% ─── EVENT ORIGINS ───────────────────────────────────────────────────
-    subgraph EVENT_SOURCES["🌐 EVENT SOURCES (Triggers)"]
+    %% EVENT ORIGINS
+    subgraph EVENT_SOURCES["EVENT SOURCES (Triggers)"]
         direction TB
-        E1("📱 Broker WhatsApp<br/>'2 BHK in Mumbai, ₹50L'")
-        E2("👤 Buyer Lead Form<br/>'Interested in this property'")
-        E3("🗺️ Buyer Page Visit<br/>GET /apartment/luxury-2bhk")
-        E4("🔐 User Registration<br/>+91 9999999999")
-        E5("⚙️ Admin Action<br/>Update/Delete/Override")
+        E1("Broker WhatsApp<br/>'2 BHK in Mumbai, INR 50L'")
+        E2("Buyer Lead Form<br/>'Interested in this property'")
+        E3("Buyer Page Visit<br/>GET /apartment/luxury-2bhk")
+        E4("User Registration<br/>+91 9999999999")
+        E5("Admin Action<br/>Update/Delete/Override")
     end
 
-    %% ─── EVENT PROCESSING LAYER (Vercel) ─────────────────────────────────
-    subgraph EVENT_PROC["⚡ EVENT PROCESSING (Vercel — Next.js 16)"]
+    %% EVENT PROCESSING LAYER (Vercel)
+    subgraph EVENT_PROC["EVENT PROCESSING (Vercel - Next.js 16)"]
         direction TB
         WH["Webhook Handler<br/>POST /api/whatsapp/webhook"]
         LH["Lead Handler<br/>POST /api/leads"]
@@ -1112,49 +1112,49 @@ flowchart TB
     E4 --> RH
     E5 --> AH
 
-    %% ─── BUSINESS LOGIC LAYER (apps/api) ──────────────────────────────────
-    subgraph BUS_LOGIC["🧠 BUSINESS LOGIC (apps/api — Internal TS Library)"]
+    %% BUSINESS LOGIC LAYER
+    subgraph BUS_LOGIC["BUSINESS LOGIC (apps/api - Internal TS Library)"]
         direction TB
-        AI_FALLBACK["🤖 3-Level Fallback Chain<br/>Claude 3.5 → Regex → Flask"]
-        DUPE_PROP["🔍 Property Dup Detection<br/>phone+city+price+BHK ≤ 24hrs"]
-        DUPE_LEAD["🔍 Lead Dup Detection<br/>propertyId+phone ≤ 24hrs"]
-        DUPE_USER["🔍 User Dup Detection<br/>email/phone already exists"]
-        OTP_FLOW["🔐 OTP Flow<br/>send → verify → phoneVerified"]
-        CONV_STATE["💭 Conversation State Machine<br/>GREETING → ACCUMULATING → GENERATING"]
-        MEDIA_PROC["🖼️ Media Processing<br/>Cloudinary Upload → mediaJson"]
-        ANALYTICS["📊 Analytics Pipeline<br/>viewCount++ → inquiryCount++"]
+        AI_FALLBACK["3-Level Fallback Chain<br/>Claude 3.5 -> Regex -> Flask"]
+        DUPE_PROP["Property Dup Detection<br/>phone+city+price+BHK <= 24hrs"]
+        DUPE_LEAD["Lead Dup Detection<br/>propertyId+phone <= 24hrs"]
+        DUPE_USER["User Dup Detection<br/>email/phone already exists"]
+        OTP_FLOW["OTP Flow<br/>send -> verify -> phoneVerified"]
+        CONV_STATE["Conversation State Machine<br/>GREETING -> ACCUMULATING -> GENERATING"]
+        MEDIA_PROC["Media Processing<br/>Cloudinary Upload -> mediaJson"]
+        ANALYTICS["Analytics Pipeline<br/>viewCount++ -> inquiryCount++"]
     end
 
     WH --> CONV_STATE
     CONV_STATE -->|GENERATING| AI_FALLBACK
     WH --> DUPE_PROP
     DUPE_PROP -->|Pass| AI_FALLBACK
-    DUPE_PROP -->|Block: Already exists| BROKER_BLOCK(["⛔ Reply: Property exists"])
-    
+    DUPE_PROP -->|Block: Already exists| BROKER_BLOCK(["Reply: Property exists"])
+
     LH --> DUPE_LEAD
-    DUPE_LEAD -->|Pass| LEADS["📋 Lead Sanitization<br/>tokenCount · countryCode"]
-    DUPE_LEAD -->|Block: Already enquired| BUYER_BLOCK(["⛔ Return: Already enquired"])
+    DUPE_LEAD -->|Pass| LEADS["Lead Sanitization<br/>tokenCount | countryCode"]
+    DUPE_LEAD -->|Block: Already enquired| BUYER_BLOCK(["Return: Already enquired"])
 
     RH --> DUPE_USER
     DUPE_USER -->|Pass| OTP_FLOW
-    DUPE_USER -->|Block: 409 Conflict| REG_BLOCK(["⛔ 409: Email/phone in use"])
+    DUPE_USER -->|Block: 409 Conflict| REG_BLOCK(["409: Email/phone in use"])
 
     PH --> ANALYTICS
-    PH --> RENDER_FALLBACK["📄 3-Level Render Fallback<br/>DB → Flask Mock → TS Hardcoded"]
+    PH --> RENDER_FALLBACK["3-Level Render Fallback<br/>DB -> Flask Mock -> TS Hardcoded"]
 
     E5 --> AH
 
-    %% ─── DATA PERSISTENCE LAYER ──────────────────────────────────────────
-    subgraph DATA_PERSIST["🗄️ DATA PERSISTENCE (packages/shared + Supabase)"]
+    %% DATA PERSISTENCE LAYER
+    subgraph DATA_PERSIST["DATA PERSISTENCE (packages/shared + Supabase)"]
         direction TB
-        DB_PROPERTY["🏠 Property<br/>+ slug · mockDataUrl · mediaJson · plan"]
-        DB_USER["👤 User<br/>+ phone · countryCode · phoneVerified · role · plan"]
-        DB_LEAD["📋 Lead<br/>+ propertyId · phone · countryCode · tokenCount"]
-        DB_IMAGE["🖼️ Image<br/>+ url · mediaType: image|video · order"]
-        DB_ANALYTICS["📊 Analytics<br/>+ viewCount · inquiryCount"]
-        DB_OTP["🔐 OtpVerification<br/>+ otp · expiresAt · attempts · verified"]
-        DB_CONV["💭 ConversationState<br/>+ state · context"]
-        DB_MSG["💬 WhatsappMessage<br/>+ content · direction"]
+        DB_PROPERTY["Property<br/>+ slug | mockDataUrl | mediaJson | plan"]
+        DB_USER["User<br/>+ phone | countryCode | phoneVerified | role | plan"]
+        DB_LEAD["Lead<br/>+ propertyId | phone | countryCode | tokenCount"]
+        DB_IMAGE["Image<br/>+ url | mediaType: image|video | order"]
+        DB_ANALYTICS["Analytics<br/>+ viewCount | inquiryCount"]
+        DB_OTP["OtpVerification<br/>+ otp | expiresAt | attempts | verified"]
+        DB_CONV["ConversationState<br/>+ state | context"]
+        DB_MSG["WhatsappMessage<br/>+ content | direction"]
     end
 
     AI_FALLBACK -->|createListing| DB_PROPERTY
@@ -1174,15 +1174,15 @@ flowchart TB
     AH --> DB_USER
     AH --> DB_LEAD
 
-    %% ─── REACTIVE UI LAYER (Continuously Re-renders) ──────────────────────
-    subgraph REACTIVE_UI["🔄 REACTIVE UI (apps/web — Dashboard Components)"]
+    %% REACTIVE UI LAYER
+    subgraph REACTIVE_UI["REACTIVE UI (apps/web - Dashboard Components)"]
         direction TB
-        UI_GROWTH["📈 Growth OS<br/>Pending tasks · AI credits<br/>Quick actions · Activity feed"]
-        UI_LISTINGS["🏠 Listings Panel<br/>Real-time property list<br/>Status · Views · Enquiries"]
-        UI_LEADS["👥 Leads Panel<br/>Enquiry stream<br/>Source · Token count · Time"]
-        UI_ANALYTICS["📊 Analytics Dashboard<br/>Views chart · Inquiries chart<br/>Conversion rate"]
-        UI_PROFILE["👤 Profile Page<br/>Phone · Country code<br/>Verify OTP button"]
-        UI_ACTIVITY["📜 Activity Log<br/>Webhook events · Errors<br/>State transitions"]
+        UI_GROWTH["Growth OS<br/>Pending tasks | AI credits<br/>Quick actions | Activity feed"]
+        UI_LISTINGS["Listings Panel<br/>Real-time property list<br/>Status | Views | Enquiries"]
+        UI_LEADS["Leads Panel<br/>Enquiry stream<br/>Source | Token count | Time"]
+        UI_ANALYTICS["Analytics Dashboard<br/>Views chart | Inquiries chart<br/>Conversion rate"]
+        UI_PROFILE["Profile Page<br/>Phone | Country code<br/>Verify OTP button"]
+        UI_ACTIVITY["Activity Log<br/>Webhook events | Errors<br/>State transitions"]
     end
 
     DB_PROPERTY -->|useSWR revalidation| UI_LISTINGS
@@ -1196,16 +1196,16 @@ flowchart TB
     DB_CONV --> UI_ACTIVITY
     DB_MSG --> UI_ACTIVITY
 
-    %% ─── EXTERNAL SERVICE REACTIONS ──────────────────────────────────────
-    subgraph EXT_REACT["🔗 EXTERNAL SERVICE REACTIONS"]
+    %% EXTERNAL SERVICE REACTIONS
+    subgraph EXT_REACT["EXTERNAL SERVICE REACTIONS"]
         direction TB
-        SEND_WA["📱 AiSensy Send<br/>OTP · Listing URL · Reply"]
-        WEBHOOK_WA["📱 AiSensy Webhook<br/>Inbound message → Event"]
-        CLOUD_UPLOAD["☁️ Cloudinary Upload<br/>Image · Video · Auto-detect"]
-        ANTHROPIC_API["🧠 Anthropic API<br/>Claude 3.5 Sonnet"]
-        FLASK_MOCK["🐍 Flask Mock API<br/>GET /api/mock/{type}/{bhk}"]
-        SEO_PIPELINE["🔍 SEO Pipeline<br/>JSON-LD · OG · Twitter Cards"]
-        REDIRECT_301["🔄 Legacy Redirect<br/>property/[slug] → 301 → type route"]
+        SEND_WA["AiSensy Send<br/>OTP | Listing URL | Reply"]
+        WEBHOOK_WA["AiSensy Webhook<br/>Inbound message -> Event"]
+        CLOUD_UPLOAD["Cloudinary Upload<br/>Image | Video | Auto-detect"]
+        ANTHROPIC_API["Anthropic API<br/>Claude 3.5 Sonnet"]
+        FLASK_MOCK["Flask Mock API<br/>GET /api/mock/{type}/{bhk}"]
+        SEO_PIPELINE["SEO Pipeline<br/>JSON-LD | OG | Twitter Cards"]
+        REDIRECT_301["Legacy Redirect<br/>property/[slug] -> 301 -> type route"]
     end
 
     OTP_FLOW --> SEND_WA
@@ -1217,69 +1217,69 @@ flowchart TB
     SEND_WA -->|OTP delivered| UI_PROFILE
     SEND_WA -->|URL shared| UI_LISTINGS
 
-    %% ─── REACTIVE CASCADE LABELS ─────────────────────────────────────────
-    CASCADE1("⚡ REACTIVE CASCADE 1<br/>WhatsApp → Webhook → Conversation →<br/>Fallback → DB → UI → WhatsApp Reply")
-    CASCADE2("⚡ REACTIVE CASCADE 2<br/>Page Visit → SSR → DB/Fallback →<br/>Render → Analytics++ → SEO Pipeline")
-    CASCADE3("⚡ REACTIVE CASCADE 3<br/>Lead Form → Dup Check → Lead DB →<br/>Analytics++ → Broker Dashboard UI")
-    CASCADE4("⚡ REACTIVE CASCADE 4<br/>Registration → Dup Check → OTP →<br/>Phone Verify → Dashboard Unlock")
+    %% REACTIVE CASCADE LABELS
+    CASCADE1("REACTIVE CASCADE 1<br/>WhatsApp -> Webhook -> Conversation -><br/>Fallback -> DB -> UI -> WhatsApp Reply")
+    CASCADE2("REACTIVE CASCADE 2<br/>Page Visit -> SSR -> DB/Fallback -><br/>Render -> Analytics++ -> SEO Pipeline")
+    CASCADE3("REACTIVE CASCADE 3<br/>Lead Form -> Dup Check -> Lead DB -><br/>Analytics++ -> Broker Dashboard UI")
+    CASCADE4("REACTIVE CASCADE 4<br/>Registration -> Dup Check -> OTP -><br/>Phone Verify -> Dashboard Unlock")
 
     CASCADE1 -.->|"Chain 1"| WH
     CASCADE2 -.->|"Chain 2"| PH
     CASCADE3 -.->|"Chain 3"| LH
     CASCADE4 -.->|"Chain 4"| RH
 
-    %% ─── STYLES ──────────────────────────────────────────────────────────
-    style EVENT_SOURCES fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style EVENT_PROC fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
-    style BUS_LOGIC fill:#1e1b18,color:#60a5fa,stroke:#60a5fa
-    style DATA_PERSIST fill:#1e1b18,color:#15803D,stroke:#15803D
-    style REACTIVE_UI fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style EXT_REACT fill:#1e1b18,color:#f87171,stroke:#f87171
-    
-    style E1 fill:#15803D,color:#fff,stroke:#15803D
-    style E2 fill:#C9A84C,color:#000,stroke:#C9A84C
-    style E3 fill:#C9A84C,color:#000,stroke:#C9A84C
-    style E4 fill:#60a5fa,color:#fff,stroke:#60a5fa
-    style E5 fill:#f87171,color:#fff,stroke:#f87171
-    
-    style WH fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style LH fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style PH fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style RH fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style UH fill:#a78bfa,color:#fff,stroke:#a78bfa
-    style AH fill:#a78bfa,color:#fff,stroke:#a78bfa
-    
-    style AI_FALLBACK fill:#C9A84C,color:#000,stroke:#C9A84C
-    style DUPE_PROP fill:#f87171,color:#fff,stroke:#f87171
-    style DUPE_LEAD fill:#f87171,color:#fff,stroke:#f87171
-    style DUPE_USER fill:#f87171,color:#fff,stroke:#f87171
-    style CONV_STATE fill:#60a5fa,color:#fff,stroke:#60a5fa
-    style OTP_FLOW fill:#60a5fa,color:#fff,stroke:#60a5fa
-    style ANALYTICS fill:#34d399,color:#000,stroke:#34d399
-    
-    style CASCADE1 fill:#15803D,color:#fff,stroke:#15803D
-    style CASCADE2 fill:#15803D,color:#fff,stroke:#15803D
-    style CASCADE3 fill:#15803D,color:#fff,stroke:#15803D
-    style CASCADE4 fill:#15803D,color:#fff,stroke:#15803D
-    
-    style SEND_WA fill:#15803D,color:#fff,stroke:#15803D
-    style WEBHOOK_WA fill:#15803D,color:#fff,stroke:#15803D
-    style FLASK_MOCK fill:#4169E1,color:#fff,stroke:#4169E1
-    style ANTHROPIC_API fill:#C9A84C,color:#000,stroke:#C9A84C
-    style CLOUD_UPLOAD fill:#f87171,color:#fff,stroke:#f87171
-    style SEO_PIPELINE fill:#C9A84C,color:#000,stroke:#C9A84C
-    style REDIRECT_301 fill:#DC2626,color:#fff,stroke:#DC2626
-    
-    style UI_GROWTH fill:#C9A84C,color:#000,stroke:#C9A84C
-    style UI_LISTINGS fill:#C9A84C,color:#000,stroke:#C9A84C
-    style UI_LEADS fill:#C9A84C,color:#000,stroke:#C9A84C
-    style UI_ANALYTICS fill:#C9A84C,color:#000,stroke:#C9A84C
-    style UI_PROFILE fill:#C9A84C,color:#000,stroke:#C9A84C
-    style UI_ACTIVITY fill:#C9A84C,color:#000,stroke:#C9A84C
-    
-    style BROKER_BLOCK fill:#DC2626,color:#fff,stroke:#DC2626
-    style BUYER_BLOCK fill:#DC2626,color:#fff,stroke:#DC2626
-    style REG_BLOCK fill:#DC2626,color:#fff,stroke:#DC2626
+    %% STYLES
+    style EVENT_SOURCES fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style EVENT_PROC fill:#222,color:#fff,stroke:#ccc
+    style BUS_LOGIC fill:#444,color:#fff,stroke:#ccc
+    style DATA_PERSIST fill:#666,color:#fff,stroke:#ccc
+    style REACTIVE_UI fill:#888,color:#000,stroke:#000
+    style EXT_REACT fill:#aaa,color:#000,stroke:#000
+
+    style E1 fill:#222,color:#fff,stroke:#ccc
+    style E2 fill:#444,color:#fff,stroke:#ccc
+    style E3 fill:#666,color:#fff,stroke:#ccc
+    style E4 fill:#888,color:#000,stroke:#000
+    style E5 fill:#bbb,color:#000,stroke:#000
+
+    style WH fill:#333,color:#fff,stroke:#ccc
+    style LH fill:#333,color:#fff,stroke:#ccc
+    style PH fill:#333,color:#fff,stroke:#ccc
+    style RH fill:#333,color:#fff,stroke:#ccc
+    style UH fill:#333,color:#fff,stroke:#ccc
+    style AH fill:#333,color:#fff,stroke:#ccc
+
+    style AI_FALLBACK fill:#555,color:#fff,stroke:#ccc
+    style DUPE_PROP fill:#777,color:#fff,stroke:#ccc
+    style DUPE_LEAD fill:#777,color:#fff,stroke:#ccc
+    style DUPE_USER fill:#777,color:#fff,stroke:#ccc
+    style CONV_STATE fill:#999,color:#000,stroke:#000
+    style OTP_FLOW fill:#999,color:#000,stroke:#000
+    style ANALYTICS fill:#bbb,color:#000,stroke:#000
+
+    style CASCADE1 fill:#333,color:#fff,stroke:#fff,stroke-width:2px
+    style CASCADE2 fill:#333,color:#fff,stroke:#fff,stroke-width:2px
+    style CASCADE3 fill:#333,color:#fff,stroke:#fff,stroke-width:2px
+    style CASCADE4 fill:#333,color:#fff,stroke:#fff,stroke-width:2px
+
+    style SEND_WA fill:#444,color:#fff,stroke:#ccc
+    style WEBHOOK_WA fill:#444,color:#fff,stroke:#ccc
+    style FLASK_MOCK fill:#666,color:#fff,stroke:#ccc
+    style ANTHROPIC_API fill:#888,color:#000,stroke:#000
+    style CLOUD_UPLOAD fill:#aaa,color:#000,stroke:#000
+    style SEO_PIPELINE fill:#ccc,color:#000,stroke:#000
+    style REDIRECT_301 fill:#eee,color:#000,stroke:#000
+
+    style UI_GROWTH fill:#555,color:#fff,stroke:#ccc
+    style UI_LISTINGS fill:#555,color:#fff,stroke:#ccc
+    style UI_LEADS fill:#555,color:#fff,stroke:#ccc
+    style UI_ANALYTICS fill:#555,color:#fff,stroke:#ccc
+    style UI_PROFILE fill:#555,color:#fff,stroke:#ccc
+    style UI_ACTIVITY fill:#555,color:#fff,stroke:#ccc
+
+    style BROKER_BLOCK fill:#777,color:#fff,stroke:#ccc
+    style BUYER_BLOCK fill:#777,color:#fff,stroke:#ccc
+    style REG_BLOCK fill:#777,color:#fff,stroke:#ccc
 ```
 
 ---
@@ -1288,35 +1288,35 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    subgraph CURRENT["⚡ CURRENT (Synchronous)"]
-        CUR_WEBHOOK["AiSensy Webhook → Vercel<br/>Handles everything synchronously<br/>✅ Text-only, 1-2 images, fast Claude<br/>⚠️ Risk: 10s timeout on heavy loads"]
+    subgraph CURRENT["CURRENT (Synchronous)"]
+        CUR_WEBHOOK["AiSensy Webhook -> Vercel<br/>Handles everything synchronously<br/>  Text-only, 1-2 images, fast Claude<br/>  Risk: 10s timeout on heavy loads"]
     end
 
-    subgraph FUTURE["🔮 FUTURE (Async Queue)"]
+    subgraph FUTURE["FUTURE (Async Queue)"]
         direction TB
-        
-        F_WEBHOOK["POST /api/whatsapp/webhook<br/>→ parseInboundMessage() (instant <100ms)"]
-        F_QUEUE["→ Save to Queue Table / Redis"]
-        F_200["→ Return 200 OK instantly"]
-        F_FLASK["🐍 Flask async worker picks up queue<br/>→ downloadMedia() from URLs<br/>→ uploadImage() to Cloudinary<br/>→ generateListing() via Claude<br/>→ createListing() to Supabase<br/>→ sendMessage() reply to broker<br/>✅ No 10s timeout — unlimited time"]
-        
+
+        F_WEBHOOK["POST /api/whatsapp/webhook<br/>-> parseInboundMessage() (instant <100ms)"]
+        F_QUEUE["-> Save to Queue Table / Redis"]
+        F_200["-> Return 200 OK instantly"]
+        F_FLASK["Flask async worker picks up queue<br/>-> downloadMedia() from URLs<br/>-> uploadImage() to Cloudinary<br/>-> generateListing() via Claude<br/>-> createListing() to Supabase<br/>-> sendMessage() reply to broker<br/>  No 10s timeout - unlimited time"]
+
         F_WEBHOOK --> F_QUEUE
         F_QUEUE --> F_200
         F_QUEUE --> F_FLASK
     end
 
-    subgraph BENEFIT["🎯 BENEFIT"]
-        BENEFIT_TEXT["Broker gets instant<br/>'✓ Listing being processed' reply<br/>instead of waiting 10-30 seconds"]
+    subgraph BENEFIT["BENEFIT"]
+        BENEFIT_TEXT["Broker gets instant<br/>'Listing being processed' reply<br/>instead of waiting 10-30 seconds"]
     end
 
     CURRENT -.->|Evolution| FUTURE
     FUTURE --> BENEFIT
 
-    style CURRENT fill:#fbbf24,color:#000,stroke:#fbbf24
-    style FUTURE fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style F_200 fill:#15803D,color:#fff,stroke:#15803D
-    style F_FLASK fill:#4169E1,color:#fff,stroke:#4169E1
-    style BENEFIT fill:#15803D,color:#fff,stroke:#15803D
+    style CURRENT fill:#555,color:#fff,stroke:#ccc
+    style FUTURE fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style F_200 fill:#333,color:#fff,stroke:#ccc
+    style F_FLASK fill:#777,color:#fff,stroke:#ccc
+    style BENEFIT fill:#999,color:#000,stroke:#000
 ```
 
 ---

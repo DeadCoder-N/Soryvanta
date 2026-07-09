@@ -1,0 +1,77 @@
+{
+  "title": "1800 sqft Office Space in Connaught Place, Delhi",
+  "description": "A premium commercial office space available for sale in the heart of Delhi's most prestigious business district — Connaught Place. This 1800 sqft office on the ground floor offers a prime retail/business presence with high footfall and excellent visibility. The space features a professional reception area, two private cabins for senior management, a large open-plan work area for 20-25 workstations, a conference room with AV setup, a pantry/break area, and two washrooms. The property has a dedicated entrance from the main road with signage rights. 3-phase power connection with UPS backup, high-speed fiber internet connectivity, centralized air conditioning, and fire safety systems are all installed and operational. Connaught Place offers unmatched connectivity with the Rajiv Chowk metro station at walking distance, making it accessible from all parts of Delhi-NCR. Ideal for IT/ITES companies, corporate offices, co-working space operators, retail showrooms, banks, or professional services firms. The area also attracts significant foot traffic for restaurants and retail businesses.",
+  "price": 21000000,
+  "priceLabel": "₹2.1 Cr",
+  "bedrooms": null,
+  "bathrooms": null,
+  "areaSqft": 1800,
+  "floor": "Ground",
+  "totalFloors": 4,
+  "facing": "South",
+  "city": "Delhi",
+  "address": "Connaught Place, New Delhi, Delhi 110001",
+  "type": "COMMERCIAL",
+  "status": "ACTIVE",
+  "features": [
+    "Ground Floor with Main Road Frontage",
+    "Signage Rights Included",
+    "Centralized Air Conditioning",
+    "3-Phase Power with UPS Backup",
+    "High-Speed Fiber Internet Ready",
+    "Fire Safety System Installed",
+    "CCTV Surveillance",
+    "Conference Room with AV",
+    "Pantry/Break Area",
+    "Two Washrooms",
+    "Reception Area",
+    "Private Cabins",
+    "Open Plan for 25 Workstations",
+    "Visitor Parking",
+    "Wheelchair Accessible"
+  ],
+  "businessSuitability": [
+    "IT/ITES Company",
+    "Corporate Office",
+    "Co-Working Space",
+    "Retail Showroom",
+    "Bank/Financial Services",
+    "Restaurant/Cafe",
+    "Professional Services",
+    "Showroom"
+  ],
+  "amenities": [
+    "Metro Access (Rajiv Chowk)",
+    "Visitor Parking",
+    "Security Guard",
+    "Power Backup",
+    "Elevator Access",
+    "Food Court Nearby",
+    "ATM Banking",
+    "Hotel Nearby"
+  ],
+  "images": [
+    { "url": "https://placehold.co/800x600/1e1b18/C9A84C", "caption": "Office Reception", "type": "image", "order": 1 },
+    { "url": "https://placehold.co/800x600/161412/C9A84C", "caption": "Open Plan Work Area", "type": "image", "order": 2 },
+    { "url": "https://placehold.co/800x600/0F0E0C/C9A84C", "caption": "Conference Room", "type": "image", "order": 3 },
+    { "url": "https://placehold.co/800x600/161412/D4A837", "caption": "Private Cabin", "type": "image", "order": 4 },
+    { "url": "https://placehold.co/800x600/1e1b18/D4A837", "caption": "Front View from Road", "type": "image", "order": 5 }
+  ],
+  "broker": {
+    "name": "Anjali Gupta",
+    "phone": "917777888999",
+    "agency": "Brisvora Commercial Solutions",
+    "experience": "14 years"
+  },
+  "location": {
+    "lat": 28.6329,
+    "lng": 77.2196,
+    "landmark": "Near Rajiv Chowk Metro Station"
+  },
+  "legal": {
+    "ownership": "Freehold",
+    "propertyTax": "Paid till 2026",
+    "occupancy": "Immediate Possession",
+    "commercialLicense": "Active"
+  }
+}

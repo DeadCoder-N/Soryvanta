@@ -6,7 +6,8 @@ export async function createListing(
   generated: GeneratedListing,
   imageUrls: string[],
   rawInput: string,
-  ownerId?: string
+  ownerId?: string,
+  mockDataUrl?: string
 ) {
   const tempId = crypto.randomUUID()
   const slug = generateSlug(generated.title, tempId)
@@ -29,6 +30,7 @@ export async function createListing(
       features: generated.features,
       amenities: generated.amenities,
       rawInput,
+      mockDataUrl: mockDataUrl ?? null,
       images: {
         create: imageUrls.map((url, i) => ({ url, order: i })),
       },
@@ -124,9 +126,15 @@ export async function deleteListing(id: string, ownerId: string) {
 }
 
 export async function incrementViewCount(propertyId: string) {
-  return prisma.analytics.update({
+  return prisma.analytics.upsert({
     where: { propertyId },
-    data: {
+    create: {
+      propertyId,
+      viewCount: 1,
+      inquiryCount: 0,
+      lastViewed: new Date(),
+    },
+    update: {
       viewCount: { increment: 1 },
       lastViewed: new Date(),
     },

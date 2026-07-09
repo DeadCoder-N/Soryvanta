@@ -1,0 +1,59 @@
+{
+  "title": "1200 sqft Residential Plot in Whitefield, Bangalore",
+  "description": "A prime residential plot available for sale in the rapidly developing Whitefield area of Bangalore. This 1200 sqft plot (30×40 dimensions) is located in a gated community with all necessary approvals in place. The plot is ideal for constructing a 2-3 BHK independent house or a luxury villa. The neighborhood has excellent social infrastructure with top-rated international schools, multi-specialty hospitals, shopping malls, and entertainment centers within a 2 km radius. The plot enjoys road access from a 40-ft wide road with underground drainage, water connection, and electricity already available at the site. The area is witnessing rapid appreciation due to the upcoming metro extension and the proximity to the IT corridor (3 km from Whitefield Main Road). Clear title with no encumbrances. All original documents available for verification. Immediate registration possible. Ideal for end-use construction or long-term investment.",
+  "price": 8500000,
+  "priceLabel": "₹85 L",
+  "bedrooms": null,
+  "bathrooms": null,
+  "areaSqft": 1200,
+  "plotDimensions": "30 × 40",
+  "zone": "Residential",
+  "facing": "East",
+  "city": "Bangalore",
+  "address": "Whitefield, Bangalore, Karnataka 560066",
+  "type": "PLOT",
+  "status": "ACTIVE",
+  "features": [
+    "Corner Plot",
+    "40-ft Wide Road Access",
+    "Underground Drainage",
+    "Water Connection Ready",
+    "Electricity Connection Ready",
+    "Gated Community",
+    "Clear Title",
+    "East Facing - Vastu Compliant",
+    "Metro Proximity (Upcoming)",
+    "No Encumbrances"
+  ],
+  "amenities": [
+    "Park Within Community",
+    "Security Guard",
+    "Street Lighting",
+    "Wide Roads",
+    "Children's Play Area",
+    "Community Hall"
+  ],
+  "images": [
+    { "url": "https://placehold.co/800x600/1e1b18/C9A84C", "caption": "Plot View from Road", "type": "image", "order": 1 },
+    { "url": "https://placehold.co/800x600/161412/C9A84C", "caption": "Site Survey Map", "type": "image", "order": 2 },
+    { "url": "https://placehold.co/800x600/0F0E0C/C9A84C", "caption": "Neighborhood View", "type": "image", "order": 3 }
+  ],
+  "broker": {
+    "name": "Suresh Reddy",
+    "phone": "918888777666",
+    "agency": "Brisvora Land Holdings",
+    "experience": "10 years"
+  },
+  "location": {
+    "lat": 12.9698,
+    "lng": 77.7500,
+    "landmark": "Near ITPL Main Road"
+  },
+  "legal": {
+    "ownership": "Freehold",
+    "khata": "A-Khata",
+    "approvals": "BBMP Approved Layout",
+    "surveyNo": "123/45/67",
+    "occupancy": "Immediate Registration"
+  }
+}

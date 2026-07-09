@@ -13,3 +13,7 @@ coverage
 doc/
 *.vsix
 
+# Amazon Q rules & guidelines
+.amazonq/
+BRISVORA_AI_GUIDELINES.md
+

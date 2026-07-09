@@ -103,14 +103,16 @@ export async function POST(req: Request) {
       }
 
       const rawMessage = accumulatedText || msg.body
-      const generated = await generateListing({ rawMessage, imageUrls })
+      const result = await generateListing({ rawMessage, imageUrls })
 
       // createListing: ownerPhone always set, ownerId only if registered
-      const property = await createListing(digits, generated, imageUrls, rawMessage, user?.id)
+      const property = await createListing(digits, result.listing, imageUrls, rawMessage, user?.id, result.mockDataUrl)
 
-      const listingUrl = `${process.env.NEXTAUTH_URL || 'https://brisvora.vercel.app'}/property/${property.slug}`
+      // Use new SEO route based on type
+      const typeRoute = result.listing.type?.toLowerCase() || 'property'
+      const listingUrl = `${process.env.NEXTAUTH_URL || 'https://brisvora.vercel.app'}/${typeRoute}/${property.slug}`
 
-      let replyBody = `Your listing is ready!\n\n${generated.title}\n\n${listingUrl}`
+      let replyBody = `Your listing is ready!\n\n${result.listing.title}\n\n${listingUrl}`
       if (!user) {
         replyBody += `\n\nTo edit this listing, register at brisvora.vercel.app with this WhatsApp number.`
       }

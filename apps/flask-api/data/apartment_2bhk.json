@@ -1,0 +1,65 @@
+{
+  "title": "2 BHK Apartment in Bandra West, Mumbai",
+  "description": "A beautifully designed 2 BHK apartment in the upscale Bandra West area of Mumbai. This 850 sqft flat offers two spacious bedrooms with attached balconies, a modern living room with city views, and a fully modular kitchen with branded fittings. The society boasts world-class amenities including a swimming pool, fully-equipped gymnasium, landscaped gardens, and indoor games room. Located in a prime locality with easy access to Bandra Kurla Complex, top-rated schools, fine dining restaurants, and premium shopping destinations. 24/7 security with intercom facility. The apartment is Vastu-compliant and gets excellent natural light throughout the day. A perfect home for growing families who value comfort and convenience.",
+  "price": 12000000,
+  "priceLabel": "₹1.2 Cr",
+  "bedrooms": 2,
+  "bathrooms": 2,
+  "areaSqft": 850,
+  "floor": 12,
+  "totalFloors": 15,
+  "facing": "West",
+  "city": "Mumbai",
+  "address": "Bandra West, Mumbai, Maharashtra 400050",
+  "type": "APARTMENT",
+  "status": "ACTIVE",
+  "features": [
+    "Modular Kitchen with Chimney",
+    "Vitrified Flooring",
+    "False Ceiling with LED",
+    "Air Conditioning Pre-Installed",
+    "Power Backup for Full Home",
+    "Intercom Facility",
+    "Video Door Phone",
+    "Wardrobes in All Bedrooms",
+    "Balcony with City View",
+    "Vastu Compliant",
+    "Rain Water Harvesting",
+    "Sewage Treatment Plant"
+  ],
+  "amenities": [
+    "Swimming Pool",
+    "Gymnasium",
+    "Landscaped Garden",
+    "Children's Play Area",
+    "Indoor Games Room",
+    "Community Hall",
+    "Jogging Track",
+    "Senior Citizen Corner",
+    "Yoga Deck",
+    "Car Parking"
+  ],
+  "images": [
+    { "url": "https://placehold.co/800x600/1e1b18/C9A84C", "caption": "Living Room with City View", "type": "image", "order": 1 },
+    { "url": "https://placehold.co/800x600/161412/C9A84C", "caption": "Master Bedroom", "type": "image", "order": 2 },
+    { "url": "https://placehold.co/800x600/0F0E0C/C9A84C", "caption": "Modular Kitchen", "type": "image", "order": 3 },
+    { "url": "https://placehold.co/800x600/161412/D4A837", "caption": "Second Bedroom", "type": "image", "order": 4 },
+    { "url": "https://placehold.co/800x600/1e1b18/D4A837", "caption": "Swimming Pool View", "type": "image", "order": 5 }
+  ],
+  "broker": {
+    "name": "Priya Patel",
+    "phone": "919876543210",
+    "agency": "Brisvora Premium Properties",
+    "experience": "12 years"
+  },
+  "location": {
+    "lat": 19.0596,
+    "lng": 72.8295,
+    "landmark": "Near Bandra Kurla Complex"
+  },
+  "legal": {
+    "ownership": "Freehold",
+    "rera": "P51900067890",
+    "occupancy": "Ready to Move"
+  }
+}

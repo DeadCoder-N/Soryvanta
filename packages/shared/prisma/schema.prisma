@@ -7,6 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  BROKER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum Plan {
+  STARTER
+  PROFESSIONAL
+  BUSINESS
+  ENTERPRISE
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  VILLA
+  PLOT
+  COMMERCIAL
+  OTHER
+}
+
+enum PropertyStatus {
+  ACTIVE
+  INACTIVE
+  SOLD
+  RENTED
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -14,6 +48,7 @@ model User {
   phone         String?   @unique
   passwordHash  String?
   role          Role      @default(BROKER)
+  plan          Plan      @default(STARTER)        // NEW: Maps to pricing tier
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -78,6 +113,8 @@ model Property {
   features    String[]
   amenities   String[]
   rawInput    String?
+  mockDataUrl String?                   // NEW: URL to Flask mock JSON for fallback
+  mediaJson   Json?                     // NEW: [{url, type, caption, order}] images+videos
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
@@ -93,13 +130,14 @@ model Property {
 }
 
 model Image {
-  id          String   @id @default(cuid())
-  propertyId  String
-  url         String
+  id           String   @id @default(cuid())
+  propertyId   String
+  url          String
   thumbnailUrl String?
-  caption     String?
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
+  caption      String?
+  order        Int      @default(0)
+  mediaType    String   @default("image")          // NEW: "image" | "video"
+  createdAt    DateTime @default(now())
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
@@ -107,17 +145,21 @@ model Image {
 }
 
 model Lead {
-  id         String   @id @default(cuid())
-  propertyId String
-  name       String?
-  phone      String?
-  message    String?
-  source     String   @default("whatsapp")
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  propertyId  String
+  name        String?
+  phone       String?
+  countryCode String   @default("+91")             // NEW: Country dial code
+  tokenCount  Int      @default(0)                 // NEW: Message char count for analytics
+  message     String?
+  source      String   @default("whatsapp")
+  createdAt   DateTime @default(now())
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
+  @@index([phone])
+  @@unique([propertyId, phone, createdAt])          // NEW: Duplicate prevention
 }
 
 model Analytics {
@@ -143,33 +185,6 @@ model WhatsappMessage {
   user User? @relation(fields: [userId], references: [id])
 
   @@index([waId])
-}
-
-enum Role {
-  BROKER
-  ADMIN
-  SUPER_ADMIN
-}
-
-enum PropertyType {
-  APARTMENT
-  HOUSE
-  VILLA
-  PLOT
-  COMMERCIAL
-  OTHER
-}
-
-enum PropertyStatus {
-  ACTIVE
-  INACTIVE
-  SOLD
-  RENTED
-}
-
-enum MessageDirection {
-  INBOUND
-  OUTBOUND
 }
 
 model ConversationState {

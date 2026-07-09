@@ -28,8 +28,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'rawMessage is required' }, { status: 400 })
   }
 
-  const generated = await generateListing({ rawMessage })
-  const property = await createListing('web', generated, imageUrls, rawMessage, session.user.id)
+  const result = await generateListing({ rawMessage })
+  const property = await createListing('web', result.listing, imageUrls, rawMessage, session.user.id)
 
   return NextResponse.json(property, { status: 201 })
 }

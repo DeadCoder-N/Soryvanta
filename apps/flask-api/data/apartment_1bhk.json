@@ -1,0 +1,54 @@
+{
+  "title": "1 BHK Flat in Andheri West, Mumbai",
+  "description": "A cozy 1 BHK apartment in the heart of Andheri West, Mumbai. This well-maintained flat features a spacious bedroom, hall, and a modern kitchen with ample storage. Located in a gated society with 24/7 security and power backup. Walking distance to Andheri station, schools, and hospitals. Perfect for young professionals and small families looking for a budget-friendly home in a prime Mumbai location. The building has a lift, visitor parking, and CCTV surveillance. Ready to move in with no waiting period.",
+  "price": 6500000,
+  "priceLabel": "₹65 L",
+  "bedrooms": 1,
+  "bathrooms": 1,
+  "areaSqft": 450,
+  "floor": 3,
+  "totalFloors": 7,
+  "facing": "East",
+  "city": "Mumbai",
+  "address": "Andheri West, Mumbai, Maharashtra 400053",
+  "type": "APARTMENT",
+  "status": "ACTIVE",
+  "features": [
+    "Modular Kitchen",
+    "Vitrified Tiles",
+    "Power Backup",
+    "Lift Access",
+    "24/7 Security",
+    "CCTV Surveillance",
+    "Visitor Parking",
+    "Rain Water Harvesting"
+  ],
+  "amenities": [
+    "Security Guard",
+    "Power Backup",
+    "Lift",
+    "Visitor Parking"
+  ],
+  "images": [
+    { "url": "https://placehold.co/800x600/1e1b18/C9A84C", "caption": "Living Room", "type": "image", "order": 1 },
+    { "url": "https://placehold.co/800x600/161412/C9A84C", "caption": "Bedroom", "type": "image", "order": 2 },
+    { "url": "https://placehold.co/800x600/0F0E0C/C9A84C", "caption": "Kitchen", "type": "image", "order": 3 },
+    { "url": "https://placehold.co/800x600/161412/D4A837", "caption": "Bathroom", "type": "image", "order": 4 }
+  ],
+  "broker": {
+    "name": "Rahul Sharma",
+    "phone": "918850908790",
+    "agency": "Brisvora Realty",
+    "experience": "8 years"
+  },
+  "location": {
+    "lat": 19.1197,
+    "lng": 72.8469,
+    "landmark": "Near Andheri Station"
+  },
+  "legal": {
+    "ownership": "Freehold",
+    "rera": "P51900012345",
+    "occupancy": "Ready to Move"
+  }
+}

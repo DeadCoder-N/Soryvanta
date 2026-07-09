@@ -1,0 +1,68 @@
+{
+  "title": "4 BHK Luxury Villa in Koregaon Park, Pune",
+  "description": "A stunning 4 BHK luxury villa in the prestigious Koregaon Park area of Pune. This 3200 sqft villa sits on a 2400 sqft plot and offers the ultimate in luxury living. The ground floor features a grand living room with 14-foot ceilings, a formal dining room, a modern kitchen with premium imported fittings, and a guest bedroom with attached bathroom. The first floor houses three spacious bedrooms, each with its own balcony and attached bathroom. The master suite includes a walk-in wardrobe, a spa-inspired bathroom with a jacuzzi, and a private terrace. The villa comes with a private swimming pool, a landscaped garden with automatic irrigation, a home theatre room, and a dedicated servant quarters. Smart home automation controls lighting, climate, security, and entertainment systems throughout. Premium Italian marble flooring, imported sanitaryware, and designer light fixtures throughout. Located in one of Pune's most exclusive neighborhoods with 24/7 security and close to the Osho Ashram, luxury hotels, and fine dining restaurants.",
+  "price": 45000000,
+  "priceLabel": "₹4.5 Cr",
+  "bedrooms": 4,
+  "bathrooms": 5,
+  "areaSqft": 3200,
+  "plotSqft": 2400,
+  "floors": 2,
+  "facing": "North",
+  "city": "Pune",
+  "address": "Koregaon Park, Pune, Maharashtra 411001",
+  "type": "VILLA",
+  "status": "ACTIVE",
+  "features": [
+    "Private Swimming Pool",
+    "Smart Home Automation",
+    "Italian Marble Flooring",
+    "Imported Sanitaryware",
+    "Jacuzzi in Master Bathroom",
+    "Home Theatre Room",
+    "Landscaped Garden with Irrigation",
+    "Walk-in Wardrobe",
+    "Modular Kitchen with Premium Fittings",
+    "14-Foot Ceiling in Living Room",
+    "Servant Quarters",
+    "Private Terrace",
+    "Rain Water Harvesting",
+    "Solar Panels",
+    "Carport for 3 Cars",
+    "Video Door Phone with Gate Automation"
+  ],
+  "amenities": [
+    "Private Pool",
+    "Home Theatre",
+    "Garden",
+    "Terrace",
+    "Car Parking for 3",
+    "24/7 Security",
+    "Power Backup",
+    "Club Membership Available"
+  ],
+  "images": [
+    { "url": "https://placehold.co/800x600/1e1b18/C9A84C", "caption": "Villa Exterior", "type": "image", "order": 1 },
+    { "url": "https://placehold.co/800x600/161412/C9A84C", "caption": "Grand Living Room", "type": "image", "order": 2 },
+    { "url": "https://placehold.co/800x600/0F0E0C/C9A84C", "caption": "Private Pool and Garden", "type": "image", "order": 3 },
+    { "url": "https://placehold.co/800x600/161412/D4A837", "caption": "Master Bedroom with Terrace", "type": "image", "order": 4 },
+    { "url": "https://placehold.co/800x600/1e1b18/D4A837", "caption": "Jacuzzi Bathroom", "type": "image", "order": 5 },
+    { "url": "https://placehold.co/800x600/161412/D4A837", "caption": "Home Theatre Room", "type": "image", "order": 6 }
+  ],
+  "broker": {
+    "name": "Vikram Mehta",
+    "phone": "919999888777",
+    "agency": "Brisvora Luxury Estates",
+    "experience": "20 years"
+  },
+  "location": {
+    "lat": 18.5362,
+    "lng": 73.8863,
+    "landmark": "Near Osho Ashram"
+  },
+  "legal": {
+    "ownership": "Freehold",
+    "rera": "P52100045678",
+    "occupancy": "Ready to Move"
+  }
+}

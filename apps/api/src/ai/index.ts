@@ -5,90 +5,173 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 })
 
-export async function generateListing(input: ListingGenerationInput): Promise<GeneratedListing> {
+export type ListingResult = {
+  listing: GeneratedListing
+  mockDataUrl?: string
+  level: 'claude' | 'regex-mock' | 'flask-mock'
+}
+
+export async function generateListing(input: ListingGenerationInput): Promise<ListingResult> {
   const raw = input.rawMessage
   const imageUrls = input.imageUrls ?? []
+  const flaskApiUrl = process.env.NEXT_PUBLIC_FLASK_API_URL || 'http://localhost:5000'
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.warn('ANTHROPIC_API_KEY not set. Falling back to mock generator.')
-    return mockGenerateListing(input)
+  // ── LEVEL 1: Claude 3.5 Sonnet ────────────────────────────────
+  if (process.env.ANTHROPIC_API_KEY) {
+    try {
+      const userContent: any[] = []
+      for (const url of imageUrls) {
+        userContent.push({
+          type: 'image',
+          source: { type: 'url', url },
+        })
+      }
+      userContent.push({
+        type: 'text',
+        text: raw || 'Please analyze the property images above and generate a listing.',
+      })
+
+      console.log('[generateListing] Level 1 — Claude 3.5 Sonnet')
+      console.log('[generateListing] Input text:', raw)
+      console.log('[generateListing] Input images:', imageUrls)
+
+      const msg = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 2048,
+        system: `You are an expert luxury real estate copywriter and data extractor. Extract structured listing data from informal broker messages. Output ONLY the requested JSON via the tool. Make educated guesses for missing fields based on context. Description must be polished, professional, and appeal to luxury buyers. Use correct spelling and grammar.`,
+        messages: [{ role: 'user', content: userContent }],
+        tools: [{
+          name: 'extract_property_details',
+          description: 'Extract property details into structured listing.',
+          input_schema: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              description: { type: 'string' },
+              address: { type: 'string' },
+              city: { type: 'string' },
+              price: { type: 'number' },
+              priceLabel: { type: 'string' },
+              bedrooms: { type: 'number' },
+              bathrooms: { type: 'number' },
+              areaSqft: { type: 'number' },
+              type: { type: 'string', enum: ['APARTMENT', 'HOUSE', 'VILLA', 'PLOT', 'COMMERCIAL', 'OTHER'] },
+              features: { type: 'array', items: { type: 'string' } },
+              amenities: { type: 'array', items: { type: 'string' } }
+            },
+            required: ['title', 'description', 'address', 'city', 'price', 'priceLabel', 'type', 'features', 'amenities']
+          }
+        }],
+        tool_choice: { type: 'tool', name: 'extract_property_details' }
+      })
+
+      const toolUse = msg.content.find(c => c.type === 'tool_use')
+      if (toolUse && toolUse.type === 'tool_use') {
+        const data = toolUse.input as any
+        return {
+          listing: {
+            ...data,
+            bedrooms: data.bedrooms ?? undefined,
+            bathrooms: data.bathrooms ?? undefined,
+            areaSqft: data.areaSqft ?? undefined,
+          } as GeneratedListing,
+          level: 'claude'
+        }
+      }
+      throw new Error('Claude did not return tool usage.')
+    } catch (error) {
+      console.error('[generateListing] Level 1 failed:', (error as any)?.message)
+      console.warn('[generateListing] Falling to Level 2 — Regex mock')
+    }
+  } else {
+    console.warn('[generateListing] ANTHROPIC_API_KEY not set. Skipping Level 1.')
   }
 
+  // ── LEVEL 2: Regex Mock Fallback ───────────────────────────────
   try {
-    // Build message content — text + images if available
-    const userContent: any[] = []
-
-    for (const url of imageUrls) {
-      userContent.push({
-        type: 'image',
-        source: { type: 'url', url },
-      })
-    }
-
-    userContent.push({
-      type: 'text',
-      text: raw || 'Please analyze the property images above and generate a listing.',
-    })
-
-    console.log('Claude input text:', raw)
-    console.log('Claude input images:', imageUrls)
-
-    const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 2048,
-      system: `You are an expert luxury real estate copywriter and data extractor. Your task is to extract information from messy, informal text messages from brokers and generate a highly polished, professional property listing.
-Output ONLY the requested JSON data using the provided tool.
-If some information is missing (like bedrooms, bathrooms, exact price, or area), make a highly educated guess based on the context, city, or standard real estate configurations.
-Keep the description elegant, highlighting luxury, comfort, and premium lifestyle. Use correct spelling and grammar regardless of the input.`,
-      messages: [{ role: 'user', content: userContent }],
-      tools: [{
-        name: 'extract_property_details',
-        description: 'Extract and format the property details into a structured listing.',
-        input_schema: {
-          type: 'object',
-          properties: {
-            title: { type: 'string', description: 'Catchy, elegant title (e.g., "Spacious 3 BHK Apartment in Bandra West")' },
-            description: { type: 'string', description: '2-3 paragraphs of polished, luxury-focused description. Make it sound appealing.' },
-            address: { type: 'string', description: 'Specific neighborhood, locality, or address extracted from text' },
-            city: { type: 'string', description: 'The city name. Capitalized.' },
-            price: { type: 'number', description: 'Exact numeric price in INR (e.g., 18000000 for 1.8 Cr)' },
-            priceLabel: { type: 'string', description: 'Human readable short price (e.g., "₹1.8 Cr", "₹85 L")' },
-            bedrooms: { type: 'number', description: 'Number of bedrooms (null if plot/commercial)' },
-            bathrooms: { type: 'number', description: 'Number of bathrooms' },
-            areaSqft: { type: 'number', description: 'Area in square feet' },
-            type: { type: 'string', enum: ['APARTMENT', 'HOUSE', 'VILLA', 'PLOT', 'COMMERCIAL', 'OTHER'] },
-            features: { type: 'array', items: { type: 'string' }, description: '5-8 specific features (e.g., "Modular Kitchen", "Sea View", "Vastu Compliant")' },
-            amenities: { type: 'array', items: { type: 'string' }, description: '3-6 nearby amenities (e.g., "Near Metro", "Shopping Mall", "Schools")' }
-          },
-          required: ['title', 'description', 'address', 'city', 'price', 'priceLabel', 'type', 'features', 'amenities']
-        }
-      }],
-      tool_choice: { type: 'tool', name: 'extract_property_details' }
-    })
-
-    const toolUse = msg.content.find(c => c.type === 'tool_use')
-    console.log('Claude raw output:', JSON.stringify(msg.content))
-    if (toolUse && toolUse.type === 'tool_use') {
-      const data = toolUse.input as any
-      return {
-        ...data,
-        bedrooms: data.bedrooms ?? undefined,
-        bathrooms: data.bathrooms ?? undefined,
-        areaSqft: data.areaSqft ?? undefined,
-      } as GeneratedListing
-    }
-    
-    throw new Error('Claude did not return tool usage.')
+    console.log('[generateListing] Level 2 — Regex mock')
+    const regexResult = mockGenerateListing(input)
+    return { listing: regexResult, level: 'regex-mock' }
   } catch (error) {
-    console.error('Anthropic API Error:', JSON.stringify(error))
-    console.error('Anthropic API Error message:', (error as any)?.message)
-    console.error('Anthropic API Error status:', (error as any)?.status)
-    console.warn('Falling back to mock generator.')
-    return mockGenerateListing(input)
+    console.error('[generateListing] Level 2 failed:', (error as any)?.message)
+    console.warn('[generateListing] Falling to Level 3 — Flask JSON mock')
+  }
+
+  // ── LEVEL 3: Flask JSON Mock API ────────────────────────────────
+  console.log('[generateListing] Level 3 — Flask JSON mock API')
+
+  const rawLower = (raw || '').toLowerCase()
+  let flaskType = 'apartment'
+  let bhk = '2bhk'
+
+  if (rawLower.includes('villa')) flaskType = 'villa'
+  else if (rawLower.includes('plot') || rawLower.includes('land')) flaskType = 'plot'
+  else if (rawLower.includes('commercial') || rawLower.includes('office') || rawLower.includes('shop')) flaskType = 'commercial'
+
+  const bhkMatch = rawLower.match(/(\d)\s*bhk/)
+  if (bhkMatch) {
+    const n = parseInt(bhkMatch[1])
+    if (n === 1) bhk = '1bhk'
+    else if (n === 2) bhk = '2bhk'
+    else if (n >= 3) bhk = '3bhk'
+  }
+
+  const mockUrl = `${flaskApiUrl}/api/mock/${flaskType}/${['villa', 'plot', 'commercial'].includes(flaskType) ? '' : bhk}`.replace(/\/$/, '')
+
+  try {
+    const response = await fetch(mockUrl)
+    if (!response.ok) throw new Error(`Flask returned ${response.status}`)
+
+    const flaskData = await response.json()
+    const listing: GeneratedListing = {
+      title: flaskData.title,
+      description: flaskData.description,
+      address: flaskData.address,
+      city: flaskData.city,
+      price: flaskData.price,
+      priceLabel: flaskData.priceLabel,
+      bedrooms: flaskData.bedrooms ?? undefined,
+      bathrooms: flaskData.bathrooms ?? undefined,
+      areaSqft: flaskData.areaSqft,
+      type: flaskData.type,
+      features: flaskData.features,
+      amenities: flaskData.amenities,
+    }
+
+    return {
+      listing,
+      mockDataUrl: mockUrl,
+      level: 'flask-mock'
+    }
+  } catch (error) {
+    console.error('[generateListing] Level 3 failed:', (error as any)?.message)
+    return {
+      listing: {
+        title: `Property in ${extractCity(raw || '')}`,
+        description: `A well-maintained property located in a prime area of ${extractCity(raw || '')}. Features modern interiors and excellent connectivity.`,
+        address: `Prime Location, ${extractCity(raw || '')}`,
+        city: extractCity(raw || ''),
+        price: 8500000,
+        priceLabel: '₹85 L',
+        bedrooms: 2,
+        bathrooms: 2,
+        areaSqft: 850,
+        type: 'APARTMENT',
+        features: ['Modular Kitchen', 'Car Parking', 'Power Backup'],
+        amenities: ['Near Metro', 'Shopping Nearby'],
+      },
+      level: 'flask-mock'
+    }
   }
 }
 
-// Fallback regex logic in case API fails
+/** Extract city name from raw message text. */
+function extractCity(raw: string): string {
+  const match = raw.toLowerCase().match(/\b(mumbai|delhi|bangalore|bengaluru|pune|hyderabad|chennai|kolkata|jaipur|ahmedabad|surat|lucknow|noida|gurgaon|gurugram)\b/i)
+  return match ? match[1].charAt(0).toUpperCase() + match[1].slice(1) : 'Mumbai'
+}
+
+/** Level 2 fallback — regex-based extraction from raw message text. */
 function mockGenerateListing(input: ListingGenerationInput): GeneratedListing {
   const raw = input.rawMessage.toLowerCase()
 

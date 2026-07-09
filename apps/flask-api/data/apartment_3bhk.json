@@ -1,0 +1,70 @@
+{
+  "title": "3 BHK Premium Apartment in Wakad, Pune",
+  "description": "A spacious 3 BHK premium apartment in the rapidly growing Wakad area of Pune. Spread across 1200 sqft, this home features three large bedrooms with attached bathrooms, a grand living room with a pooja room, a separate dining area, and a modular kitchen with a utility balcony. The 7th-floor apartment offers panoramic views of the surrounding hills and greenery. The society includes premium amenities: a temperature-controlled swimming pool, a professional gymnasium, a squash court, and a rooftop garden with barbecue area. Located close to Hinjewadi IT Park with excellent connectivity to the Mumbai-Pune Expressway. Walking distance to international schools, supermarkets, and hospitals. Ideal for senior professionals and large families seeking a premium lifestyle in Pune's IT corridor.",
+  "price": 18500000,
+  "priceLabel": "₹1.85 Cr",
+  "bedrooms": 3,
+  "bathrooms": 3,
+  "areaSqft": 1200,
+  "floor": 7,
+  "totalFloors": 12,
+  "facing": "North-East",
+  "city": "Pune",
+  "address": "Wakad, Pune, Maharashtra 411057",
+  "type": "APARTMENT",
+  "status": "ACTIVE",
+  "features": [
+    "Modular Kitchen with Island",
+    "Italian Marble Flooring",
+    "False Ceiling with Cove Lighting",
+    "Split AC in All Rooms",
+    "Home Automation Ready",
+    "Video Door Phone",
+    "Pooja Room",
+    "Utility Balcony",
+    "Dining Area with Chandelier Point",
+    "Walk-in Wardrobe in Master",
+    "Smart Lock Compatible Door",
+    "Heat Reflective Glass Windows"
+  ],
+  "amenities": [
+    "Temperature Controlled Pool",
+    "Professional Gym",
+    "Squash Court",
+    "Rooftop Garden",
+    "Barbecue Area",
+    "Indoor Badminton Court",
+    "Party Hall",
+    "Library",
+    "Cafeteria",
+    "Jogging Track",
+    "Children's Pool",
+    "Multipurpose Court",
+    "EV Charging Station",
+    "Solar Power Backup"
+  ],
+  "images": [
+    { "url": "https://placehold.co/800x600/1e1b18/C9A84C", "caption": "Grand Living Room", "type": "image", "order": 1 },
+    { "url": "https://placehold.co/800x600/161412/C9A84C", "caption": "Master Bedroom with Walk-in Wardrobe", "type": "image", "order": 2 },
+    { "url": "https://placehold.co/800x600/0F0E0C/C9A84C", "caption": "Modular Kitchen with Island", "type": "image", "order": 3 },
+    { "url": "https://placehold.co/800x600/161412/D4A837", "caption": "Dining Area", "type": "image", "order": 4 },
+    { "url": "https://placehold.co/800x600/1e1b18/D4A837", "caption": "Rooftop Garden", "type": "image", "order": 5 },
+    { "url": "https://placehold.co/800x600/161412/D4A837", "caption": "Second Bedroom", "type": "image", "order": 6 }
+  ],
+  "broker": {
+    "name": "Amit Deshmukh",
+    "phone": "917654321098",
+    "agency": "Brisvora Prime Realty",
+    "experience": "15 years"
+  },
+  "location": {
+    "lat": 18.5703,
+    "lng": 73.7769,
+    "landmark": "Near Hinjewadi IT Park"
+  },
+  "legal": {
+    "ownership": "Freehold",
+    "rera": "P52100098765",
+    "occupancy": "Ready to Move"
+  }
+}

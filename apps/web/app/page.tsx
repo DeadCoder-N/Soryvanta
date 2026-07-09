@@ -1,7 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
-import { searchListings } from '@brisvora/api'
-import { formatPrice } from '@brisvora/shared'
 import { auth } from '@/auth'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
@@ -17,58 +14,29 @@ import PricingSection from '@/components/PricingSection'
 import FaqSection from '@/components/FaqSection'
 import FinalCtaSection from '@/components/FinalCtaSection'
 import Footer from '@/components/Footer'
-import HoverCard from '@/components/HoverCard'
 
-interface SearchParams {
-  city?: string; minPrice?: string; maxPrice?: string
-  type?: string; bedrooms?: string; page?: string
-}
-type SearchListing = {
-  id: string; slug: string; title: string; city: string; price: number
-  type: string; bedrooms: number | null; bathrooms: number | null
-  images: Array<{ url: string }>; analytics: { viewCount: number } | null
-}
-
-export default async function HomePage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const sp = await searchParams
+export default async function HomePage() {
   const session = await auth()
-  const listings = await searchListings({
-    city: sp.city,
-    minPrice: sp.minPrice ? Number(sp.minPrice) : undefined,
-    maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
-    type: sp.type,
-    bedrooms: sp.bedrooms ? Number(sp.bedrooms) : undefined,
-    page: sp.page ? Number(sp.page) : 1,
-  }).catch(() => [] as SearchListing[])
-  const hasFilters = sp.city || sp.type || sp.bedrooms || sp.minPrice || sp.maxPrice
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', overflowX: 'hidden' }}>
       <Navbar />
-
       <Hero isLoggedIn={!!session?.user} />
-
       <TrustSection />
-
       <ProblemSection />
-
       <SolutionSection />
-
       <EcosystemSection />
-
       <GrowthDashboardSection />
-
       <SolutionsSection />
-
       <IntegrationsSection />
-
       <CustomerSuccessSection />
-
       <PricingSection />
-
       <FaqSection />
-
       <FinalCtaSection />
+      <Footer />
+    </div>
+  )
+}
 
       {/* ── PREMIUM SEARCH BAR ── */}
       <section style={{

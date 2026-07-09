@@ -134,7 +134,7 @@ export default function Hero({ isLoggedIn }: HeroProps) {
               >
                 {isLoggedIn ? 'Go to Dashboard' : 'Start Building'}
               </Link>
-              <Link href="/#features" className="btn-secondary hero-cta-secondary">
+              <Link href="/demo" className="btn-secondary hero-cta-secondary">
                 Watch Demo
               </Link>
             </div>

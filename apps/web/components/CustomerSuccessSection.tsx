@@ -952,7 +952,7 @@ export default function CustomerSuccessSection() {
             }}>
               Join Early Access
             </Link>
-            <Link href="/#roadmap" className="btn-secondary" style={{
+            <Link href="/roadmap" className="btn-secondary" style={{
               padding: 'clamp(0.75rem,1.4vw,0.95rem) clamp(1.5rem,3vw,2rem)',
               fontSize: 'clamp(0.72rem,1.05vw,0.82rem)',
             }}>

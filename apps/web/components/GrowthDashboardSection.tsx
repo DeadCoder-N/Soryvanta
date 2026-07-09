@@ -408,17 +408,17 @@ export default function GrowthDashboardSection() {
             margin: '0 auto clamp(1.5rem,3vw,2.5rem)',
           }} />
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/dashboard" className="btn-primary" style={{
+            <Link href="/register" className="btn-primary" style={{
               padding: 'clamp(0.75rem,1.4vw,0.95rem) clamp(1.5rem,3vw,2rem)',
               fontSize: 'clamp(0.72rem,1.05vw,0.82rem)',
             }}>
-              Explore Dashboard
+              Start Free
             </Link>
-            <Link href="/register" className="btn-secondary" style={{
+            <Link href="/demo" className="btn-secondary" style={{
               padding: 'clamp(0.75rem,1.4vw,0.95rem) clamp(1.5rem,3vw,2rem)',
               fontSize: 'clamp(0.72rem,1.05vw,0.82rem)',
             }}>
-              View Analytics Demo
+              View Demo
             </Link>
           </div>
         </div>

@@ -327,7 +327,7 @@ export default function ProblemSection() {
               height: '1px', width: 'clamp(3rem,8vw,6rem)',
               background: 'linear-gradient(90deg, transparent, var(--gold-border), transparent)',
             }} />
-            <Link href="/#features" style={{
+            <Link href="/features" style={{
               fontFamily: "'Cinzel', serif",
               fontSize: 'clamp(0.48rem,0.78vw,0.56rem)',
               letterSpacing: '0.2em', textTransform: 'uppercase',

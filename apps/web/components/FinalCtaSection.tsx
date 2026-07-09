@@ -320,7 +320,7 @@ export default function FinalCtaSection() {
           </Link>
 
           <Link
-            href="/#demo"
+            href="/demo"
             className="btn-ghost cta-secondary-btn"
             style={{
               padding: 'clamp(0.9rem,1.6vw,1.15rem) clamp(2rem,4vw,2.8rem)',

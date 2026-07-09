@@ -29,7 +29,7 @@ export default function HoverCard({ href, children, className, style, hoverStyle
       }}
       onMouseLeave={e => {
         Object.keys(hover).forEach(k => {
-          (e.currentTarget.style as Record<string, string>)[k] = (base as Record<string, string>)[k] ?? ''
+          (e.currentTarget.style as unknown as Record<string, string>)[k] = (base as unknown as Record<string, string>)[k] ?? ''
         })
       }}
     >

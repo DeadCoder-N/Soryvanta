@@ -118,7 +118,7 @@ export default async function AdminOverviewPage() {
           </p>
           {propertiesByStatus.map((s: GroupByResult) => (
             <div key={s.status} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontSize: '0.82rem', color: statusColor[s.status] ?? 'var(--text-secondary)' }}>{s.status}</span>
+              <span style={{ fontSize: '0.82rem', color: statusColor[s.status ?? ''] ?? 'var(--text-secondary)' }}>{s.status}</span>
               <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.2rem', color: 'var(--text-primary)' }}>{s._count}</span>
             </div>
           ))}

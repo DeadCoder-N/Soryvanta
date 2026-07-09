@@ -20,7 +20,7 @@
 
 ---
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology | Version |
 |---|---|---|
@@ -46,56 +46,32 @@
 
 ## 📁 Monorepo Structure
 
-```
-BRISVORA/
-├── apps/
-│   ├── web/                          # Next.js 16 — main server (port 3000)
-│   │   ├── app/
-│   │   │   ├── apartment/[slug]/     # NEW: 1/2/3 BHK type-specific SEO routes
-│   │   │   ├── villa/[slug]/         # NEW: Luxury villa pages
-│   │   │   ├── plot/[slug]/          # NEW: Land/plot pages
-│   │   │   ├── commercial/[slug]/    # NEW: Commercial property pages
-│   │   │   ├── property/[slug]/      # OLD: 301 redirects to type route
-│   │   │   ├── (auth)/
-│   │   │   ├── dashboard/            # Growth, listings, leads, analytics
-│   │   │   ├── admin/                # Role-gated admin panel
-│   │   │   ├── api/                  # All route handlers
-│   │   │   │   ├── mock/[type]/      # NEW: Flask mock API proxy fallback
-│   │   │   │   └── ...
-│   │   │   └── globals.css           # Design token system
-│   │   ├── components/               # React components
-│   │   └── __tests__/                # 44 Vitest tests
-│   │
-│   ├── flask-api/                    # NEW: Python Flask microservice
-│   │   ├── app.py                    # Flask entry point
-│   │   ├── routes/
-│   │   │   ├── mock.py              # GET /api/mock/{type}/{bhk}
-│   │   │   └── health.py            # GET /health
-│   │   ├── data/                     # Mock JSON files (6 total)
-│   │   ├── requirements.txt
-│   │   └── Dockerfile
-│   │
-│   └── api/                          # Internal TS library
-│       └── src/
-│           ├── ai/index.ts           # 3-level fallback chain
-│           ├── listings/index.ts      # Duplicate detection
-│           ├── leads/index.ts        # Lead sanitization
-│           └── ...
-│
-├── packages/
-│   └── shared/
-│       ├── prisma/schema.prisma      # mockDataUrl, mediaJson, countryCode, plan
-│       └── src/
-│           ├── types/index.ts        # All TypeScript interfaces
-│           └── utils/index.ts
-│
-├── .github/
-│   └── workflows/
-│       └── deploy.yml                # NEW: CI/CD — test → Vercel + Render
-│
-├── turbo.json
-├── pnpm-workspace.yaml
-└── README.md
+```mermaid
+flowchart LR
+    subgraph BRISVORA["BRISVORA Monorepo"]
+        direction TB
+        APPS["apps/"] --> WEB["web/<br/>Next.js 16 App Router<br/>:3000"]
+        APPS --> FLASK["flask-api/<br/>Python Flask Microservice<br/>:5000"]
+        APPS --> API["api/<br/>Internal TS Library"]
+        
+        WEB --> WEB_DIRS["app/ · components/ · __tests__/ · public/"]
+        FLASK --> FLASK_DIRS["app.py · routes/ · data/ · tests/"]
+        API --> API_SRC["src/ai · src/listings · src/leads · src/whatsapp"]
+        
+        PACKAGES["packages/"] --> SHARED["shared/<br/>Prisma Schema + Types + Utils"]
+        SHARED --> PRISMA["prisma/schema.prisma"]
+        SHARED --> TYPES["src/types/"]
+        SHARED --> UTILS["src/utils/"]
+        
+        ROOT["Root Config"] --> FILES["turbo.json · pnpm-workspace.yaml<br/>tsconfig.base.json · .github/workflows"]
+    end
+
+    style BRISVORA fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style WEB fill:#4169E1,color:#fff,stroke:#4169E1
+    style FLASK fill:#3776AB,color:#fff,stroke:#3776AB
+    style API fill:#15803D,color:#fff,stroke:#15803D
+    style SHARED fill:#C9A84C,color:#000,stroke:#C9A84C
+    style PRISMA fill:#2D3748,color:#fff,stroke:#2D3748
 ```
 
 ---
@@ -398,256 +374,243 @@ model User {
 | Render.com for Flask (not Vercel) | ffmpeg support, unlimited timeout, file system access for future video transcoding |
 | mediaJson instead of mediaType on Image | One JSON column stores all media metadata — zero migration for new types |
 | Additive DB changes only | Never breaks existing production data — safe to deploy at any time |
+
+---
+
 # 📐 Architecture Diagrams
 
 ## System Architecture — Full Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                              BRISVORA PLATFORM                                       │
-│                                                                                     │
-│  ┌────────────────────────────────────────────────────────────────────────────┐     │
-│  │                      VERCEL — apps/web (Next.js 16)                        │     │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐  │     │
-│  │  │  PUBLIC      │  │  DASHBOARD  │  │  ADMIN      │  │  API ROUTES     │  │     │
-│  │  │  /apartment/ │  │  /dashboard │  │  /admin     │  │  /api/leads     │  │     │
-│  │  │  /villa/     │  │  /listings  │  │  /users     │  │  /api/upload    │  │     │
-│  │  │  /plot/      │  │  /leads     │  │  /properties│  │  /api/webhook   │  │     │
-│  │  │  /commercial/│  │  /analytics │  │  /messages  │  │  /api/broker/   │  │     │
-│  │  │  /property/*→│  │  /profile   │  │  /leads     │  │  /api/mock/    │  │     │
-│  │  │  301 redirect│  │  /growth    │  │             │  │                │  │     │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └──────────────────┘  │     │
-│  └────────────────────────────────────────────────────────────────────────────┘     │
-│                                    │                                               │
-│  ┌────────────────────────────────────┐  ┌─────────────────────────────────────┐    │
-│  │  apps/api — Internal TS Library    │  │  packages/shared — Prisma + Types    │    │
-│  │  ┌──────────┐  ┌───────────────┐   │  │  ┌──────────┐  ┌──────────────┐    │    │
-│  │  │ ai/      │  │ whatsapp/     │   │  │  │ Prisma   │  │ Types +      │    │    │
-│  │  │ index.ts │  │ index.ts      │   │  │  │ Schema   │  │ Utils        │    │    │
-│  │  └──────────┘  └───────────────┘   │  │  └──────────┘  └──────────────┘    │    │
-│  │  ┌──────────┐  ┌───────────────┐   │  └─────────────────────────────────────┘    │
-│  │  │ listings/│  │ leads/        │   │                                            │
-│  │  │ index.ts │  │ index.ts      │   │                                            │
-│  │  └──────────┘  └───────────────┘   │                                            │
-│  │  ┌──────────┐  ┌───────────────┐   │                                            │
-│  │  │ images/  │  │ conversation/ │   │                                            │
-│  │  │ index.ts │  │ index.ts      │   │                                            │
-│  │  └──────────┘  └───────────────┘   │                                            │
-│  └────────────────────────────────────┘                                            │
-│                                                                                     │
-│  ┌──────────────────────────────────────────────────────────────────┐               │
-│  │              EXTERNAL SERVICES                                    │               │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────┐ │               │
-│  │  │  Anthropic  │  │  AiSensy    │  │  Supabase   │  │Cloudin-│ │               │
-│  │  │  Claude 3.5 │  │  WhatsApp   │  │  PostgreSQL │  │ary     │ │               │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └────────┘ │               │
-│  └──────────────────────────────────────────────────────────────────┘               │
-│                                                                                     │
-│  ┌──────────────────────────────────────────────────────────────────┐               │
-│  │  RENDER.COM — apps/flask-api (Python Flask Microservice)         │               │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │               │
-│  │  │  Mock JSON  │  │  Async      │  │  Future: Video          │  │               │
-│  │  │  API        │  │  Webhook    │  │  Transcoding (ffmpeg)   │  │               │
-│  │  │  /api/mock/ │  │  Processor  │  │                         │  │               │
-│  │  └─────────────┘  └─────────────┘  └─────────────────────────┘  │               │
-│  └──────────────────────────────────────────────────────────────────┘               │
-│                                                                                     │
-└─────────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph VERCEL["☁️ VERCEL — apps/web (Next.js 16)"]
+        direction TB
+        PUBLIC["🌐 PUBLIC PAGES<br/>/apartment/[slug]<br/>/villa/[slug]<br/>/plot/[slug]<br/>/commercial/[slug]"]
+        DASHBOARD["📊 DASHBOARD<br/>/dashboard/growth<br/>/dashboard/listings<br/>/dashboard/leads<br/>/dashboard/analytics"]
+        ADMIN["🛡️ ADMIN PANEL<br/>/admin/users<br/>/admin/properties<br/>/admin/leads<br/>/admin/cms"]
+        API_ROUTES["⚡ API ROUTES<br/>/api/leads<br/>/api/upload<br/>/api/whatsapp/webhook<br/>/api/broker/*"]
+    end
+
+    subgraph INTERNAL["🧩 INTERNAL LIBRARIES"]
+        direction TB
+        API_TS["apps/api — Internal TS Library<br/>ai/ · whatsapp/ · listings/<br/>leads/ · images/ · conversation/"]
+        SHARED_PKG["packages/shared<br/>Prisma Schema + Types + Utils"]
+    end
+
+    subgraph EXTERNAL["🔗 EXTERNAL SERVICES"]
+        direction TB
+        ANTHROPIC["🧠 Anthropic Claude 3.5 Sonnet"]
+        AISENSY["📱 AiSensy WhatsApp API"]
+        SUPABASE["🗄️ Supabase PostgreSQL"]
+        CLOUDINARY["☁️ Cloudinary Media"]
+    end
+
+    subgraph RENDER["🐍 RENDER.COM — apps/flask-api"]
+        direction TB
+        MOCK_API["Mock JSON API<br/>GET /api/mock/{type}/{bhk}"]
+        ASYNC_WORKER["Async Worker<br/>Future: ffmpeg transcoding"]
+    end
+
+    PUBLIC --> API_ROUTES
+    DASHBOARD --> API_ROUTES
+    ADMIN --> API_ROUTES
+    
+    API_ROUTES --> API_TS
+    API_ROUTES --> SHARED_PKG
+    
+    API_TS --> ANTHROPIC
+    API_TS --> AISENSY
+    API_TS --> SUPABASE
+    API_TS --> CLOUDINARY
+    
+    API_TS -->|3rd Fallback Level| MOCK_API
+    
+    SHARED_PKG --> SUPABASE
+
+    style VERCEL fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style PUBLIC fill:#C9A84C,color:#000,stroke:#C9A84C
+    style DASHBOARD fill:#15803D,color:#fff,stroke:#15803D
+    style ADMIN fill:#DC2626,color:#fff,stroke:#DC2626
+    style API_ROUTES fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style INTERNAL fill:#4169E1,color:#fff,stroke:#4169E1
+    style EXTERNAL fill:#2D3748,color:#fff,stroke:#2D3748
+    style RENDER fill:#3776AB,color:#fff,stroke:#3776AB
+    style ANTHROPIC fill:#C9A84C,color:#000,stroke:#C9A84C
+    style AISENSY fill:#15803D,color:#fff,stroke:#15803D
+    style SUPABASE fill:#4169E1,color:#fff,stroke:#4169E1
+    style CLOUDINARY fill:#f87171,color:#fff,stroke:#f87171
 ```
 
 ---
 
 ## Listing Generation Flow — 3-Level Fallback Chain
 
-```
-Broker WhatsApp Message
-        │
-        ▼
-AiSensy Webhook → POST /api/whatsapp/webhook
-        │
-        ▼
-parseInboundMessage() → extracts phone, text, mediaUrls
-        │
-        ▼
-ConversationState Machine: GREETING → ACCUMULATING → GENERATING
-        │
-        ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                    GENERATION FALLBACK CHAIN                                     │
-│                                                                                  │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  LEVEL 1 — Claude 3.5 Sonnet (APRIMARY_POINT)                           │   │
-│  │  • Uses ANTHROPIC_API_KEY                                                │   │
-│  │  • tool_use API extracts structured JSON                                 │   │
-│  │  • Fields: title, description, price, BHK, city, type, features, etc.    │   │
-│  │  • Hindi/Hinglish input supported                                        │   │
-│  │  • SUCCESS → createListing() → Supabase                                  │   │
-│  │  • FAIL → fall to Level 2                                                │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                    │                                             │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  LEVEL 2 — Regex Mock Fallback (NO_API_KEY)                              │   │
-│  │  • mockGenerateListing() in apps/api/src/ai/index.ts                     │   │
-│  │  • Regex-based extraction from raw text                                  │   │
-│  │  • Works without ANTHROPIC_API_KEY entirely                              │   │
-│  │  • SUCCESS → createListing() → Supabase                                  │   │
-│  │  • FAIL → fall to Level 3                                                │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                    │                                             │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  LEVEL 3 — Flask JSON Mock API (ALWAYS_WORKS)                            │   │
-│  │  • GET /api/mock/{type}/{bhk} on Python Flask microservice               │   │
-│  │  • Returns rich pre-built property data per type                         │   │
-│  │  • Property.mockDataUrl saved to Supabase for page fallback              │   │
-│  │  • THREE types: 1BHK / 2BHK / 3BHK Apartment + Villa + Plot + Commercial│   │
-│  │  • ALWAYS returns → createListing() → Supabase                           │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                    │                                             │
-│                                    ▼                                             │
-│              createListing() → Supabase PostgreSQL                               │
-│              Property.mockDataUrl = "https://flask-api.com/api/mock/apartment/2" │
-│                                    │                                             │
-│                                    ▼                                             │
-│              sendMessage() → Broker gets shareable URL on WhatsApp               │
-│                                    │                                             │
-│                                    ▼                                             │
-│              Property Page: /apartment/[slug] or /villa/[slug] etc.              │
-└──────────────────────────────────────────────────────────────────────────────────┘
-```
-
 ```mermaid
 flowchart TD
-    A([📱 Broker WhatsApp]) --> B[AiSensy Webhook]
-    B --> C[parseInboundMessage]
-    C --> D{ConversationState}
-    D -->|GREETING| E[Bot intro]
-    D -->|ACCUMULATING| F[Collecting details]
-    D -->|GENERATING| G{3-Level Fallback Chain}
-    
-    G --> G1[Level 1: Claude 3.5 Sonnet]
-    G1 -->|Success| H[createListing]
-    G1 -->|Fail| G2[Level 2: Regex Mock]
-    G2 -->|Success| H
-    G2 -->|Fail| G3[Level 3: Flask JSON Mock API]
-    G3 -->|Always works| H
-    
-    H --> I[save mockDataUrl to Supabase]
-    I --> J[sendMessage → Broker gets URL]
-    J --> K([Buyer visits /apartment/[slug]])
+    subgraph INPUT["📱 Input Sources"]
+        A1["Broker sends WhatsApp<br/>'2 BHK in Mumbai, ₹50L'"]
+    end
 
-    style A fill:#15803D,color:#fff
-    style G fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style K fill:#C9A84C,color:#000
-    style G3 fill:#4169E1,color:#fff,stroke:#4169E1
+    subgraph WEBHOOK["⚡ Webhook Processing"]
+        WH["AiSensy Webhook<br/>POST /api/whatsapp/webhook"]
+        PARSE["parseInboundMessage()<br/>Extract phone · text · mediaUrls"]
+        CONV["Conversation State Machine<br/>GREETING → ACCUMULATING → GENERATING"]
+    end
+
+    subgraph FALLBACK["🧠 3-Level Generation Fallback Chain"]
+        L1["🥇 LEVEL 1: Claude 3.5 Sonnet<br/>• Anthropic API tool_use<br/>• Structured JSON extraction<br/>• Hindi/Hinglish supported"]
+        L2["🥈 LEVEL 2: Regex Mock<br/>• No API key needed<br/>• Regex-based extraction<br/>• Works offline"]
+        L3["🥉 LEVEL 3: Flask JSON Mock<br/>• GET /api/mock/{type}/{bhk}<br/>• ALWAYS returns data<br/>• 6 JSON files on Render.com"]
+    end
+
+    subgraph PERSIST["🗄️ Data Persistence"]
+        DB_CREATE["createListing() → Supabase"]
+        DB_PROPERTY["🏠 Property record<br/>+ mockDataUrl · mediaJson"]
+        DB_IMAGES["🖼️ Image records<br/>+ mediaType: image|video"]
+    end
+
+    subgraph OUTPUT["📲 Output Delivery"]
+        SEND_WA["sendMessage()<br/>Broker gets shareable URL"]
+        URL["✅ /apartment/luxury-2bhk"]
+    end
+
+    A1 --> WH
+    WH --> PARSE
+    PARSE --> CONV
+    CONV -->|GENERATING| FALLBACK
+    
+    L1 -->|Success| PERSIST
+    L1 -->|Fail| L2
+    L2 -->|Success| PERSIST
+    L2 -->|Fail| L3
+    L3 -->|Always works| PERSIST
+    
+    DB_PROPERTY --> SEND_WA
+    DB_IMAGES --> SEND_WA
+    SEND_WA --> URL
+
+    style INPUT fill:#15803D,color:#fff,stroke:#15803D
+    style WEBHOOK fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style FALLBACK fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style L1 fill:#C9A84C,color:#000,stroke:#C9A84C
+    style L2 fill:#C9A84C,color:#000,stroke:#C9A84C
+    style L3 fill:#4169E1,color:#fff,stroke:#4169E1
+    style PERSIST fill:#15803D,color:#fff,stroke:#15803D
+    style OUTPUT fill:#C9A84C,color:#000,stroke:#C9A84C
+    style URL fill:#15803D,color:#fff,stroke:#15803D
 ```
 
 ---
 
 ## Property Page Data Flow — 3-Level Rendering Fallback
 
-```
-/apartment/[slug] or /villa/[slug] or /plot/[slug] or /commercial/[slug]
-        │
-        ▼
-page.tsx (SSR — Server Component)
-        │
-        ▼
-getListingBySlug(slug) → Supabase DB Query
-        │
-        ▼
-┌────────────────────────────────────────────────────────────────────────────────────┐
-│                    PAGE DATA FALLBACK CHAIN                                         │
-│                                                                                    │
-│  ┌────────────────────────────────────────────────────────────────────────────┐   │
-│  │  LEVEL 1 — Real DB Data Found                                                │   │
-│  │  • Property record exists in Supabase with all fields                        │   │
-│  │  • Images in Image[] relation                                                │   │
-│  │  • Analytics record exists                                                   │   │
-│  │  • Render ApartmentClient / VillaClient with real data                       │   │
-│  │  • FAIL (no DB record) → fall to Level 2                                     │   │
-│  └────────────────────────────────────────────────────────────────────────────┘   │
-│                                    │                                               │
-│  ┌────────────────────────────────────────────────────────────────────────────┐   │
-│  │  LEVEL 2 — Flask Mock JSON via mockDataUrl                                   │   │
-│  │  • Fetch from Property.mockDataUrl (stored at listing generation)            │   │
-│  │  • e.g. "https://flask-api.com/api/mock/apartment/2bhk"                     │   │
-│  │  • Returns same shape as DB data (adapter layer)                             │   │
-│  │  • Render with mock data — indistinguishable from real                      │   │
-│  │  • FAIL (Flask down) → fall to Level 3                                       │   │
-│  └────────────────────────────────────────────────────────────────────────────┘   │
-│                                    │                                               │
-│  ┌────────────────────────────────────────────────────────────────────────────┐   │
-│  │  LEVEL 3 — Hardcoded TypeScript Fallback                                     │   │
-│  │  • Inline mock data objects in each Client component                         │   │
-│  │  • Per-type: Apartment (3 variants), Villa, Plot, Commercial                 │   │
-│  │  • ALWAYS renders — never blank page                                         │   │
-│  └────────────────────────────────────────────────────────────────────────────┘   │
-│                                    │                                               │
-│                                    ▼                                               │
-│              ApartmentClient / VillaClient / PlotClient / CommercialClient         │
-│              with correct SEO metadata, JSON-LD, and open graph                    │
-└────────────────────────────────────────────────────────────────────────────────────┘
-```
-
 ```mermaid
 flowchart TD
-    A([Browser requests /apartment/[slug]]) --> B[page.tsx SSR]
-    B --> C[getListingBySlug DB Query]
-    C --> D{DB Record Found?}
-    
-    D -->|Yes| E[Render with Real Data]
-    D -->|No / Incomplete| F{Fetch mockDataUrl from Flask?}
-    
-    F -->|Yes| G[Fetch Flask JSON Mock API]
-    G -->|Success| H[Render with Mock Data]
-    G -->|Flask Down| I[Hardcoded TS Fallback]
-    F -->|No mockDataUrl| I
-    
-    E --> J[ApartmentClient]
-    H --> J
-    I --> J
-    
-    J --> K[✓ SEO Title + Meta]
-    J --> L[✓ JSON-LD Schemas]
-    J --> M[✓ Open Graph + Twitter]
-    J --> N[✓ Increment View Count]
+    subgraph REQUEST["🌐 Browser Request"]
+        REQ["GET /apartment/[slug]"]
+    end
 
-    style A fill:#C9A84C,color:#000
-    style D fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style I fill:#1e1b18,color:#fff,stroke:#C9A84C
+    subgraph SSR["⚙️ Server Component SSR"]
+        SSR_QUERY["getListingBySlug(slug)<br/>→ Supabase DB Query"]
+    end
+
+    subgraph RENDER_FALLBACK["📄 3-Level Render Fallback Chain"]
+        R_L1["🥇 LEVEL 1: Real DB Data<br/>• Property record exists<br/>• Images in Image[] relation<br/>• Analytics tracked"]
+        R_L2["🥈 LEVEL 2: Flask Mock JSON<br/>• Fetch Property.mockDataUrl<br/>• Same shape as DB data<br/>• Adapter layer transforms"]
+        R_L3["🥉 LEVEL 3: TS Hardcoded<br/>• Inline mock data objects<br/>• Per-type: 3 Apartment + Villa + Plot + Commercial<br/>• NEVERSHOWNING_BLANK_PAGE"]
+    end
+
+    subgraph CLIENT["🖥️ Client Component"]
+        RENDER["ApartmentClient / VillaClient<br/>/ PlotClient / CommercialClient"]
+        SEO["🔍 SEO Pipeline<br/>✓ Title + Meta<br/>✓ JSON-LD Schema<br/>✓ Open Graph + Twitter Cards"]
+        ANALYTICS["📊 Analytics<br/>viewCount++"]
+    end
+
+    REQ --> SSR_QUERY
+    SSR_QUERY --> RENDER_FALLBACK
+    
+    R_L1 -->|DB record exists| CLIENT
+    R_L1 -->|No DB record| R_L2
+    R_L2 -->|Flask responds| CLIENT
+    R_L2 -->|Flask down / No URL| R_L3
+    R_L3 -->|Always renders| CLIENT
+    
+    RENDER --> SEO
+    RENDER --> ANALYTICS
+
+    style REQUEST fill:#C9A84C,color:#000,stroke:#C9A84C
+    style SSR fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style RENDER_FALLBACK fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style R_L1 fill:#15803D,color:#fff,stroke:#15803D
+    style R_L2 fill:#4169E1,color:#fff,stroke:#4169E1
+    style R_L3 fill:#DC2626,color:#fff,stroke:#DC2626
+    style CLIENT fill:#C9A84C,color:#000,stroke:#C9A84C
+    style SEO fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style ANALYTICS fill:#60a5fa,color:#fff,stroke:#60a5fa
 ```
 
 ---
 
 ## SEO Route Structure — 4 Type-Specific Patterns
 
-```
-apps/web/app/
-│
-├── apartment/[slug]/                    ← SEO: "2 BHK Apartment in Mumbai"
-│   ├── page.tsx                         ← SSR + Metadata + JSON-LD
-│   └── ApartmentClient.tsx              ← Handles 1BHK / 2BHK / 3BHK variants
-│
-├── villa/[slug]/                        ← SEO: "4 BHK Luxury Villa in Pune"
-│   ├── page.tsx
-│   └── VillaClient.tsx                  ← Premium layout, gold accents, pool
-│
-├── plot/[slug]/                         ← SEO: "1200 sqft Plot in Bangalore"
-│   ├── page.tsx
-│   └── PlotClient.tsx                   ← Legal section, land-specific layout
-│
-├── commercial/[slug]/                   ← SEO: "Office Space in Connaught Place"
-│   ├── page.tsx
-│   └── CommercialClient.tsx             ← Business suitability section
-│
-└── property/[slug]/                     ← OLD route — kept for backlinks
-    └── page.tsx                         ← 301 redirect → correct type route
+```mermaid
+flowchart LR
+    subgraph APP["apps/web/app/"]
+        HOMEPAGE["/"]
+        APARTMENT["apartment/[slug]/"]
+        VILLA["villa/[slug]/"]
+        PLOT["plot/[slug]/"]
+        COMMERCIAL["commercial/[slug]/"]
+        LEGACY["property/[slug]/"]
+    end
+
+    subgraph APT_DETAIL["🏠 Apartment"]
+        APT_PAGE["page.tsx<br/>SSR + Metadata + JSON-LD"]
+        APT_CLIENT["ApartmentClient.tsx<br/>1BHK / 2BHK / 3BHK variants"]
+    end
+
+    subgraph VILLA_DETAIL["🏡 Villa"]
+        VILLA_PAGE["page.tsx<br/>Premium Layout"]
+        VILLA_CLIENT["VillaClient.tsx<br/>Gold accents · Pool"]
+    end
+
+    subgraph PLOT_DETAIL["🗺️ Plot"]
+        PLOT_PAGE["page.tsx<br/>Land-specific"]
+        PLOT_CLIENT["PlotClient.tsx<br/>Legal section"]
+    end
+
+    subgraph COMM_DETAIL["🏢 Commercial"]
+        COMM_PAGE["page.tsx<br/>Business suitability"]
+        COMM_CLIENT["CommercialClient.tsx<br/>Office focus"]
+    end
+
+    subgraph LEGACY_DETAIL["🔄 Legacy"]
+        LEGACY_PAGE["page.tsx<br/>301 redirect"]
+    end
+
+    APARTMENT --> APT_DETAIL
+    VILLA --> VILLA_DETAIL
+    PLOT --> PLOT_DETAIL
+    COMMERCIAL --> COMM_DETAIL
+    LEGACY --> LEGACY_DETAIL
+
+    style APP fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style APARTMENT fill:#C9A84C,color:#000,stroke:#C9A84C
+    style VILLA fill:#C9A84C,color:#000,stroke:#C9A84C
+    style PLOT fill:#C9A84C,color:#000,stroke:#C9A84C
+    style COMMERCIAL fill:#C9A84C,color:#000,stroke:#C9A84C
+    style LEGACY fill:#DC2626,color:#fff,stroke:#DC2626
+    style APT_PAGE fill:#4169E1,color:#fff,stroke:#4169E1
+    style VILLA_PAGE fill:#4169E1,color:#fff,stroke:#4169E1
+    style PLOT_PAGE fill:#4169E1,color:#fff,stroke:#4169E1
+    style COMM_PAGE fill:#4169E1,color:#fff,stroke:#4169E1
+    style LEGACY_PAGE fill:#DC2626,color:#fff,stroke:#DC2626
 ```
 
 **Title & Description Pattern:**
 
 | Route | Title | Description |
-|-------|-------|-------------|
+|---|---|---|
 | `/apartment/[slug]` | 2 BHK Apartment in Bandra West, Mumbai | Browse this 2 BHK apartment... |
 | `/villa/[slug]` | 4 BHK Luxury Villa in Koregaon Park, Pune | Premium villa for sale in Pune... |
 | `/plot/[slug]` | 1200 sqft Plot in Whitefield, Bangalore | Residential plot for sale... |
@@ -657,30 +620,40 @@ apps/web/app/
 
 ## Flask Mock API — Python Microservice Architecture
 
-```
-apps/flask-api/
-│
-├── app.py                               ← Flask entry point (port 5000)
-├── requirements.txt                     ← flask, flask-cors, gunicorn
-├── Dockerfile                           ← For Render.com deployment
-│
-├── routes/
-│   ├── __init__.py
-│   ├── mock.py                          ← GET /api/mock/{type}/{bhk}
-│   │                                    ← Returns rich JSON mock data
-│   ├── health.py                        ← GET /health → { status: "ok" }
-│   └── processor.py                     ← FUTURE: Async webhook worker
-│
-├── data/
-│   ├── apartment_1bhk.json              ← 1 BHK flat — 150 sqft, starter layout
-│   ├── apartment_2bhk.json              ← 2 BHK flat — 850 sqft, family layout
-│   ├── apartment_3bhk.json              ← 3 BHK flat — 1200 sqft, premium layout
-│   ├── villa.json                       ← 4 BHK villa — 3200 sqft, luxury
-│   ├── plot.json                        ← 1200 sqft plot — residential zone
-│   └── commercial.json                  ← 1800 sqft office — ground floor
-│
-└── tests/
-    └── test_mock.py                     ← Pytest suite
+```mermaid
+flowchart LR
+    subgraph FLASK_APP["apps/flask-api/"]
+        direction TB
+        ENTRY["app.py<br/>Flask Entry Point · Port 5000"]
+        CONFIG["requirements.txt · Dockerfile<br/>gunicorn · flask-cors"]
+        
+        subgraph ROUTES["routes/"]
+            MOCK["mock.py<br/>GET /api/mock/{type}/{bhk}"]
+            HEALTH["health.py<br/>GET /health"]
+            PROCESSOR["processor.py<br/>Future: Async Worker"]
+        end
+        
+        subgraph DATA["data/"]
+            A1["apartment_1bhk.json<br/>150 sqft · Starter"]
+            A2["apartment_2bhk.json<br/>850 sqft · Family"]
+            A3["apartment_3bhk.json<br/>1200 sqft · Premium"]
+            V["villa.json<br/>3200 sqft · Luxury"]
+            P["plot.json<br/>1200 sqft · Residential"]
+            C["commercial.json<br/>1800 sqft · Office"]
+        end
+        
+        TESTS["tests/test_mock.py<br/>Pytest Suite"]
+    end
+
+    ENTRY --> ROUTES
+    MOCK --> DATA
+    ENTRY --> TESTS
+
+    style FLASK_APP fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style ENTRY fill:#3776AB,color:#fff,stroke:#3776AB
+    style ROUTES fill:#4169E1,color:#fff,stroke:#4169E1
+    style DATA fill:#C9A84C,color:#000,stroke:#C9A84C
+    style TESTS fill:#15803D,color:#fff,stroke:#15803D
 ```
 
 **API Endpoints:**
@@ -720,23 +693,7 @@ GET /health                      → { status: "ok", version: "1.0.0" }
 
 ---
 
-## Database Schema Changes — Additive Only
-
-```
-Property (EXISTING) → ADD:
-  mockDataUrl     String?        ← URL to Flask mock JSON endpoint
-  mediaJson       Json?          ← Images + Videos as JSON array
-                                   [{ url, type: "image"|"video", caption, order }]
-
-Lead (EXISTING) → ADD:
-  countryCode     String?        ← e.g. "+91" for India (default)
-  tokenCount      Int?           ← Character count of inquiry message
-                                 ← Color: gray(0) → gold(1-50) → green(51-100) → red(100+)
-
-User (EXISTING) → ADD:
-  plan            Plan?          ← starter | professional | business | enterprise
-                                 ← Controls feature gating per pricing tier
-```
+## Database Schema — Entity Relationship Diagram
 
 ```mermaid
 erDiagram
@@ -805,329 +762,331 @@ erDiagram
     }
 ```
 
+**Additive DB Changes Summary:**
+
+```mermaid
+flowchart LR
+    subgraph PROPERTY["Property (EXISTING)"]
+        P_ADD1["+ mockDataUrl String?"]
+        P_ADD2["+ mediaJson Json?"]
+    end
+    
+    subgraph LEAD["Lead (EXISTING)"]
+        L_ADD1["+ countryCode String?"]
+        L_ADD2["+ tokenCount Int?"]
+        L_ADD3["@@unique([propertyId, phone, createdAt])"]
+    end
+    
+    subgraph USER["User (EXISTING)"]
+        U_ADD1["+ plan Plan?"]
+    end
+    
+    subgraph IMAGE["Image (EXISTING)"]
+        I_ADD1["+ mediaType String?"]
+    end
+
+    style PROPERTY fill:#4169E1,color:#fff,stroke:#4169E1
+    style LEAD fill:#C9A84C,color:#000,stroke:#C9A84C
+    style USER fill:#15803D,color:#fff,stroke:#15803D
+    style IMAGE fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style P_ADD1 fill:#60a5fa,color:#fff,stroke:#60a5fa
+    style P_ADD2 fill:#60a5fa,color:#fff,stroke:#60a5fa
+    style L_ADD1 fill:#fbbf24,color:#000,stroke:#fbbf24
+    style L_ADD2 fill:#fbbf24,color:#000,stroke:#fbbf24
+    style L_ADD3 fill:#DC2626,color:#fff,stroke:#DC2626
+    style U_ADD1 fill:#34d399,color:#000,stroke:#34d399
+    style I_ADD1 fill:#c084fc,color:#fff,stroke:#c084fc
+```
+
 ---
 
 ## CI/CD Pipeline — GitHub Actions
 
-```
-GitHub push to main branch
-        │
-        ▼
-┌────────────────────────────────────────────────────────────────────────────────────┐
-│                    GITHUB ACTIONS WORKFLOW                                         │
-│                                                                                    │
-│  ┌────────────────────────────────────────────────────────────────────────────┐   │
-│  │  JOB 1: TEST (runs on all pushes)                                           │   │
-│  │  ├── pnpm install --no-frozen-lockfile                                      │   │
-│  │  ├── pnpm type-check                                                        │   │
-│  │  ├── pnpm lint                                                              │   │
-│  │  ├── pnpm test:run (44 Vitest tests)                                        │   │
-│  │  ├── pytest apps/flask-api/ (if Flask tests exist)                          │   │
-│  │  └── pnpm build --filter=web...                                             │   │
-│  └────────────────────────────────────────────────────────────────────────────┘   │
-│                                    │                                               │
-│                    All checks pass?                                                │
-│                    │                        │                                      │
-│                    ▼                        ▼                                      │
-│  ┌────────────────────────────┐  ┌──────────────────────────────┐                 │
-│  │  JOB 2: DEPLOY WEB        │  │  JOB 3: DEPLOY FLASK         │                 │
-│  │  (needs: test)            │  │  (needs: test)               │                 │
-│  │                           │  │                              │                 │
-│  │  Vercel Deploy Hook       │  │  Render.com Deploy Hook      │                 │
-│  │  ─────────────────────────│  │  ────────────────────────────│                 │
-│  │  Triggers Vercel auto-    │  │  Triggers Render auto-       │                 │
-│  │  deploy from GitHub       │  │  deploy from GitHub          │                 │
-│  │  monorepo → apps/web      │  │  → apps/flask-api            │                 │
-│  │                           │  │                              │                 │
-│  │  URL: brisvora.vercel.app │  │  URL: brisvora-flask.render. │                 │
-│  └────────────────────────────┘  └──────────────────────────────┘                 │
-│                                                                                    │
-└────────────────────────────────────────────────────────────────────────────────────┘
-```
-
 ```mermaid
 flowchart LR
-    A([Git Push to main]) --> B[GitHub Actions Triggered]
-    B --> C{Job 1: Test}
+    subgraph TRIGGER["🚀 Trigger"]
+        GIT_PUSH["Git Push to main"]
+    end
+
+    subgraph JOB1["🧪 Job 1: Test"]
+        direction TB
+        INSTALL["pnpm install --no-frozen-lockfile"]
+        TYPE_CHECK["pnpm type-check"]
+        LINT["pnpm lint"]
+        VITEST["pnpm test:run (44 Vitest tests)"]
+        PYTEST["pytest apps/flask-api/"]
+        BUILD["pnpm build --filter=web..."]
+    end
+
+    subgraph DECISION["✅ All Pass?"]
+        PASS["All Checks Pass"]
+        FAIL["❌ Build Fails"]
+    end
+
+    subgraph JOB2["🚀 Job 2: Deploy Web"]
+        VERCEL_DEP["Vercel Deploy Hook<br/>→ brisvora.vercel.app"]
+    end
+
+    subgraph JOB3["🐍 Job 3: Deploy Flask"]
+        RENDER_DEP["Render.com Deploy Hook<br/>→ brisvora-flask.onrender.com"]
+    end
+
+    GIT_PUSH --> JOB1
+    INSTALL --> DECISION
+    TYPE_CHECK --> DECISION
+    LINT --> DECISION
+    VITEST --> DECISION
+    PYTEST --> DECISION
+    BUILD --> DECISION
     
-    C --> C1[pnpm install]
-    C --> C2[pnpm type-check]
-    C --> C3[pnpm lint]
-    C --> C4[pnpm test:run]
-    C --> C5[pytest flask-api]
-    C --> C6[pnpm build]
-    
-    C1 --> D{All Pass?}
-    C2 --> D
-    C3 --> D
-    C4 --> D
-    C5 --> D
-    C6 --> D
-    
-    D -->|Yes| E[Job 2: Deploy Web]
-    D -->|Yes| F[Job 3: Deploy Flask]
-    D -->|No| G([❌ Build Fails])
-    
-    E --> H[Vercel Auto-Deploy]
-    F --> I[Render.com Auto-Deploy]
-    
-    H --> J([Next.js: brisvora.vercel.app])
-    I --> K([Flask API: brisvora-flask.onrender.com])
-    
-    style A fill:#15803D,color:#fff
-    style G fill:#DC2626,color:#fff
-    style J fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style K fill:#4169E1,color:#fff,stroke:#4169E1
-    style D fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    DECISION -->|All pass| JOB2
+    DECISION -->|All pass| JOB3
+    DECISION -->|Any fail| FAIL
+
+    style TRIGGER fill:#15803D,color:#fff,stroke:#15803D
+    style JOB1 fill:#4169E1,color:#fff,stroke:#4169E1
+    style DECISION fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style FAIL fill:#DC2626,color:#fff,stroke:#DC2626
+    style JOB2 fill:#C9A84C,color:#000,stroke:#C9A84C
+    style JOB3 fill:#3776AB,color:#fff,stroke:#3776AB
+    style VERCEL_DEP fill:#C9A84C,color:#000,stroke:#C9A84C
+    style RENDER_DEP fill:#3776AB,color:#fff,stroke:#3776AB
 ```
 
 ---
 
 ## CMS Layer — Super Admin Only
 
-```
-┌────────────────────────────────────────────────────────────────────────────────────┐
-│                    CMS CONTROL PANEL (Super Admin Only)                             │
-│                                                                                    │
-│  ┌───────────────────────────┐  ┌──────────────────────────────────────────────┐   │
-│  │  PROPERTY TYPE SCHEMAS    │  │  TEMPLATE LAYOUTS                            │   │
-│  │                           │  │                                              │   │
-│  │  ← Apartment Fields:      │  │  ← Apartment:  hero + specs + features      │   │
-│  │    title, price, BHK,     │  │  ← Villa:      taller hero + premium        │   │
-│  │    area, floor, parking   │  │                specs + highlights            │   │
-│  │                           │  │                                              │   │
-│  │  ← Villa Fields:          │  │  ← Plot:       hero + legal + land info     │   │
-│  │    title, price, BHK,     │  │  ← Commercial: hero + business suitability   │   │
-│  │    pool, garden, floors   │  │                                              │   │
-│  │                           │  │                                              │   │
-│  │  ← Plot Fields:           │  │  ← Section order editor (drag & drop)        │   │
-│  │    title, price, area,    │  │  ← Per-type SEO title templates              │   │
-│  │    zone, dimensions       │  │                                              │   │
-│  │                           │  │                                              │   │
-│  │  ← Commercial Fields:     │  │  ← Color accent per type                     │   │
-│  │    title, price, area,    │  │    Apartment: gold / Villa: platinum         │   │
-│  │    floor, parking, power  │  │    Plot: teal / Commercial: blue             │   │
-│  └───────────────────────────┘  └──────────────────────────────────────────────┘   │
-│                                                                                    │
-│  ┌───────────────────────────┐  ┌──────────────────────────────────────────────┐   │
-│  │  GLOBAL CONTENT           │  │  MOCK DATA MANAGEMENT                        │   │
-│  │                           │  │                                              │   │
-│  │  ← Section labels/text    │  │  ← Edit mock JSON inline                     │   │
-│  │  ← CTA button copies      │  │  ← Preview mock rendering                   │   │
-│  │  ← Feature descriptions   │  │  ← Deploy mock changes to Flask             │   │
-│  │  ← Default phone/country  │  │  ← Mock data version history                │   │
-│  └───────────────────────────┘  └──────────────────────────────────────────────┘   │
-│                                                                                    │
-│  ALL CHANGES: Super Admin only → stored in Supabase CMS table                     │
-│  Changes propagate to all new listings automatically                               │
-└────────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph CMS["🛡️ CMS CONTROL PANEL (Super Admin Only)"]
+        direction TB
+        
+        SCHEMAS["📋 PROPERTY TYPE SCHEMAS"]
+        TEMPLATES["🎨 TEMPLATE LAYOUTS"]
+        GLOBAL["🌍 GLOBAL CONTENT"]
+        MOCK_CTRL["📁 MOCK DATA MANAGEMENT"]
+        
+        subgraph SCHEMAS_DETAIL[" "]
+            APT_SCHEMA["Apartment: title, price, BHK,<br/>area, floor, parking"]
+            VILLA_SCHEMA["Villa: title, price, BHK,<br/>pool, garden, floors"]
+            PLOT_SCHEMA["Plot: title, price, area,<br/>zone, dimensions"]
+            COMM_SCHEMA["Commercial: title, price,<br/>area, floor, parking, power"]
+        end
+        
+        subgraph TEMPLATES_DETAIL[" "]
+            APT_TEMP["Apartment: hero + specs + features"]
+            VILLA_TEMP["Villa: taller hero + premium specs"]
+            PLOT_TEMP["Plot: hero + legal + land info"]
+            COMM_TEMP["Commercial: hero + business suitability"]
+            EDITOR["Section order editor (drag & drop)"]
+        end
+        
+        subgraph GLOBAL_DETAIL[" "]
+            LABELS["Section labels / text"]
+            CTA["CTA button copies"]
+            FEATURES["Feature descriptions"]
+            DEFAULT_PHONE["Default country code"]
+        end
+        
+        subgraph MOCK_DETAIL[" "]
+            EDIT_JSON["Edit mock JSON inline"]
+            PREVIEW["Preview mock rendering"]
+            DEPLOY["Deploy changes to Flask"]
+            HISTORY["Version history"]
+        end
+    end
+
+    CMS --> STORAGE["🗄️ Stored in Supabase CMS table"]
+    STORAGE --> PROPAGATE["⚡ Changes propagate to<br/>all new listings automatically"]
+
+    style CMS fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style SCHEMAS fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style TEMPLATES fill:#C9A84C,color:#000,stroke:#C9A84C
+    style GLOBAL fill:#15803D,color:#fff,stroke:#15803D
+    style MOCK_CTRL fill:#4169E1,color:#fff,stroke:#4169E1
+    style SCHEMAS_DETAIL fill:#2D3748,color:#fff,stroke:#2D3748
+    style TEMPLATES_DETAIL fill:#2D3748,color:#fff,stroke:#2D3748
+    style GLOBAL_DETAIL fill:#2D3748,color:#fff,stroke:#2D3748
+    style MOCK_DETAIL fill:#2D3748,color:#fff,stroke:#2D3748
+    style STORAGE fill:#DC2626,color:#fff,stroke:#DC2626
+    style PROPAGATE fill:#15803D,color:#fff,stroke:#15803D
 ```
 
 ---
 
 ## Role Hierarchy & Plan Mapping
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    ROLE HIERARCHY                                            │
-│                                                                             │
-│  🔴 SUPER_ADMIN (You Only)                                                  │
-│  ├── Full CMS control — schemas, templates, mock data                       │
-│  ├── Full platform admin — all users, all listings, all leads               │
-│  ├── Plan management — assign tiers, override limits                        │
-│  └── Cannot be created via registration (DB seeded only)                    │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  🟡 ADMIN  (Professional / Business / Enterprise plans)              │   │
-│  │  ├── Can manage their OWN listings and leads                          │   │
-│  │  ├── Can view OWN analytics dashboard                                 │   │
-│  │  ├── Professional (₹999/mo): Analytics + CRM + Automation            │   │
-│  │  ├── Business (₹2499/mo): Multi-user + Priority Support              │   │
-│  │  └── Enterprise (Custom): Custom integrations + Dedicated support     │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                          │                                                  │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  🟢 BROKER (Starter — Free plan)                                     │   │
-│  │  ├── Basic AI listings (up to 10/month)                              │   │
-│  │  ├── Dashboard access                                                 │   │
-│  │  ├── WhatsApp integration                                             │   │
-│  │  ├── SEO optimized pages                                              │   │
-│  │  ├── Lead capture forms                                               │   │
-│  │  └── Can upgrade to ADMIN by choosing Professional/Business plan     │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  ⚪ PUBLIC (No login required)                                        │   │
-│  │  ├── Can view any property page by URL                                │   │
-│  │  ├── Can submit lead via LeadForm (country dropdown + token counter)  │   │
-│  │  └── NO authentication needed for template pages                      │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph ROLES["👤 ROLE HIERARCHY"]
+        SUPER["🔴 SUPER_ADMIN<br/>(You Only)"]
+        ADMIN["🟡 ADMIN<br/>(Professional / Business / Enterprise)"]
+        BROKER["🟢 BROKER<br/>(Starter — Free)"]
+        PUBLIC["⚪ PUBLIC<br/>(No login required)"]
+    end
+
+    SUPER -->|"Full CMS control · All users/all listings<br/>Plan management · DB seeded only"| ADMIN
+    ADMIN -->|"Own listings & leads<br/>Analytics dashboard"| BROKER
+    BROKER -->|"Basic AI listings (≤10/mo)<br/>Dashboard · WhatsApp · SEO pages"| PUBLIC
+    PUBLIC -->|"View any property page<br/>Submit lead via LeadForm"| OUT
+
+    subgraph PLANS["💰 PLAN MAPPING"]
+        STARTER["🥉 Starter (FREE)<br/>• 10 AI listings/month<br/>• Basic dashboard<br/>• WhatsApp integration"]
+        PROFESSIONAL["🥈 Professional (₹999/mo)<br/>• Unlimited listings<br/>• Analytics + CRM<br/>• Automation tools"]
+        BUSINESS["🥇 Business (₹2499/mo)<br/>• Multi-user support<br/>• Priority support<br/>• Advanced analytics"]
+        ENTERPRISE["🏆 Enterprise (Custom)<br/>• Custom integrations<br/>• Dedicated support<br/>• SLA guarantee"]
+    end
+
+    BROKER --> STARTER
+    ADMIN --> PROFESSIONAL
+    ADMIN --> BUSINESS
+    SUPER --> ENTERPRISE
+
+    style ROLES fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style SUPER fill:#DC2626,color:#fff,stroke:#DC2626
+    style ADMIN fill:#fbbf24,color:#000,stroke:#fbbf24
+    style BROKER fill:#15803D,color:#fff,stroke:#15803D
+    style PUBLIC fill:#9CA3AF,color:#000,stroke:#9CA3AF
+    style PLANS fill:#2D3748,color:#fff,stroke:#2D3748
+    style STARTER fill:#15803D,color:#fff,stroke:#15803D
+    style PROFESSIONAL fill:#fbbf24,color:#000,stroke:#fbbf24
+    style BUSINESS fill:#4169E1,color:#fff,stroke:#4169E1
+    style ENTERPRISE fill:#C9A84C,color:#000,stroke:#C9A84C
 ```
 
 ---
 
 ## Duplicate Entry Sanitization Flow
 
-```
-Prevention applied at TWO levels:
-```
-
-### Level 1 — Property Duplicate Detection (Broker Side)
-
-```
-Broker submits property via WhatsApp
-        │
-        ▼
-parseInboundMessage() → extract text
-        │
-        ▼
-Check for duplicate:
-  MATCH ON: same ownerPhone + same city + same price ±10% + same bedrooms
-  WITHIN: 24 hours of last submission
-        │
-        ├── DUPLICATE FOUND → Send "This property already exists" message
-        │                   → Suggest editing existing listing
-        │                   → DO NOT call generateListing()
-        │
-        └── NO DUPLICATE → Proceed to ConversationState → GENERATING
-```
-
-### Level 2 — Lead Duplicate Detection (Buyer Side)
-
-```
-Buyer submits lead on property page
-        │
-        ▼
-POST /api/leads → receives: propertyId, name, phone, countryCode, message
-        │
-        ▼
-Check for duplicate:
-  MATCH ON: same propertyId + same phone
-  WITHIN: 24 hours of last lead submission for this property
-        │
-        ├── DUPLICATE FOUND → Return { duplicate: true, message: "Lead already submitted" }
-        │                   → DO NOT create new Lead record
-        │                   → Frontend shows "You've already enquired about this property"
-        │
-        └── NO DUPLICATE → createLead() → Return success
-                         → Increment Analytics.inquiryCount
-                         → Notify broker via WhatsApp
-```
-
 ```mermaid
-flowchart TD
-    subgraph Property_Level
-        A1([Broker WhatsApp]) --> B1[parseInboundMessage]
-        B1 --> C1{Duplicate Check}
-        C1 -->|Same phone+city+price+BHK < 24hrs| D1[⛔ Duplicate: Block + Notify]
-        C1 -->|New property| E1[Proceed to Generation]
+flowchart LR
+    subgraph PROPERTY_LEVEL["🏠 Level 1 — Property (Broker Side)"]
+        direction TB
+        P_INPUT["Broker submits via WhatsApp"]
+        P_PARSE["parseInboundMessage()"]
+        P_CHECK{"Duplicate Check<br/>Same: phone + city<br/>+ price ±10% + BHK<br/>Within 24hrs?"}
+        P_DUP["⛔ DUPLICATE FOUND<br/>→ 'Property already exists'<br/>→ Suggest editing"]
+        P_NEW["✅ NO DUPLICATE<br/>→ Proceed to Generation"]
+        
+        P_INPUT --> P_PARSE --> P_CHECK
+        P_CHECK -->|Yes| P_DUP
+        P_CHECK -->|No| P_NEW
     end
 
-    subgraph Lead_Level
-        A2([Buyer Lead Form]) --> B2[POST /api/leads]
-        B2 --> C2{Duplicate Check}
-        C2 -->|Same propertyId+phone < 24hrs| D2[⛔ Duplicate: Return error]
-        C2 -->|New lead| E2[createLead + increment inquiryCount]
+    subgraph LEAD_LEVEL["📋 Level 2 — Lead (Buyer Side)"]
+        direction TB
+        L_INPUT["Buyer submits Lead Form"]
+        L_API["POST /api/leads<br/>propertyId · phone · countryCode · message"]
+        L_CHECK{"Duplicate Check<br/>Same: propertyId + phone<br/>Within 24hrs?"}
+        L_DUP["⛔ DUPLICATE FOUND<br/>→ 'Already enquired'<br/>→ Do NOT create Lead"]
+        L_NEW["✅ NO DUPLICATE<br/>→ createLead()<br/>→ Analytics.inquiryCount++"]
+        
+        L_INPUT --> L_API --> L_CHECK
+        L_CHECK -->|Yes| L_DUP
+        L_CHECK -->|No| L_NEW
     end
 
-    style D1 fill:#DC2626,color:#fff
-    style D2 fill:#DC2626,color:#fff
-    style C1 fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style C2 fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style PROPERTY_LEVEL fill:#1e1b18,color:#15803D,stroke:#15803D
+    style LEAD_LEVEL fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style P_CHECK fill:#1e1b18,color:#f87171,stroke:#f87171
+    style L_CHECK fill:#1e1b18,color:#f87171,stroke:#f87171
+    style P_DUP fill:#DC2626,color:#fff,stroke:#DC2626
+    style L_DUP fill:#DC2626,color:#fff,stroke:#DC2626
+    style P_NEW fill:#15803D,color:#fff,stroke:#15803D
+    style L_NEW fill:#15803D,color:#fff,stroke:#15803D
 ```
 
 ---
 
 ## Country Dropdown — Registration & LeadForm
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    COUNTRY CODE DROPDOWN                                    │
-│                                                                             │
-│  Applied at TWO points:                                                     │
-│                                                                             │
-│  1. BROKER REGISTRATION (/register)                                         │
-│     ┌────────────────────────────────────────────┐                          │
-│     │ 🇮🇳 +91  │  [Enter 10-digit phone number]  │                          │
-│     └────────────────────────────────────────────┘                          │
-│     • Default: India (+91)                                                  │
-│     • Required: selects country before submitting                           │
-│     • Saved to User.phone as: countryCode + phone = "919999999999"          │
-│                                                                             │
-│  2. BUYER LEAD FORM (on property page)                                      │
-│     ┌────────────────────────────────────────────┐                          │
-│     │ 🇮🇳 +91  │  [Enter 10-digit phone number]  │                          │
-│     │ [Enter your name]                          │                          │
-│     │ [Enter message — token counter below]      │                          │
-│     │ [0/200] ← token count changes color        │                          │
-│     └────────────────────────────────────────────┘                          │
-│     • Default: India (+91)                                                  │
-│     • 12 countries with flag emoji                                          │
-│     • Country list: IN, US, UK, AE, SG, AU, CA, SA, QA, OM, KW, BH          │
-│     • Saved to Lead: countryCode + phone, tokenCount                        │
-│                                                                             │
-│  TOKEN COUNTER COLORS (on LeadForm message textarea):                       │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  0 chars   →  Gray (#6B5E45)  "Start typing..."                     │   │
-│  │  1-50      →  Gold (#C9A84C)  "Great start!"                        │   │
-│  │  51-100    →  Green (#15803D) "Good detail!"                          │   │
-│  │  100+      →  Red (#DC2626)   "Too long, be concise!"                 │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph REGISTER["📝 1. BROKER REGISTRATION (/register)"]
+        direction TB
+        R_SELECT["🌍 Select Country<br/>🇮🇳 +91 (Default India)"]
+        R_PHONE["📱 Enter 10-digit phone"]
+        R_SAVE["Saved to User.phone:<br/>countryCode + phone<br/>= '919999999999'"]
+        
+        R_SELECT --> R_PHONE --> R_SAVE
+    end
+
+    subgraph LEADFORM["📋 2. BUYER LEAD FORM (Property Page)"]
+        direction TB
+        L_SELECT["🌍 Select Country<br/>🇮🇳 +91 (Default)"]
+        L_PHONE["📱 Enter 10-digit phone"]
+        L_NAME["👤 Enter your name"]
+        L_MESSAGE["✏️ Enter message<br/>Token counter below"]
+        L_TOKEN["📊 TOKEN COUNTER<br/>0 chars → Gray 'Start typing...'<br/>1-50 → Gold 'Great start!'<br/>51-100 → Green 'Good detail!'<br/>100+ → Red 'Too long!'"]
+        L_SAVE["Saved to Lead:<br/>countryCode + phone + tokenCount"]
+        
+        L_SELECT --> L_PHONE --> L_NAME --> L_MESSAGE --> L_TOKEN --> L_SAVE
+    end
+
+    COUNTRIES["🌐 Supported Countries<br/>IN · US · UK · AE · SG<br/>AU · CA · SA · QA · OM · KW · BH"]
+
+    REGISTER --> COUNTRIES
+    LEADFORM --> COUNTRIES
+
+    style REGISTER fill:#4169E1,color:#fff,stroke:#4169E1
+    style LEADFORM fill:#C9A84C,color:#000,stroke:#C9A84C
+    style L_TOKEN fill:#1e1b18,color:#fff,stroke:#C9A84C
+    style COUNTRIES fill:#15803D,color:#fff,stroke:#15803D
+    style R_SAVE fill:#60a5fa,color:#fff,stroke:#60a5fa
+    style L_SAVE fill:#fbbf24,color:#000,stroke:#fbbf24
 ```
 
 ---
 
 ## Video Support — Optional Media on Property Page
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    VIDEO AS OPTIONAL MEDIA                                    │
-│                                                                             │
-│  Image model updated:                                                       │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  Image {                                                             │   │
-│  │    mediaType: "image" | "video"     ← NEW field                      │   │
-│  │    url: String                     ← Cloudinary URL                  │   │
-│  │    thumbnailUrl: String?           ← For video poster                │   │
-│  │    caption: String?                ← Alt text / video title          │   │
-│  │  }                                                                   │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                                                                             │
-│  Render logic in ApartmentClient / VillaClient:                             │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  if (media.type === "video") {                                       │   │
-│  │    <video controls poster={media.thumbnailUrl}>                      │   │
-│  │      <source src={media.url} type="video/mp4" />                     │   │
-│  │    </video>                                                          │   │
-│  │  } else {                                                            │   │
-│  │    <Image src={media.url} alt={media.caption} />                     │   │
-│  │  }                                                                   │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                                                                             │
-│  Upload API (POST /api/upload): accepts both image and video                │
-│  Cloudinary.cloudinaryUploader.upload(file, { resource_type: "auto" })       │
-│  → resource_type = "auto" detects image vs video automatically              │
-│                                                                             │
-│  VIDEO TRANSCODING (Phase 2 — via Flask on Render.com):                     │
-│  • ffmpeg-based compression for large videos                                │
-│  • Generates multiple resolutions (720p, 480p)                             │
-│  • Generates thumbnail poster frame                                         │
-│  • Not required for MVP — Cloudinary serves video natively                  │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph UPLOAD["📤 Upload API"]
+        U_POST["POST /api/upload<br/>resource_type: auto"]
+        CLOUD["☁️ Cloudinary<br/>Auto-detects image vs video"]
+    end
+
+    subgraph DB_MODEL["🗄️ Image Model"]
+        IMG["Image {<br/>  mediaType: 'image' | 'video'<br/>  url: String<br/>  thumbnailUrl: String?<br/>  caption: String?<br/>  order: Int<br/>}"]
+    end
+
+    subgraph RENDER_LOGIC["🖥️ Render Logic"]
+        RENDER_IF{"media.type === 'video'?"}
+        VIDEO["<video controls<br/>  poster={thumbnailUrl}<br/>  <source src={url} />"]
+        IMAGE["<Image src={url}<br/>  alt={caption} />"]
+    end
+
+    subgraph FUTURE["🔮 Phase 2 — Flask Transcoding"]
+        FFMPEG["ffmpeg compression<br/>Multiple resolutions<br/>Thumbnail generation"]
+    end
+
+    U_POST --> CLOUD
+    CLOUD --> DB_MODEL
+    DB_MODEL --> RENDER_IF
+    RENDER_IF -->|Yes| VIDEO
+    RENDER_IF -->|No| IMAGE
+    FUTURE -.->|Future async| CLOUD
+
+    style UPLOAD fill:#4169E1,color:#fff,stroke:#4169E1
+    style DB_MODEL fill:#C9A84C,color:#000,stroke:#C9A84C
+    style RENDER_LOGIC fill:#1e1b18,color:#fff,stroke:#C9A84C
+    style VIDEO fill:#15803D,color:#fff,stroke:#15803D
+    style IMAGE fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style FUTURE fill:#2D3748,color:#fff,stroke:#2D3748
 ```
 
 ---
 
-## 13. Master Reactive System Architecture — Event Propagation & State Update Flow
+## Master Reactive System Architecture — Event Propagation & State Update Flow
 
 This diagram shows the **complete reactive interaction** across the entire platform — how every event triggers cascading state updates, how components react to changes in real-time, and how the system maintains perfect consistency across all layers.
 
 ```mermaid
 flowchart TB
     %% ─── EVENT ORIGINS ───────────────────────────────────────────────────
-    subgraph "🌐 EVENT SOURCES (Triggers)"
+    subgraph EVENT_SOURCES["🌐 EVENT SOURCES (Triggers)"]
         direction TB
         E1("📱 Broker WhatsApp<br/>'2 BHK in Mumbai, ₹50L'")
         E2("👤 Buyer Lead Form<br/>'Interested in this property'")
@@ -1137,7 +1096,7 @@ flowchart TB
     end
 
     %% ─── EVENT PROCESSING LAYER (Vercel) ─────────────────────────────────
-    subgraph "⚡ EVENT PROCESSING (Vercel — Next.js 16)"
+    subgraph EVENT_PROC["⚡ EVENT PROCESSING (Vercel — Next.js 16)"]
         direction TB
         WH["Webhook Handler<br/>POST /api/whatsapp/webhook"]
         LH["Lead Handler<br/>POST /api/leads"]
@@ -1154,7 +1113,7 @@ flowchart TB
     E5 --> AH
 
     %% ─── BUSINESS LOGIC LAYER (apps/api) ──────────────────────────────────
-    subgraph "🧠 BUSINESS LOGIC (apps/api — Internal TS Library)"
+    subgraph BUS_LOGIC["🧠 BUSINESS LOGIC (apps/api — Internal TS Library)"]
         direction TB
         AI_FALLBACK["🤖 3-Level Fallback Chain<br/>Claude 3.5 → Regex → Flask"]
         DUPE_PROP["🔍 Property Dup Detection<br/>phone+city+price+BHK ≤ 24hrs"]
@@ -1170,23 +1129,23 @@ flowchart TB
     CONV_STATE -->|GENERATING| AI_FALLBACK
     WH --> DUPE_PROP
     DUPE_PROP -->|Pass| AI_FALLBACK
-    DUPE_PROP -->|Block| E1
-
+    DUPE_PROP -->|Block: Already exists| BROKER_BLOCK(["⛔ Reply: Property exists"])
+    
     LH --> DUPE_LEAD
-    DUPE_LEAD -->|Pass| LEADS["📋 Lead Sanitization<br/>tokenCount, countryCode"]
-    DUPE_LEAD -->|Block: Already enquired| E2
+    DUPE_LEAD -->|Pass| LEADS["📋 Lead Sanitization<br/>tokenCount · countryCode"]
+    DUPE_LEAD -->|Block: Already enquired| BUYER_BLOCK(["⛔ Return: Already enquired"])
+
+    RH --> DUPE_USER
+    DUPE_USER -->|Pass| OTP_FLOW
+    DUPE_USER -->|Block: 409 Conflict| REG_BLOCK(["⛔ 409: Email/phone in use"])
 
     PH --> ANALYTICS
     PH --> RENDER_FALLBACK["📄 3-Level Render Fallback<br/>DB → Flask Mock → TS Hardcoded"]
 
-    RH --> DUPE_USER
-    DUPE_USER -->|Pass| OTP_FLOW
-    DUPE_USER -->|Block: 409 Conflict| E4
-
     E5 --> AH
 
     %% ─── DATA PERSISTENCE LAYER ──────────────────────────────────────────
-    subgraph "🗄️ DATA PERSISTENCE (packages/shared + Supabase)"
+    subgraph DATA_PERSIST["🗄️ DATA PERSISTENCE (packages/shared + Supabase)"]
         direction TB
         DB_PROPERTY["🏠 Property<br/>+ slug · mockDataUrl · mediaJson · plan"]
         DB_USER["👤 User<br/>+ phone · countryCode · phoneVerified · role · plan"]
@@ -1216,7 +1175,7 @@ flowchart TB
     AH --> DB_LEAD
 
     %% ─── REACTIVE UI LAYER (Continuously Re-renders) ──────────────────────
-    subgraph "🔄 REACTIVE UI (apps/web — Dashboard Components)"
+    subgraph REACTIVE_UI["🔄 REACTIVE UI (apps/web — Dashboard Components)"]
         direction TB
         UI_GROWTH["📈 Growth OS<br/>Pending tasks · AI credits<br/>Quick actions · Activity feed"]
         UI_LISTINGS["🏠 Listings Panel<br/>Real-time property list<br/>Status · Views · Enquiries"]
@@ -1238,7 +1197,7 @@ flowchart TB
     DB_MSG --> UI_ACTIVITY
 
     %% ─── EXTERNAL SERVICE REACTIONS ──────────────────────────────────────
-    subgraph "🔗 EXTERNAL SERVICE REACTIONS"
+    subgraph EXT_REACT["🔗 EXTERNAL SERVICE REACTIONS"]
         direction TB
         SEND_WA["📱 AiSensy Send<br/>OTP · Listing URL · Reply"]
         WEBHOOK_WA["📱 AiSensy Webhook<br/>Inbound message → Event"]
@@ -1251,8 +1210,6 @@ flowchart TB
 
     OTP_FLOW --> SEND_WA
     AI_FALLBACK --> SEND_WA
-    WH --> WEBHOOK_WA
-    MEDIA_PROC --> CLOUD_UPLOAD
     AI_FALLBACK -->|Level 1| ANTHROPIC_API
     AI_FALLBACK -->|Level 3| FLASK_MOCK
     PH --> SEO_PIPELINE
@@ -1261,195 +1218,125 @@ flowchart TB
     SEND_WA -->|URL shared| UI_LISTINGS
 
     %% ─── REACTIVE CASCADE LABELS ─────────────────────────────────────────
-    CASCADE1("⚡ REACTIVE CASCADE:<br/>WhatsApp → Webhook → Conversation → Fallback → DB → UI → WhatsApp Reply")
-    CASCADE2("⚡ REACTIVE CASCADE:<br/>Page Visit → SSR → DB/Fallback → Render → Analytics++ → SEO Pipeline")
-    CASCADE3("⚡ REACTIVE CASCADE:<br/>Lead Form → Dup Check → Lead DB → Analytics++ → Broker Dashboard UI")
+    CASCADE1("⚡ REACTIVE CASCADE 1<br/>WhatsApp → Webhook → Conversation →<br/>Fallback → DB → UI → WhatsApp Reply")
+    CASCADE2("⚡ REACTIVE CASCADE 2<br/>Page Visit → SSR → DB/Fallback →<br/>Render → Analytics++ → SEO Pipeline")
+    CASCADE3("⚡ REACTIVE CASCADE 3<br/>Lead Form → Dup Check → Lead DB →<br/>Analytics++ → Broker Dashboard UI")
+    CASCADE4("⚡ REACTIVE CASCADE 4<br/>Registration → Dup Check → OTP →<br/>Phone Verify → Dashboard Unlock")
 
-    CASCADE1 -.->|"Event Chain 1"| WH
-    CASCADE2 -.->|"Event Chain 2"| PH
-    CASCADE3 -.->|"Event Chain 3"| LH
+    CASCADE1 -.->|"Chain 1"| WH
+    CASCADE2 -.->|"Chain 2"| PH
+    CASCADE3 -.->|"Chain 3"| LH
+    CASCADE4 -.->|"Chain 4"| RH
 
     %% ─── STYLES ──────────────────────────────────────────────────────────
+    style EVENT_SOURCES fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style EVENT_PROC fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
+    style BUS_LOGIC fill:#1e1b18,color:#60a5fa,stroke:#60a5fa
+    style DATA_PERSIST fill:#1e1b18,color:#15803D,stroke:#15803D
+    style REACTIVE_UI fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style EXT_REACT fill:#1e1b18,color:#f87171,stroke:#f87171
+    
     style E1 fill:#15803D,color:#fff,stroke:#15803D
     style E2 fill:#C9A84C,color:#000,stroke:#C9A84C
     style E3 fill:#C9A84C,color:#000,stroke:#C9A84C
     style E4 fill:#60a5fa,color:#fff,stroke:#60a5fa
     style E5 fill:#f87171,color:#fff,stroke:#f87171
-    style WH fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
-    style LH fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
-    style PH fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
-    style RH fill:#1e1b18,color:#a78bfa,stroke:#a78bfa
-    style AI_FALLBACK fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style DUPE_PROP fill:#1e1b18,color:#f87171,stroke:#f87171
-    style DUPE_LEAD fill:#1e1b18,color:#f87171,stroke:#f87171
-    style DUPE_USER fill:#1e1b18,color:#f87171,stroke:#f87171
-    style CONV_STATE fill:#1e1b18,color:#60a5fa,stroke:#60a5fa
-    style OTP_FLOW fill:#1e1b18,color:#60a5fa,stroke:#60a5fa
+    
+    style WH fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style LH fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style PH fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style RH fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style UH fill:#a78bfa,color:#fff,stroke:#a78bfa
+    style AH fill:#a78bfa,color:#fff,stroke:#a78bfa
+    
+    style AI_FALLBACK fill:#C9A84C,color:#000,stroke:#C9A84C
+    style DUPE_PROP fill:#f87171,color:#fff,stroke:#f87171
+    style DUPE_LEAD fill:#f87171,color:#fff,stroke:#f87171
+    style DUPE_USER fill:#f87171,color:#fff,stroke:#f87171
+    style CONV_STATE fill:#60a5fa,color:#fff,stroke:#60a5fa
+    style OTP_FLOW fill:#60a5fa,color:#fff,stroke:#60a5fa
+    style ANALYTICS fill:#34d399,color:#000,stroke:#34d399
+    
     style CASCADE1 fill:#15803D,color:#fff,stroke:#15803D
     style CASCADE2 fill:#15803D,color:#fff,stroke:#15803D
     style CASCADE3 fill:#15803D,color:#fff,stroke:#15803D
+    style CASCADE4 fill:#15803D,color:#fff,stroke:#15803D
+    
     style SEND_WA fill:#15803D,color:#fff,stroke:#15803D
     style WEBHOOK_WA fill:#15803D,color:#fff,stroke:#15803D
     style FLASK_MOCK fill:#4169E1,color:#fff,stroke:#4169E1
-    style ANTHROPIC_API fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style SEO_PIPELINE fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style UI_GROWTH fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style UI_LISTINGS fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style UI_LEADS fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style UI_ANALYTICS fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style UI_PROFILE fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-    style UI_ACTIVITY fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
-```
-
-### Reactive Cascade 1: WhatsApp Listing Generation
-
-```
-Broker sends "2 BHK in Mumbai, ₹50L" on WhatsApp
-    │
-    ▼
-AiSensy Webhook → POST /api/whatsapp/webhook (instant <100ms)
-    │
-    ▼
-Conversation State Machine: GREETING → ACCUMULATING → GENERATING
-    │
-    ▼
-Duplicate Detection: phone+city+price+BHK within 24hrs?
-    ├── YES → ⛔ "Property already exists" → Reply to Broker
-    └── NO → 3-Level Fallback Chain
-              ├── Level 1: Claude 3.5 Sonnet (if API key present)
-              ├── Level 2: Regex Mock (no API key needed)
-              └── Level 3: Flask JSON Mock API (always works)
-    │
-    ▼
-createListing() → Supabase (Property + Images + mockDataUrl)
-    │
-    ▼
-sendMessage() → Broker gets URL on WhatsApp
-    │
-    ▼
-Dashboard UI REACTS: useSWR revalidates → New listing appears in real-time
-    │
-    ▼
-Analytics UI REACTS: Listing count increments → Chart updates
-    │
-    ▼
-Buyer visits URL → Property page renders with fallback chain
-```
-
-### Reactive Cascade 2: Buyer Page Visit & Enquiry
-
-```
-Buyer visits /apartment/luxury-2bhk
-    │
-    ▼
-Server Component SSR: getListingBySlug()
-    │
-    ▼
-3-Level Render Fallback: DB → Flask Mock → TS Hardcoded
-    │
-    ▼
-React Component REACTS: ApartmentClient renders with data
-    │
-    ▼
-SEO Pipeline REACTS: Metadata → JSON-LD → OG → Twitter Cards
-    │
-    ▼
-Analytics Pipeline REACTS: viewCount++ → Dashboard chart updates
-    │
-    ▼
-Buyer fills Lead Form (with country code + token counter)
-    │
-    ▼
-POST /api/leads → Duplicate Detection
-    ├── YES → ⛔ "Already enquired"
-    └── NO → createLead() → Supabase
-    │
-    ▼
-Leads Dashboard UI REACTS: New lead appears in real-time
-    │
-    ▼
-Analytics Dashboard REACTS: inquiryCount++ → Conversion rate updates
-    │
-    ▼
-Broker is notified → Can reply via WhatsApp
-```
-
-### Reactive Cascade 3: User Registration & OTP
-
-```
-Broker registers: Selects 🇮🇳 +91, enters 9999999999
-    │
-    ▼
-POST /api/register → Duplicate Detection
-    ├── YES → ⛔ 409 Conflict "Email/phone in use"
-    └── NO → CREATE User with countryCode
-    │
-    ▼
-Profile UI REACTS: Shows phone + countryCode + "Verify" button
-    │
-    ▼
-Broker clicks "Verify via WhatsApp"
-    │
-    ▼
-POST /api/otp/send → createOtp() → DB (expires 10min)
-    │
-    ▼
-AiSensy Send REACTS: OTP delivered on WhatsApp
-    │
-    ▼
-Broker enters 6-digit code → POST /api/otp/verify
-    │
-    ▼
-OTP Validation: Valid? Expired? Too many attempts?
-    ├── VALID → phoneVerified = true → UI REACTS: green checkmark
-    ├── EXPIRED → ⛔ "Request new OTP"
-    └── INVALID → ⛔ Retry (max 3 attempts)
-    │
-    ▼
-Dashboard UI REACTS: Phone verified → Full access unlocked
-    │
-    ▼
-Broker can now generate listings via WhatsApp
+    style ANTHROPIC_API fill:#C9A84C,color:#000,stroke:#C9A84C
+    style CLOUD_UPLOAD fill:#f87171,color:#fff,stroke:#f87171
+    style SEO_PIPELINE fill:#C9A84C,color:#000,stroke:#C9A84C
+    style REDIRECT_301 fill:#DC2626,color:#fff,stroke:#DC2626
+    
+    style UI_GROWTH fill:#C9A84C,color:#000,stroke:#C9A84C
+    style UI_LISTINGS fill:#C9A84C,color:#000,stroke:#C9A84C
+    style UI_LEADS fill:#C9A84C,color:#000,stroke:#C9A84C
+    style UI_ANALYTICS fill:#C9A84C,color:#000,stroke:#C9A84C
+    style UI_PROFILE fill:#C9A84C,color:#000,stroke:#C9A84C
+    style UI_ACTIVITY fill:#C9A84C,color:#000,stroke:#C9A84C
+    
+    style BROKER_BLOCK fill:#DC2626,color:#fff,stroke:#DC2626
+    style BUYER_BLOCK fill:#DC2626,color:#fff,stroke:#DC2626
+    style REG_BLOCK fill:#DC2626,color:#fff,stroke:#DC2626
 ```
 
 ---
 
 ## Async Webhook Processing Architecture (Future)
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    FUTURE: ASYNC WEBHOOK PROCESSING                          │
-│                                                                             │
-│  CURRENT (works, tested):                                                   │
-│                                                                             │
-│  AiSensy webhook → Vercel handles everything synchronously                  │
-│  → Works fine for: text-only, 1-2 images, fast Claude response             │
-│  → Risk: Vercel 10s timeout if: many images, slow Claude, DB latency       │
-│                                                                             │
-│  FUTURE (when timeout becomes a problem):                                   │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  Vercel (instant 200 OK):                                            │   │
-│  │  POST /api/whatsapp/webhook                                          │   │
-│  │  → parseInboundMessage() (instant <100ms)                            │   │
-│  │  → Save message to queue table or Redis                              │   │
-│  │  → Return 200 OK immediately                                         │   │
-│  │  → Flask picks up from queue (async)                                 │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                                    │                                       │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │  Render.com /apps/flask-api (async worker):                          │   │
-│  │  → downloadMedia() from URLs                                         │   │
-│  │  → uploadImage() to Cloudinary                                       │   │
-│  │  → generateListing() via Claude                                      │   │
-│  │  → createListing() to Supabase                                       │   │
-│  │  → sendMessage() reply to broker                                     │   │
-│  │  → No 10s timeout — unlimited processing time                        │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│                                                                             │
-│  BENEFIT: Broker gets instant "✓ Listing being processed" reply             │
-│  instead of waiting 10-30 seconds for complete generation                   │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph CURRENT["⚡ CURRENT (Synchronous)"]
+        CUR_WEBHOOK["AiSensy Webhook → Vercel<br/>Handles everything synchronously<br/>✅ Text-only, 1-2 images, fast Claude<br/>⚠️ Risk: 10s timeout on heavy loads"]
+    end
+
+    subgraph FUTURE["🔮 FUTURE (Async Queue)"]
+        direction TB
+        
+        F_WEBHOOK["POST /api/whatsapp/webhook<br/>→ parseInboundMessage() (instant <100ms)"]
+        F_QUEUE["→ Save to Queue Table / Redis"]
+        F_200["→ Return 200 OK instantly"]
+        F_FLASK["🐍 Flask async worker picks up queue<br/>→ downloadMedia() from URLs<br/>→ uploadImage() to Cloudinary<br/>→ generateListing() via Claude<br/>→ createListing() to Supabase<br/>→ sendMessage() reply to broker<br/>✅ No 10s timeout — unlimited time"]
+        
+        F_WEBHOOK --> F_QUEUE
+        F_QUEUE --> F_200
+        F_QUEUE --> F_FLASK
+    end
+
+    subgraph BENEFIT["🎯 BENEFIT"]
+        BENEFIT_TEXT["Broker gets instant<br/>'✓ Listing being processed' reply<br/>instead of waiting 10-30 seconds"]
+    end
+
+    CURRENT -.->|Evolution| FUTURE
+    FUTURE --> BENEFIT
+
+    style CURRENT fill:#fbbf24,color:#000,stroke:#fbbf24
+    style FUTURE fill:#1e1b18,color:#C9A84C,stroke:#C9A84C
+    style F_200 fill:#15803D,color:#fff,stroke:#15803D
+    style F_FLASK fill:#4169E1,color:#fff,stroke:#4169E1
+    style BENEFIT fill:#15803D,color:#fff,stroke:#15803D
 ```
 
 ---
+
+## 🧪 Testing
+
+```bash
+# 44 Vitest tests + Pytest suite
+pnpm test:run
+cd apps/flask-api && pytest
+```
+
+| Test Suite | Type | Count | What it tests |
+|---|---|---|---|
+| `api.edge-cases.test.ts` | Vitest | ✓ | API fallback chain, rate limiting, timeout handling |
+| `dashboard.edge-cases.test.ts` | Vitest | ✓ | Dashboard rendering, empty states, error boundaries |
+| Flask `test_mock.py` | Pytest | ✓ | Mock API endpoints, JSON validation, health check |
+
+---
+
+## 📝 License
+
+Private — All Rights Reserved. © 2025 Brisvora

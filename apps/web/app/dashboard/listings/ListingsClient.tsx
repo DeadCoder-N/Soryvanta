@@ -22,6 +22,14 @@ const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }>
   INACTIVE: { bg: 'var(--surface-3)',               color: 'var(--text-muted)', label: 'Inactive' },
 }
 
+const TYPE_PATH: Record<string, string> = {
+  APARTMENT: 'apartment', VILLA: 'villa', PLOT: 'plot', COMMERCIAL: 'commercial',
+}
+
+function listingPath(type: string, slug: string) {
+  return `/${TYPE_PATH[type] ?? 'property'}/${slug}`
+}
+
 function formatPrice(p: number) {
   if (p >= 10000000) return `₹${(p / 10000000).toFixed(1)} Cr`
   if (p >= 100000)   return `₹${(p / 100000).toFixed(1)} L`
@@ -207,7 +215,7 @@ export default function ListingsClient({ listings }: { listings: Listing[] }) {
                       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
                       <IcoEdit size={12} /> Edit
                     </Link>
-                    <Link href={`/property/${listing.slug}`} target="_blank"
+                    <Link href={listingPath(listing.type, listing.slug)} target="_blank"
                       className="listing-action-btn"
                       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
                       <IcoExternalLink size={12} /> View

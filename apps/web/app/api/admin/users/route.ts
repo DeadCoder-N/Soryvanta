@@ -48,13 +48,24 @@ export async function PATCH(req: Request) {
   if (!session?.user || !isSuperAdmin(session.user.role))
     return NextResponse.json({ error: 'Forbidden — Super Admin only' }, { status: 403 })
 
-  const { userId, role } = await req.json()
-  if (!userId || !role) return NextResponse.json({ error: 'userId and role required' }, { status: 400 })
-  if (!['BROKER', 'ADMIN', 'SUPER_ADMIN'].includes(role))
-    return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
+  const { userId, role, plan } = await req.json()
+  if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
-  const user = await prisma.user.update({ where: { id: userId }, data: { role } })
-  return NextResponse.json({ id: user.id, role: user.role })
+  if (role) {
+    if (!['BROKER', 'ADMIN', 'SUPER_ADMIN'].includes(role))
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
+    const user = await prisma.user.update({ where: { id: userId }, data: { role } })
+    return NextResponse.json({ id: user.id, role: user.role })
+  }
+
+  if (plan) {
+    if (!['STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE'].includes(plan))
+      return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+    const user = await prisma.user.update({ where: { id: userId }, data: { plan } })
+    return NextResponse.json({ id: user.id, plan: user.plan })
+  }
+
+  return NextResponse.json({ error: 'role or plan required' }, { status: 400 })
 }
 
 export async function DELETE(req: Request) {

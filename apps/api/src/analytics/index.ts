@@ -4,6 +4,7 @@ type PropertyWithAnalytics = {
   id: string
   title: string
   slug: string
+  type: string
   status: string
   createdAt: Date
   analytics: { viewCount: number; inquiryCount: number } | null
@@ -18,6 +19,7 @@ export async function getBrokerAnalytics(ownerId: string) {
       id: true,
       title: true,
       slug: true,
+      type: true,
       status: true,
       createdAt: true,
       analytics: true,
@@ -54,6 +56,7 @@ export async function getBrokerAnalytics(ownerId: string) {
       id: p.id,
       title: p.title,
       slug: p.slug,
+      type: p.type,
       views: p.analytics?.viewCount ?? 0,
       leads: p._count.leads,
       conversionRate: (p.analytics?.viewCount ?? 0) > 0

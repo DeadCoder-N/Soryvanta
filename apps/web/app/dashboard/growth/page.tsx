@@ -11,8 +11,15 @@ import {
 type Analytics = {
   totalViews: number; totalLeads: number; totalListings: number; activeListings: number
   whatsappLeads: number; webLeads: number; conversionRate: number
-  topListings: Array<{ id: string; title: string; slug: string; views: number; leads: number; conversionRate: number }>
+  topListings: Array<{ id: string; title: string; slug: string; type: string; views: number; leads: number; conversionRate: number }>
   properties: Array<{ id: string; title: string; slug: string; analytics: { viewCount: number } | null; _count: { leads: number } }>
+}
+
+function propertyPath(type: string, slug: string) {
+  const map: Record<string, string> = {
+    APARTMENT: 'apartment', VILLA: 'villa', PLOT: 'plot', COMMERCIAL: 'commercial',
+  }
+  return `/${map[type] ?? 'property'}/${slug}`
 }
 
 type LeadWithProperty = {
@@ -340,7 +347,7 @@ function TopListingsTable({ topListings }: { topListings: Analytics['topListings
               <tr key={item.id} className="table-row"
                 style={{ borderBottom: '1px solid var(--border)' }}>
                 <td style={{ padding: '12px 20px', color: 'var(--text-primary)', fontWeight: 500 }}>
-                  <Link href={`/property/${item.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Link href={propertyPath(item.type, item.slug)} style={{ textDecoration: 'none', color: 'inherit' }}>
                     {item.title.length > 32 ? item.title.slice(0, 30) + '...' : item.title}
                   </Link>
                 </td>

@@ -100,11 +100,32 @@ export async function searchListings(params: {
 export async function updateListing(
   id: string,
   ownerId: string,
-  data: Partial<GeneratedListing>
+  data: Partial<GeneratedListing>,
+  keepImageIds: string[] = [],
+  newImageUrls: string[] = []
 ) {
+  const existing = await prisma.property.findFirst({
+    where: { id, OR: [{ ownerId }, { ownerId: null }] },
+    select: { id: true },
+  })
+  if (!existing) throw new Error('Listing not found or access denied')
+
   return prisma.property.update({
-    where: { id, ownerId },
-    data: { ...data, updatedAt: new Date() },
+    where: { id },
+    data: {
+      ...data,
+      updatedAt: new Date(),
+      images: {
+        ...(keepImageIds.length > 0
+          ? { deleteMany: { id: { notIn: keepImageIds } } }
+          : newImageUrls.length > 0
+            ? { deleteMany: {} }
+            : {}
+        ),
+        create: newImageUrls.map((url, i) => ({ url, order: i })),
+      },
+    },
+    include: { images: true },
   })
 }
 

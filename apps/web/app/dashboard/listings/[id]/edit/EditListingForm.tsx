@@ -42,7 +42,9 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
-  const [existingImages, setExistingImages] = useState<Array<{ id: string; url: string }>>(listing.images ?? [])
+  const [existingImages, setExistingImages] = useState<Array<{ id: string; url: string }>>(
+    Array.from(new Map((listing.images ?? []).map(img => [img.id, img])).values())
+  )
   const [newImageUrls, setNewImageUrls] = useState<string[]>([])
 
   const [formData, setFormData] = useState({
@@ -77,7 +79,7 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
         urls.push(data.url)
       }
     }
-    setNewImageUrls(prev => [...prev, ...urls])
+    setNewImageUrls(prev => [...new Set([...prev, ...urls])])
     setUploading(false)
   }
 
@@ -111,7 +113,8 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
     })
 
     if (!res.ok) {
-      const data = await res.json()
+      const text = await res.text()
+      const data = text ? JSON.parse(text) : {}
       setError(data.error ?? 'Failed to update listing')
       setLoading(false)
       return
@@ -228,8 +231,8 @@ export default function EditListingForm({ listing }: { listing: Listing }) {
           {/* Current images grid */}
           {allImages.length > 0 && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '8px', marginBottom: '12px' }}>
-              {allImages.map(img => (
-                <div key={img.id} style={{ position: 'relative', paddingTop: '75%', background: 'var(--linen-md)' }}>
+              {allImages.map((img, i) => (
+                <div key={`${img.id}-${i}`} style={{ position: 'relative', paddingTop: '75%', background: 'var(--linen-md)' }}>
                   <Image src={img.url} alt="" fill style={{ objectFit: 'cover' }} />
                   <button
                     type="button"

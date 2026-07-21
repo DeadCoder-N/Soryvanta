@@ -9,9 +9,14 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   }
 
   const { id } = await params
-  const data = await req.json()
-  const updated = await updateListing(id, session.user.id, data)
-  return NextResponse.json(updated)
+  try {
+    const { keepImageIds, newImageUrls, ...fields } = await req.json()
+    const updated = await updateListing(id, session.user.id, fields, keepImageIds ?? [], newImageUrls ?? [])
+    return NextResponse.json(updated)
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Failed to update listing'
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {

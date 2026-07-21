@@ -24,7 +24,7 @@ export default function NewListingPage() {
       const res = await fetch('/api/upload', { method: 'POST', body: form })
       if (res.ok) urls.push((await res.json()).url)
     }
-    setImageUrls(prev => [...prev, ...urls])
+    setImageUrls(prev => [...new Set([...prev, ...urls])])
     setUploading(false)
   }, [])
 
@@ -103,7 +103,7 @@ export default function NewListingPage() {
           {imageUrls.length > 0 && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: '8px', marginTop: '12px' }}>
               {imageUrls.map((url, i) => (
-                <div key={url} className="animate-scale-in" style={{ position: 'relative', paddingTop: '75%', background: 'var(--surface-3)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', animationDelay: `${i * 0.05}s` }}>
+                <div key={i} className="animate-scale-in" style={{ position: 'relative', paddingTop: '75%', background: 'var(--surface-3)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', animationDelay: `${i * 0.05}s` }}>
                   <Image src={url} alt="" fill style={{ objectFit: 'cover' }} />
                   <button type="button" onClick={() => setImageUrls(p => p.filter(u => u !== url))}
                     style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}

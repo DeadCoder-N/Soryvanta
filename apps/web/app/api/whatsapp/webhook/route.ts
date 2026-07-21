@@ -110,7 +110,8 @@ export async function POST(req: Request) {
 
       // Use new SEO route based on type
       const typeRoute = result.listing.type?.toLowerCase() || 'property'
-      const listingUrl = `${process.env.NEXTAUTH_URL || 'https://brisvora.vercel.app'}/${typeRoute}/${property.slug}`
+      const baseUrl = (process.env.NEXTAUTH_URL || 'https://brisvora.vercel.app').replace(/^http:\/\/192\.168\.\d+\.\d+:\d+/, 'https://brisvora.vercel.app')
+      const listingUrl = `${baseUrl}/${typeRoute}/${property.slug}`
 
       let replyBody = `Your listing is ready!\n\n${result.listing.title}\n\n${listingUrl}`
       if (!user) {

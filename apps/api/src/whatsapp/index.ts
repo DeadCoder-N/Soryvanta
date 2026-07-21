@@ -141,17 +141,20 @@ export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
   // Strategy 1: Project API — WhatsApp Cloud API style
   if (PROJECT_API_KEY && PROJECT_ID) {
     try {
+      const payload: Record<string, any> = {
+        to: destination,
+        type: 'text',
+        text: { body: msg.body },
+      }
+      if (msg.contactId) payload.contact_id = msg.contactId
+
       const res = await fetch(`${PROJECT_API_BASE}/project/${PROJECT_ID}/messages`, {
         method: 'POST',
         headers: {
           'X-AiSensy-Project-API-Pwd': PROJECT_API_KEY,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          to: destination,
-          type: 'text',
-          text: { body: msg.body },
-        }),
+        body: JSON.stringify(payload),
       })
       const resText = await res.text()
       if (res.ok) {

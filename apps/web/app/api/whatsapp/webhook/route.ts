@@ -1,53 +1,86 @@
 import { NextResponse } from 'next/server'
-import { prisma, ConversationContextSchema } from '@brisvora/shared'
+import { prisma, ConversationContextSchema } from '@marketing-os/shared'
 import {
-  parseInboundMessage, sendMessage, downloadMedia,
+  sendMessage, downloadMedia,
   generateListing, uploadImage, createListing,
   processConversationalMessage, clearConversationState, getConversationState,
-} from '@brisvora/api'
+} from '@marketing-os/api'
+import {
+  verifyOpenWASignature, parseOpenWAInbound, extractOpenWAMediaBuffers, OpenWAWebhookDelivery,
+} from '@marketing-os/api'
 
-const WEBHOOK_SECRET = process.env.AISENSY_WEBHOOK_SECRET
+const WEBHOOK_SECRET = process.env.OPENWA_WEBHOOK_SECRET || process.env.AISENSY_WEBHOOK_SECRET
+
+// In-process dedup of OpenWA deliveries (X-OpenWA-Idempotency-Key is stable
+// across retries of the same occurrence). Bounded so a long-running process
+// cannot grow unboundedly.
+const seenKeys = new Set<string>()
+const SEEN_KEYS_MAX = 10_000
+
+function recordKey(key: string) {
+  if (seenKeys.size >= SEEN_KEYS_MAX) seenKeys.clear()
+  seenKeys.add(key)
+}
 
 export async function GET(req: Request) {
+  // OpenWA does not use a verify handshake; it POSTs signed deliveries only.
+  // Kept for backwards compatibility with any legacy verifier.
   const url = new URL(req.url)
   const mode = url.searchParams.get('hub.mode')
   const token = url.searchParams.get('hub.verify_token')
   const challenge = url.searchParams.get('hub.challenge')
-
   if (mode === 'subscribe' && token && challenge) {
     if (WEBHOOK_SECRET && token !== WEBHOOK_SECRET) {
       return NextResponse.json({ error: 'Invalid verify token' }, { status: 403 })
     }
     return NextResponse.json(challenge)
   }
-
-  const plainToken = url.searchParams.get('token')
-  const plainChallenge = url.searchParams.get('challenge')
-  if (plainToken && plainChallenge) {
-    if (WEBHOOK_SECRET && plainToken !== WEBHOOK_SECRET) {
-      return NextResponse.json({ error: 'Invalid verify token' }, { status: 403 })
-    }
-    return NextResponse.json(plainChallenge)
-  }
-
   return NextResponse.json({ ok: true })
 }
 
 export async function POST(req: Request) {
-  try {
-    const body = await req.json()
-    console.log('--- WEBHOOK RECEIVED ---')
-    console.log(JSON.stringify(body).slice(0, 2000))
+  // Read the raw body BEFORE parsing so the HMAC can be verified over the
+  // exact bytes OpenWA sent (not a re-serialized copy).
+  const rawBody = Buffer.from(await req.arrayBuffer())
+  const signature = req.headers.get('X-OpenWA-Signature')
+  const idempotencyKey = req.headers.get('X-OpenWA-Idempotency-Key')
 
-    const msg = parseInboundMessage(body)
-    if (!msg) {
-      console.log('Ignored: non-message or system event')
+  if (WEBHOOK_SECRET) {
+    if (!verifyOpenWASignature(rawBody, signature, WEBHOOK_SECRET)) {
+      console.warn('OpenWA webhook rejected: invalid HMAC signature')
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 403 })
+    }
+  }
+
+  let delivery: OpenWAWebhookDelivery
+  try {
+    delivery = JSON.parse(rawBody.toString('utf8')) as OpenWAWebhookDelivery
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
+
+  const event = delivery.event
+
+  // Session lifecycle events are informational only — never reply to a user.
+  if (event !== 'message.received') {
+    return NextResponse.json({ ok: true })
+  }
+
+  // Idempotency: dedupe on the delivery key so a retried event cannot create
+  // a second listing or send a duplicate reply.
+  if (idempotencyKey) {
+    if (seenKeys.has(idempotencyKey)) {
       return NextResponse.json({ ok: true })
     }
+    recordKey(idempotencyKey)
+  }
 
-    console.log('Parsed:', JSON.stringify({ waId: msg.waId, body: msg.body, contactId: msg.contactId, mediaUrls: msg.mediaUrls }))
+  const msg = parseOpenWAInbound(delivery)
+  if (!msg) {
+    return NextResponse.json({ ok: true })
+  }
 
-    // Look up registered user — optional, not required
+  try {
     const phone = msg.waId
     const digits = phone.replace(/\D/g, '')
     const candidates = new Set<string>([digits, `+${digits}`])
@@ -65,18 +98,31 @@ export async function POST(req: Request) {
       if (user) break
     }
 
-    // Use userId if registered, otherwise use phone as the conversation key
     const conversationKey = user?.id ?? `phone:${digits}`
+
+    // OpenWA inlines inbound media as base64 in the webhook payload (under
+    // WEBHOOK_MEDIA_INLINE_MAX_BYTES, default 1 MiB). Those bytes are
+    // ephemeral — they are not retrievable later — so upload each photo to
+    // Cloudinary as it arrives and pass the resulting URL into the conversation
+    // accumulator. Larger/omitted media falls back to the stored-message
+    // media endpoint via downloadMedia.
+    const newImageUrls: string[] = []
+    const inlineBuffers = extractOpenWAMediaBuffers(delivery)
+    for (const buffer of inlineBuffers) {
+      try {
+        const { url } = await uploadImage(buffer, 'marketing-os/properties', 'image')
+        newImageUrls.push(url)
+      } catch (err) {
+        console.error('Failed to upload inbound image:', err)
+      }
+    }
 
     const flowResult = await processConversationalMessage(
       conversationKey,
       msg.waId,
       msg.body,
-      msg.mediaUrls ?? []
+      newImageUrls
     )
-
-    console.log('Flow result:', flowResult)
-    console.log('Media URLs in this message:', msg.mediaUrls)
 
     if (flowResult === 'GENERATING') {
       await sendMessage({ to: msg.waId, contactId: msg.contactId, body: 'Generating your listing with AI... Please wait a moment.' })
@@ -84,38 +130,23 @@ export async function POST(req: Request) {
       const conversation = await getConversationState(conversationKey)
       const context = ConversationContextSchema.parse(conversation?.context ?? {})
       const accumulatedText = context.accumulatedText ?? ''
-      const accumulatedImageIds = context.imageUrls ?? []
-      const allMediaIds = [...accumulatedImageIds, ...(msg.mediaUrls ?? [])]
-
-      console.log('All media to process:', allMediaIds)
-      const imageUrls: string[] = []
-      for (const mediaId of allMediaIds) {
-        try {
-          console.log('Downloading media:', mediaId)
-          const isVideo = mediaId.includes('/video/')
-          const buffer = await downloadMedia(mediaId)
-          const { url } = await uploadImage(buffer, 'brisvora/properties', isVideo ? 'video' : 'image')
-          console.log('Uploaded to Cloudinary:', url)
-          imageUrls.push(url)
-        } catch (err) {
-          console.error('Failed to process image:', err)
-        }
-      }
+      // imageUrls are already Cloudinary URLs from prior uploads — no re-fetch.
+      const imageUrls = context.imageUrls ?? []
 
       const rawMessage = accumulatedText || msg.body
       const result = await generateListing({ rawMessage, imageUrls })
 
-      // createListing: ownerPhone always set, ownerId only if registered
       const property = await createListing(digits, result.listing, imageUrls, rawMessage, user?.id, result.mockDataUrl)
 
-      // Use new SEO route based on type
       const typeRoute = result.listing.type?.toLowerCase() || 'property'
-      const baseUrl = (process.env.NEXTAUTH_URL || 'https://brisvora.vercel.app').replace(/^http:\/\/192\.168\.\d+\.\d+:\d+/, 'https://brisvora.vercel.app')
+      const baseUrl = (process.env.NEXTAUTH_URL || process.env.CANONICAL_URL || 'http://localhost:3000')
+        .replace(/^http:\/\/192\.168\.\d+\.\d+:\d+/, 'http://localhost:3000')
       const listingUrl = `${baseUrl}/${typeRoute}/${property.slug}`
 
       let replyBody = `Your listing is ready!\n\n${result.listing.title}\n\n${listingUrl}`
       if (!user) {
-        replyBody += `\n\nTo edit this listing, register at brisvora.vercel.app with this WhatsApp number.`
+        const registerHost = (process.env.NEXTAUTH_URL || process.env.CANONICAL_URL || 'http://localhost:3000')
+        replyBody += `\n\nTo edit this listing, register at ${registerHost.replace(/^https?:\/\//, '')} with this WhatsApp number.`
       }
 
       await sendMessage({ to: msg.waId, contactId: msg.contactId, body: replyBody })

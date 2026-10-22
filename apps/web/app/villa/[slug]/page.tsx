@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getListingBySlug, incrementViewCount } from '@brisvora/api'
+import { getListingBySlug, incrementViewCount } from '@marketing-os/api'
+import { getCanonicalUrl } from '@/lib/site'
 import VillaClient from './VillaClient'
 
 type Props = {
@@ -12,10 +13,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const property = await getListingBySlug(slug)
 
   if (!property) {
-    return { title: 'Villa Not Found | Brisvora' }
+    return { title: 'Villa Not Found | Marketing OS' }
   }
 
-  const title = `${property.title} | Brisvora`
+  const title = `${property.title} | Marketing OS`
   const description = property.description.slice(0, 160)
 
   return {
@@ -96,12 +97,14 @@ export default async function VillaPage({ params }: Props) {
     await incrementViewCount(property.id)
   }
 
+  const baseUrl = getCanonicalUrl()
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
     name: property.title,
     description: property.description,
-    url: `https://brisvora.vercel.app/villa/${slug}`,
+    url: `${baseUrl}/villa/${slug}`,
     image: property.images?.[0]?.url,
     offers: { '@type': 'Offer', price: property.price, priceCurrency: 'INR' },
   }
@@ -110,14 +113,14 @@ export default async function VillaPage({ params }: Props) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://brisvora.vercel.app' },
-      { '@type': 'ListItem', position: 2, name: 'Villas', item: 'https://brisvora.vercel.app/villa' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Villas', item: `${baseUrl}/villa` },
       { '@type': 'ListItem', position: 3, name: property.title },
     ],
   }
 
   const waMessage = encodeURIComponent(
-    `🏡 *${property.title}*\n₹${(property.price / 100000).toFixed(1)} L · ${property.bedrooms || '?'} BHK · ${property.areaSqft || '?'} sqft\n\nhttps://brisvora.vercel.app/villa/${slug}`
+    `🏡 *${property.title}*\n₹${(property.price / 100000).toFixed(1)} L · ${property.bedrooms || '?'} BHK · ${property.areaSqft || '?'} sqft\n\n${baseUrl}/villa/${slug}`
   )
   const waLink = `https://wa.me/?text=${waMessage}`
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getListingBySlug, incrementViewCount } from '@brisvora/api'
+import { getListingBySlug, incrementViewCount } from '@marketing-os/api'
+import { getCanonicalUrl } from '@/lib/site'
 import PlotClient from './PlotClient'
 
 type Props = {
@@ -10,10 +11,10 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const property = await getListingBySlug(slug)
-  if (!property) return { title: 'Plot Not Found | Brisvora' }
+  if (!property) return { title: 'Plot Not Found | Marketing OS' }
 
   return {
-    title: `${property.title} | Brisvora`,
+    title: `${property.title} | Marketing OS`,
     description: property.description.slice(0, 160),
     alternates: { canonical: `/plot/${slug}` },
   }
@@ -49,8 +50,9 @@ export default async function PlotPage({ params }: Props) {
   if (!property) notFound()
   if (property.id !== 'mock') await incrementViewCount(property.id)
 
-  const jsonLd = { '@context': 'https://schema.org', '@type': 'RealEstateListing', name: property.title, description: property.description, url: `https://brisvora.vercel.app/plot/${slug}`, image: property.images?.[0]?.url, offers: { '@type': 'Offer', price: property.price, priceCurrency: 'INR' } }
-  const waMessage = encodeURIComponent(`📍 *${property.title}*\n₹${(property.price / 100000).toFixed(1)} L · ${property.areaSqft || '?'} sqft\n\nhttps://brisvora.vercel.app/plot/${slug}`)
+  const baseUrl = getCanonicalUrl()
+  const jsonLd = { '@context': 'https://schema.org', '@type': 'RealEstateListing', name: property.title, description: property.description, url: `${baseUrl}/plot/${slug}`, image: property.images?.[0]?.url, offers: { '@type': 'Offer', price: property.price, priceCurrency: 'INR' } }
+  const waMessage = encodeURIComponent(`📍 *${property.title}*\n₹${(property.price / 100000).toFixed(1)} L · ${property.areaSqft || '?'} sqft\n\n${baseUrl}/plot/${slug}`)
 
   return (
     <>

@@ -4,6 +4,12 @@ import Providers from '@/components/Providers'
 import { auth } from '@/auth'
 import './globals.css'
 
+// Canonical site host. Reads CANONICAL_URL (preferred) or NEXTAUTH_URL from the
+// deployment environment. Never hard-code a former-brand hostname here.
+const CANONICAL_HOST =
+  process.env.CANONICAL_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'
+const canonicalUrl = CANONICAL_HOST.replace(/\/$/, '')
+
 const playfair = Playfair_Display({
   variable: '--font-serif',
   subsets: ['latin'],
@@ -19,44 +25,35 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Brisvora — AI-Powered Luxury Property Listings India | Find Premium Real Estate',
-    template: '%s | Brisvora',
+    default: 'Marketing OS — AI-Powered Luxury Property Listings India | Find Premium Real Estate',
+    template: '%s | Marketing OS',
   },
   description: 'India\'s premier AI-powered property listing platform. Brokers send WhatsApp messages, AI generates professional listings with SEO-optimized pages. Find apartments, villas, and commercial properties in Mumbai, Delhi, Bangalore.',
-  keywords: ['property listings India', 'AI real estate', 'WhatsApp property listings', 'premium property Mumbai', 'luxury apartments India', 'real estate broker platform', 'Brisvora', 'property search', 'commercial property India', 'villa listings'],
-  authors: [{ name: 'Brisvora' }],
-  creator: 'Brisvora',
-  publisher: 'Brisvora',
+  keywords: ['property listings India', 'AI real estate', 'WhatsApp property listings', 'premium property Mumbai', 'luxury apartments India', 'real estate broker platform', 'Marketing OS', 'property search', 'commercial property India', 'villa listings'],
+  authors: [{ name: 'Marketing OS' }],
+  creator: 'Marketing OS',
+  publisher: 'Marketing OS',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://brisvora.vercel.app'),
+  metadataBase: new URL(canonicalUrl),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://brisvora.vercel.app',
-    siteName: 'Brisvora',
-    title: 'Brisvora — AI-Powered Luxury Property Listings India',
+    url: canonicalUrl,
+    siteName: 'Marketing OS',
+    title: 'Marketing OS — AI-Powered Luxury Property Listings India',
     description: 'Turn WhatsApp messages into professional property listings instantly. Find premium properties in Mumbai, Delhi, Bangalore and across India.',
-    images: [
-      {
-        url: 'https://brisvora.vercel.app/Brisvora.png',
-        width: 1200,
-        height: 630,
-        alt: 'Brisvora - AI Property Listings',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Brisvora — AI-Powered Luxury Property Listings India',
+    title: 'Marketing OS — AI-Powered Luxury Property Listings India',
     description: 'Turn WhatsApp messages into professional property listings instantly.',
-    images: ['https://brisvora.vercel.app/Brisvora.png'],
   },
   robots: {
     index: true,
@@ -81,23 +78,22 @@ export const metadata: Metadata = {
       {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: 'Brisvora',
-        url: 'https://brisvora.vercel.app',
-        logo: 'https://brisvora.vercel.app/Brisvora.png',
+        name: 'Marketing OS',
+        url: canonicalUrl,
         description: 'AI-powered luxury property listing platform for Indian real estate brokers.',
         foundingDate: '2026',
-        sameAs: ['https://twitter.com/brisvora', 'https://linkedin.com/company/brisvora'],
-        contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'support@brisvora.in' },
+        sameAs: ['https://twitter.com/marketingos', 'https://linkedin.com/company/marketingos'],
+        contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'support@marketingos.in' },
       },
       {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        name: 'Brisvora',
-        url: 'https://brisvora.vercel.app',
+        name: 'Marketing OS',
+        url: canonicalUrl,
         description: "India's premier AI-powered property listing platform.",
         potentialAction: {
           '@type': 'SearchAction',
-          target: 'https://brisvora.vercel.app?city={search_term_string}',
+          target: `${canonicalUrl}?city={search_term_string}`,
           'query-input': 'required name=search_term_string',
         },
       },

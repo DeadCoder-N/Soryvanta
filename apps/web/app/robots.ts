@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next'
+import { getCanonicalUrl } from '@/lib/site'
 
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = getCanonicalUrl()
   return {
     rules: [
       {
@@ -14,6 +16,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/dashboard/', '/api/'],
       },
     ],
-    sitemap: 'https://brisvora.vercel.app/sitemap.xml',
+    sitemap: `${baseUrl}/sitemap.xml`,
   }
 }

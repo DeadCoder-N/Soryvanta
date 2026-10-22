@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
+import { getCanonicalUrl } from '@/lib/site'
 
 // Type mapping for SEO routes
 const TYPE_ROUTES: Record<string, string> = {
@@ -12,7 +13,7 @@ const TYPE_ROUTES: Record<string, string> = {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://brisvora.vercel.app'
+  const baseUrl = getCanonicalUrl()
 
   // Graceful fallback if Supabase connection fails during build
   let propertyUrls: MetadataRoute.Sitemap = []

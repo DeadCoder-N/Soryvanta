@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { getListingBySlug, incrementViewCount } from '@brisvora/api'
+import { getListingBySlug, incrementViewCount } from '@marketing-os/api'
+import { getCanonicalUrl } from '@/lib/site'
 import ApartmentClient from './ApartmentClient'
 
 type Props = {
@@ -12,10 +13,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const property = await getListingBySlug(slug)
 
   if (!property) {
-    return { title: 'Property Not Found | Brisvora' }
+    return { title: 'Property Not Found | Marketing OS' }
   }
 
-  const title = `${property.title} | Brisvora`
+  const title = `${property.title} | Marketing OS`
   const description = property.description.slice(0, 160)
 
   return {
@@ -106,13 +107,16 @@ export default async function ApartmentPage({ params }: Props) {
     await incrementViewCount(property.id)
   }
 
+  // Canonical site host (env-driven; no former-brand hostname hard-coded)
+  const baseUrl = getCanonicalUrl()
+
   // JSON-LD schemas
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
     name: property.title,
     description: property.description,
-    url: `https://brisvora.vercel.app/apartment/${slug}`,
+    url: `${baseUrl}/apartment/${slug}`,
     image: property.images?.[0]?.url,
     offers: {
       '@type': 'Offer',
@@ -125,21 +129,21 @@ export default async function ApartmentPage({ params }: Props) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://brisvora.vercel.app' },
-      { '@type': 'ListItem', position: 2, name: 'Apartments', item: 'https://brisvora.vercel.app/apartment' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Apartments', item: `${baseUrl}/apartment` },
       { '@type': 'ListItem', position: 3, name: property.title },
     ],
   }
 
   // WhatsApp share link
   const waMessage = encodeURIComponent(
-    `🏠 *${property.title}*\n₹${(property.price / 100000).toFixed(1)} L · ${property.bedrooms || '?'} BHK · ${property.areaSqft || '?'} sqft\n\nhttps://brisvora.vercel.app/apartment/${slug}`
+    `🏠 *${property.title}*\n₹${(property.price / 100000).toFixed(1)} L · ${property.bedrooms || '?'} BHK · ${property.areaSqft || '?'} sqft\n\n${baseUrl}/apartment/${slug}`
   )
   const waLink = `https://wa.me/?text=${waMessage}`
 
   // SEO keywords for apartment pages
   const bhkText = property.bedrooms ? `${property.bedrooms} BHK ` : ''
-  const seoTitle = `${bhkText}Apartment in ${property.city} | Brisvora`
+  const seoTitle = `${bhkText}Apartment in ${property.city} | Marketing OS`
 
   return (
     <>

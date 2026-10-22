@@ -29,7 +29,7 @@ improve the design before implementation.
 
 # RESPONSIVE FIRST DESIGN
 
-Brisvora is designed Mobile First.
+Marketing OS is designed Mobile First.
 
 Never design Desktop first.
 
@@ -293,7 +293,7 @@ Before considering any screen complete, verify:
 
 ✓ No generic SaaS appearance
 
-✓ Matches Brisvora brand identity
+✓ Matches Marketing OS brand identity
 
 If any item fails,
 

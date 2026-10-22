@@ -1,4 +1,4 @@
-name: Brisvora CI/CD Pipeline
+name: Marketing OS CI/CD Pipeline
 
 on:
   push:

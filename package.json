@@ -1,5 +1,5 @@
 {
-  "name": "brisvora",
+  "name": "marketing-os",
   "version": "0.0.1",
   "private": true,
   "packageManager": "pnpm@9.15.0",
@@ -8,9 +8,10 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
-    "db:generate": "pnpm --filter @brisvora/shared prisma:generate",
-    "db:migrate": "pnpm --filter @brisvora/shared prisma:migrate",
-    "db:studio": "pnpm --filter @brisvora/shared prisma:studio"
+    "db:generate": "pnpm --filter @marketing-os/shared prisma:generate",
+    "db:migrate": "pnpm --filter @marketing-os/shared prisma:migrate",
+    "db:studio": "pnpm --filter @marketing-os/shared prisma:studio",
+    "db:super-admin": "pnpm --filter @marketing-os/shared prisma:super-admin"
   },
   "devDependencies": {
     "turbo": "^2.0.0",

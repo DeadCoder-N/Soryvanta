@@ -23,7 +23,7 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.24.0
         version: 0.24.3
-      '@brisvora/shared':
+      '@marketing-os/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       cloudinary:
@@ -45,10 +45,10 @@ importers:
       '@auth/prisma-adapter':
         specifier: ^2.11.2
         version: 2.11.2(@prisma/client@5.22.0(prisma@5.22.0))
-      '@brisvora/api':
+      '@marketing-os/api':
         specifier: workspace:*
         version: link:../api
-      '@brisvora/shared':
+      '@marketing-os/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       bcryptjs:

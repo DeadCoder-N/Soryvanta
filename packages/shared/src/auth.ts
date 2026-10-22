@@ -3,10 +3,12 @@ import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './db'
 
+// trustHost is resolved from the deployment environment. No former-brand
+// hostname is hard-coded here; set NEXTAUTH_URL (or TRUST_HOST) in production.
+const trustHost = process.env.TRUST_HOST || process.env.NEXTAUTH_URL || ''
+
 export const authConfig: NextAuthConfig = {
-  trustHost: process.env.NODE_ENV === 'production' 
-    ? (['brisvora.vercel.app'] as unknown as boolean)
-    : true,
+  trustHost: trustHost ? (trustHost as unknown as boolean) : process.env.NODE_ENV === 'production',
   session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 },
   pages: {
     signIn: '/login',

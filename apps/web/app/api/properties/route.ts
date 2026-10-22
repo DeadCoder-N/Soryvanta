@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { searchListings, createListing, generateListing } from '@brisvora/api'
+import { searchListings, createListing, generateListing } from '@marketing-os/api'
 import { auth } from '@/auth'
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)

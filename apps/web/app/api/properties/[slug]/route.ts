@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getListingBySlug, incrementViewCount } from '@brisvora/api'
+import { getListingBySlug, incrementViewCount } from '@marketing-os/api'
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params

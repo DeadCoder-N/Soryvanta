@@ -226,7 +226,7 @@ export default function VillaClient({ property: p }: { property: ClientProperty 
         <div style={{ background: 'var(--surface-1, #0F0E0C)', borderRadius: 16, padding: 28, border: '1px solid rgba(201,168,76,0.2)', height: 'fit-content', position: 'sticky', top: 88 }}>
           <div style={{ fontFamily: "'Cinzel', serif", fontSize: 10, color: '#6B5E45', letterSpacing: 3, marginBottom: 8 }}>LISTED BY</div>
           <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: '#C9A84C', margin: 0 }}>Vikram Mehta</h3>
-          <p style={{ fontSize: 13, color: '#A89878', margin: '6px 0 4px' }}>Brisvora Luxury Estates</p>
+          <p style={{ fontSize: 13, color: '#A89878', margin: '6px 0 4px' }}>Marketing OS Luxury Estates</p>
           <p style={{ fontSize: 11, color: '#6B5E45', margin: '0 0 16px' }}>⭐ 20 years experience</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button onClick={() => setShowEnquiry(true)} style={{ padding: '14px 24px', background: '#C9A84C', color: '#080807', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>Schedule a Visit</button>

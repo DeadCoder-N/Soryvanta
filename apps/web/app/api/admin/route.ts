@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 
 function isAdmin(role?: string) {
   return role === 'ADMIN' || role === 'SUPER_ADMIN'

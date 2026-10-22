@@ -138,9 +138,8 @@ export default function PropertyClient({ property, waLink }: { property: Propert
         transition: 'background 0.4s, border-color 0.4s',
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Image src="/Brisvora.png" alt="Brisvora" width={36} height={36} style={{ objectFit: 'contain' }} />
           <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem', color: '#fff', letterSpacing: '0.02em' }}>
-            Brisvora
+            Marketing OS
           </span>
         </Link>
 
@@ -692,8 +691,7 @@ export default function PropertyClient({ property, waLink }: { property: Propert
       <footer style={{ background: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,0.08)', padding: '64px 5% 40px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '40px', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Image src="/Brisvora.png" alt="Brisvora" width={34} height={34} style={{ objectFit: 'contain' }} />
-            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem', color: '#fff' }}>Brisvora</span>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem', color: '#fff' }}>Marketing OS</span>
           </div>
           <div style={{ display: 'flex', gap: '28px', flexWrap: 'wrap' }}>
             <Link href="/" style={{ color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.85rem' }}>Properties</Link>
@@ -705,7 +703,7 @@ export default function PropertyClient({ property, waLink }: { property: Propert
         </div>
         <div style={{ maxWidth: '1200px', margin: '32px auto 0', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '24px' }}>
           <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', textAlign: 'center' }}>
-            © {new Date().getFullYear()} Brisvora. All rights reserved.
+            © {new Date().getFullYear()} Marketing OS. All rights reserved.
           </p>
         </div>
       </footer>

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { updateListing, deleteListing } from '@brisvora/api'
+import { updateListing, deleteListing } from '@marketing-os/api'
 import { auth } from '@/auth'
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {

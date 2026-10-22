@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 
 // GET — return current broker profile
 export async function GET() {

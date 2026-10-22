@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 
 export async function GET(_req: Request, { params }: { params: Promise<{ userId: string }> }) {
   const session = await auth()

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { createOtp, sendOtpWhatsApp } from '@brisvora/api'
+import { createOtp, sendOtpWhatsApp } from '@marketing-os/api'
 
 export async function POST(req: Request) {
   try {

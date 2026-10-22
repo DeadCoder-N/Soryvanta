@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getBrokerListings } from '@brisvora/api'
+import { getBrokerListings } from '@marketing-os/api'
 import { auth } from '@/auth'
 
 export async function GET() {

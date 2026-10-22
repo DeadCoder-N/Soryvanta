@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createLead } from '@brisvora/api'
+import { createLead } from '@marketing-os/api'
 
 export async function POST(req: Request) {
   const { propertyId, name, phone, message, source } = await req.json()

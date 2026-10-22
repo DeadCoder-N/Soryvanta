@@ -1,5 +1,5 @@
 """
-Brisvora Flask API — Python Microservice
+Marketing OS Flask API — Python Microservice
 Serves mock property data, health checks, and future async webhook processing.
 
 Endpoints:
@@ -25,7 +25,7 @@ def health_check():
     return jsonify({
         'status': 'ok',
         'version': '1.0.0',
-        'service': 'brisvora-flask-api'
+        'service': 'marketing-os-flask-api'
     })
 
 

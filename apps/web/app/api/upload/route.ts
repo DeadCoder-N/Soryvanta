@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { uploadImage } from '@brisvora/api'
+import { uploadImage } from '@marketing-os/api'
 import { auth } from '@/auth'
 
 export async function POST(req: Request) {

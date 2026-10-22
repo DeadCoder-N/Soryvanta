@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { verifyOtp } from '@brisvora/api'
+import { verifyOtp } from '@marketing-os/api'
 
 export async function POST(req: Request) {
   try {

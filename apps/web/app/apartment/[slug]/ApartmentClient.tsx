@@ -313,7 +313,7 @@ export default function ApartmentClient({ property: initialProperty }: { propert
         <div style={{ background: 'var(--surface-1, #0F0E0C)', borderRadius: 12, padding: 24, border: '1px solid rgba(201,168,76,0.15)', height: 'fit-content', position: 'sticky', top: 88 }}>
           <div style={{ fontFamily: "'Cinzel', serif", fontSize: 10, color: '#6B5E45', letterSpacing: 2, marginBottom: 8 }}>LISTED BY</div>
           <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: '#C9A84C', margin: 0 }}>Broker Name</h3>
-          <p style={{ fontSize: 13, color: '#A89878', margin: '8px 0' }}>Brisvora Realty</p>
+          <p style={{ fontSize: 13, color: '#A89878', margin: '8px 0' }}>Marketing OS Realty</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16 }}>
             <button
               onClick={() => setShowEnquiry(true)}

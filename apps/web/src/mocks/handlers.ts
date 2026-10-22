@@ -5,7 +5,7 @@ import { http, HttpResponse } from 'msw'
 export const MOCK_USER = {
   id: 'user_01',
   name: 'Ravi Sharma',
-  email: 'ravi@brisvora.com',
+  email: 'ravi@example.com',
   phone: '+918850908790',
   role: 'BROKER',
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import { prisma } from '@brisvora/shared'
-import { claimListings } from '@brisvora/api'
+import { prisma } from '@marketing-os/shared'
+import { claimListings } from '@marketing-os/api'
 
 export async function POST(req: Request) {
   const { name, email, password, phone, countryCode } = await req.json()

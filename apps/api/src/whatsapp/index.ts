@@ -1,9 +1,50 @@
-import type { WhatsAppInboundMessage, WhatsAppOutboundMessage } from '@brisvora/shared'
+import type { WhatsAppInboundMessage, WhatsAppOutboundMessage } from '@marketing-os/shared'
+import { getAiSensyCampaignName } from '@marketing-os/shared'
+import * as openwa from './openwa'
 
 const CAMPAIGN_API_KEY = process.env.AISENSY_API_KEY!
 const PROJECT_API_KEY = process.env.AISENSY_PROJECT_API_KEY!
 const PROJECT_ID = process.env.AISENSY_PROJECT_ID!
 const PROJECT_API_BASE = 'https://apis.aisensy.com/project-apis/v1'
+
+/**
+ * Active WhatsApp provider.
+ *
+ * `openwa` (default when OPENWA_API_KEY + OPENWA_SESSION_ID are set) routes
+ * WhatsApp traffic through the OpenWA gateway. `aisensy` keeps the previous
+ * AiSensy behaviour intact for a manual rollback. The provider is never
+ * silently downgraded: when OpenWA is configured it is the required path.
+ */
+const WHATSAPP_PROVIDER = (process.env.WHATSAPP_PROVIDER || '').trim().toLowerCase()
+const openwaConfigured = Boolean(process.env.OPENWA_API_KEY && process.env.OPENWA_SESSION_ID)
+export const activeProvider: 'openwa' | 'aisensy' =
+  WHATSAPP_PROVIDER === 'aisensy' ? 'aisensy' : (openwaConfigured ? 'openwa' : 'aisensy')
+
+// Re-export the OpenWA adapter surface so consumers can import from
+// @marketing-os/api without reaching into the internal module.
+export type {
+  OpenWAWebhookDelivery,
+  OpenWAMessage,
+} from './openwa'
+export {
+  verifyOpenWASignature,
+  parseOpenWAInbound,
+  extractOpenWAMediaBuffers,
+  sendOpenWAMessage,
+  downloadOpenWAMedia,
+  openwaProvider,
+} from './openwa'
+
+if (activeProvider === 'openwa') {
+  console.log('[WhatsApp] Active provider: OpenWA (session', process.env.OPENWA_SESSION_ID, ')')
+} else if (WHATSAPP_PROVIDER === 'aisensy') {
+  console.log('[WhatsApp] Active provider: AiSensy (manual rollback mode)')
+} else {
+  console.warn(
+    '[WhatsApp] No WhatsApp provider is configured. Set OPENWA_API_KEY + OPENWA_SESSION_ID ' +
+      'to use OpenWA, or WHATSAPP_PROVIDER=aisensy to keep the legacy AiSensy path.'
+  )
+}
 
 function extractFromAiSensy(body: Record<string, any>): {
   phone: string
@@ -134,8 +175,27 @@ export function parseInboundMessage(body: Record<string, any>): WhatsAppInboundM
   }
 }
 
-// Send a WhatsApp message via AiSensy Project API (live chat reply)
+// Send a WhatsApp message. Routes through the active provider.
 export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
+  if (activeProvider === 'openwa') {
+    // OpenWA's send-text endpoint requires a full JID (e.g. 918433956238@c.us),
+    // not a bare phone number. Prefer contactId (the full JID from the inbound
+    // message) and fall back to `to` for legacy callers.
+    const chatId = msg.contactId || msg.to
+    const messageId = await openwa.sendOpenWAMessage(chatId, msg.body)
+    if (messageId) {
+      console.log('Message sent via OpenWA:', messageId)
+      return
+    }
+    console.error('OpenWA send failed for:', chatId.replace(/\D/g, ''))
+    return
+  }
+
+  await sendMessageViaAiSensy(msg)
+}
+
+// Legacy AiSensy send path — kept intact for manual rollback (WHATAPP_PROVIDER=aisensy).
+async function sendMessageViaAiSensy(msg: WhatsAppOutboundMessage): Promise<void> {
   const destination = msg.to.replace(/\D/g, '')
 
   // Strategy 1: Project API — WhatsApp Cloud API style
@@ -168,14 +228,15 @@ export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
   }
 
   // Strategy 2: Campaign API with approved template (fallback)
-  if (CAMPAIGN_API_KEY) {
+  const campaignName = getAiSensyCampaignName()
+  if (CAMPAIGN_API_KEY && campaignName) {
     try {
       const res = await fetch('https://backend.aisensy.com/campaign/t1/api/v2', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           apiKey: CAMPAIGN_API_KEY,
-          campaignName: 'brisvora_reply',
+          campaignName,
           destination,
           userName: 'User',
           templateParams: [msg.body],
@@ -196,8 +257,15 @@ export async function sendMessage(msg: WhatsAppOutboundMessage): Promise<void> {
   console.error('All send strategies failed for:', destination)
 }
 
-// Download media from URL or AiSensy media endpoint
-export async function downloadMedia(mediaIdOrUrl: string): Promise<Buffer> {
+// Download media. OpenWA uses its stored-message media endpoint; AiSensy keeps
+// its legacy URL / campaign-media behaviour.
+export async function downloadMedia(mediaIdOrUrl: string, chatId?: string, messageId?: string): Promise<Buffer> {
+  if (activeProvider === 'openwa' && chatId && messageId) {
+    const buf = await openwa.downloadOpenWAMedia(chatId, messageId)
+    if (buf) return buf
+    throw new Error('OpenWA media download returned no bytes.')
+  }
+
   if (mediaIdOrUrl.startsWith('http')) {
     const res = await fetch(mediaIdOrUrl)
     if (!res.ok) throw new Error(`Failed to download media: ${res.status}`)

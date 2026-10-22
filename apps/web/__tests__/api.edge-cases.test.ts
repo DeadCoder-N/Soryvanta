@@ -235,19 +235,19 @@ describe('GET /api/broker/analytics', () => {
 describe('POST /api/register', () => {
   it('registers a new broker', async () => {
     const res = await post('/api/register', {
-      email: 'newbroker@brisvora.com',
+      email: 'newbroker@example.com',
       password: 'SecurePass123!',
       name: 'New Broker',
     })
     expect(res.status).toBe(201)
     const data = await res.json()
-    expect(data.email).toBe('newbroker@brisvora.com')
+    expect(data.email).toBe('newbroker@example.com')
   })
 
   it('returns 409 for duplicate email', async () => {
     server.use(edgeCaseHandlers.registerDuplicateEmail)
     const res = await post('/api/register', {
-      email: 'existing@brisvora.com',
+      email: 'existing@example.com',
       password: 'pass123',
     })
     expect(res.status).toBe(409)
@@ -307,7 +307,7 @@ describe('GET /api/broker/profile', () => {
     const res = await get('/api/broker/profile')
     const data = await res.json()
     expect(res.status).toBe(200)
-    expect(data.email).toBe('ravi@brisvora.com')
+    expect(data.email).toBe('ravi@example.com')
     expect(data.role).toBe('BROKER')
   })
 })

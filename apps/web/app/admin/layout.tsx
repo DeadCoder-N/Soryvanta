@@ -1,9 +1,9 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 import AdminSidebar from './AdminSidebar'
 
-export const metadata = { title: 'Admin Panel | Brisvora' }
+export const metadata = { title: 'Admin Panel | Marketing OS' }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()

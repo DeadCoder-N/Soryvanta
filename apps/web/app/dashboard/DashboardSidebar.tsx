@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import SignOutButton from './SignOutButton'
@@ -131,16 +130,8 @@ function SidebarContent({ email, phone, role, isDrawer, onClose }: {
       <div style={{ padding: isDrawer ? '16px 16px 14px' : '22px 16px 14px', borderBottom: '1px solid var(--border)' }}>
         {!isDrawer && (
           <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '18px' }}>
-            <div style={{
-              width: '32px', height: '32px', borderRadius: '9px',
-              background: 'linear-gradient(135deg, var(--gold-dim), rgba(201,168,76,0.04))',
-              border: '1px solid var(--gold-border)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Image src="/Brisvora.png" alt="Brisvora" width={22} height={22} className="logo-img" style={{ objectFit: 'contain' }} />
-            </div>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: '0.95rem', color: 'var(--text-primary)', letterSpacing: '0.04em' }}>
-              Brisvora
+              Marketing OS
               <span style={{ color: 'var(--gold)', fontSize: '0.45rem', verticalAlign: 'super', marginLeft: '1px' }}>™</span>
             </span>
           </Link>
@@ -267,8 +258,7 @@ export default function DashboardSidebar({ email, phone, role }: {
         alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Image src="/Brisvora.png" alt="Brisvora" width={26} height={26} className="logo-img" style={{ objectFit: 'contain' }} />
-          <span style={{ fontFamily: 'var(--font-serif)', fontSize: '0.9rem', color: 'var(--text-primary)' }}>Brisvora</span>
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: '0.9rem', color: 'var(--text-primary)', letterSpacing: '0.04em' }}>Marketing OS</span>
         </Link>
         <button
           onClick={() => setOpen(o => !o)}

@@ -1,5 +1,5 @@
 import { auth } from '@/auth'
-import { getBrokerAnalytics, getBrokerListings } from '@brisvora/api'
+import { getBrokerAnalytics, getBrokerListings } from '@marketing-os/api'
 import AnalyticsClient from './AnalyticsClient'
 import Link from 'next/link'
 import { IcoPlus } from '@/components/Icons'

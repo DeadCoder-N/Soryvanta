@@ -1,5 +1,5 @@
 import { auth } from '@/auth'
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 import Link from 'next/link'
 import { IcoBell, IcoMessage, IcoStar, IcoEye, IcoRefresh, IcoCalendar } from '@/components/Icons'
 

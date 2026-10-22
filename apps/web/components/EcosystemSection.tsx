@@ -127,7 +127,7 @@ export default function EcosystemSection() {
               maxWidth: '52ch', margin: '0 auto',
             }}
           >
-            Instead of juggling disconnected tools, Brisvora brings every AI-powered workflow into one intelligent platform — built to grow with your business.
+            Instead of juggling disconnected tools, Marketing OS brings every AI-powered workflow into one intelligent platform — built to grow with your business.
           </p>
         </div>
 
@@ -193,7 +193,7 @@ export default function EcosystemSection() {
                 fontSize: 'clamp(0.38rem,0.65vw,0.5rem)',
                 letterSpacing: '0.15em', textTransform: 'uppercase',
                 color: 'var(--gold)', textAlign: 'center', lineHeight: 1.3,
-              }}>Brisvora<br />AI</p>
+              }}>Marketing OS<br />AI</p>
             </div>
           </div>
 

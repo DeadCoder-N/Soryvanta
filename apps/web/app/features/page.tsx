@@ -5,7 +5,7 @@ import HoverCard from '@/components/HoverCard'
 
 export const metadata: Metadata = {
   title: 'Features — AI Capabilities Built for Growth',
-  description: 'Explore all Brisvora features: AI Landing Pages, WhatsApp Automation, SEO Engine, Lead Management, Analytics, and AI Workflows.',
+  description: 'Explore all Marketing OS features: AI Landing Pages, WhatsApp Automation, SEO Engine, Lead Management, Analytics, and AI Workflows.',
 }
 
 const FEATURES = [
@@ -24,7 +24,7 @@ export default function FeaturesPage() {
         label="Features"
         title="Every Tool You Need to"
         titleGold="Grow Your Business."
-        description="Brisvora combines AI, automation, SEO, and analytics into one intelligent platform. Everything works together — from first message to closed deal."
+        description="Marketing OS combines AI, automation, SEO, and analytics into one intelligent platform. Everything works together — from first message to closed deal."
         cta={{ label: 'Start Free →', href: '/register' }}
         ctaSecondary={{ label: 'View Pricing', href: '/#pricing' }}
       />

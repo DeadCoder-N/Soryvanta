@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Hotels & Resorts — AI Booking Pages & Enquiry Automation',
-  description: 'Brisvora helps hotels and resorts create AI-powered booking pages, automate guest enquiries, and improve Google visibility.',
+  description: 'Marketing OS helps hotels and resorts create AI-powered booking pages, automate guest enquiries, and improve Google visibility.',
 }
 
 const FEATURES = [
@@ -24,7 +24,7 @@ export default function HotelsPage() {
         label="Hotels & Resorts"
         title="AI-Powered Booking Pages for"
         titleGold="Hotels & Resorts."
-        description="Create stunning booking pages, automate guest enquiries, and rank on Google — all from a single WhatsApp message. Coming soon to Brisvora."
+        description="Create stunning booking pages, automate guest enquiries, and rank on Google — all from a single WhatsApp message. Coming soon to Marketing OS."
         badge="Coming Soon"
         cta={{ label: 'Join Waitlist →', href: '/register' }}
         ctaSecondary={{ label: 'View All Solutions', href: '/solutions' }}
@@ -87,7 +87,7 @@ export default function HotelsPage() {
             Be first when<br /><span style={{ color: 'var(--gold)' }}>Hotels launches.</span>
           </h2>
           <p style={{ fontSize: 'clamp(0.82rem,1.2vw,0.95rem)', color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: '2rem' }}>
-            Join the waitlist and get early access when Brisvora for Hotels goes live.
+            Join the waitlist and get early access when Marketing OS for Hotels goes live.
           </p>
           <Link href="/register" className="btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.82rem' }}>
             Join Waitlist →

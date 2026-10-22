@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import PhoneInput from '@/components/PhoneInput'
@@ -220,20 +219,10 @@ useEffect(() => {
           <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', background: 'radial-gradient(ellipse, rgba(201,168,76,0.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
           
           <div style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '48px' }}>
-              <div style={{
-                width: '40px', height: '40px', borderRadius: '10px',
-                background: 'linear-gradient(135deg, var(--gold-dim), rgba(201,168,76,0.05))',
-                border: '1px solid var(--gold-border)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Image src="/Brisvora.png" alt="Brisvora" width={30} height={30} className="logo-img" style={{ objectFit: 'contain' }} />
-              </div>
-              <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--text-primary)', letterSpacing: '0.04em' }}>
-                Brisvora
-                <span style={{ color: 'var(--gold)', fontSize: '0.55rem', verticalAlign: 'super', marginLeft: '2px' }}>™</span>
-              </span>
-            </div>
+            <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', color: 'var(--text-primary)', letterSpacing: '0.04em', marginBottom: '48px', display: 'inline-block' }}>
+              Marketing OS
+              <span style={{ color: 'var(--gold)', fontSize: '0.55rem', verticalAlign: 'super', marginLeft: '2px' }}>™</span>
+            </span>
             <h2 style={{ fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', fontSize: 'clamp(1.75rem, 2.5vw, 2.5rem)', fontWeight: 400, lineHeight: 1.15, marginBottom: '20px' }}>
               Turn a WhatsApp<br />message into a<br />
               <span style={{
@@ -266,7 +255,7 @@ useEffect(() => {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', position: 'relative' }}>© 2026 Brisvora. All rights reserved.</p>
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', position: 'relative' }}>© 2026 Marketing OS. All rights reserved.</p>
         </div>
 
       </div>

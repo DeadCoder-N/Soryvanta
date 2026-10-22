@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
-import { getBrokerAnalytics, getBrokerLeads } from '@brisvora/api'
-import { prisma } from '@brisvora/shared'
+import { getBrokerAnalytics, getBrokerLeads } from '@marketing-os/api'
+import { prisma } from '@marketing-os/shared'
 import Link from 'next/link'
 import {
   IcoBuilding, IcoEye, IcoMessage, IcoTarget,

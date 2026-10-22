@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Professional Services — AI Portfolio Pages & Consultation Automation',
-  description: 'Brisvora helps lawyers, consultants, and professionals create AI-powered service pages, automate consultations, and rank on Google.',
+  description: 'Marketing OS helps lawyers, consultants, and professionals create AI-powered service pages, automate consultations, and rank on Google.',
 }
 
 const FEATURES = [
@@ -24,7 +24,7 @@ export default function ProfessionalServicesPage() {
         label="Professional Services"
         title="AI-Powered Service Pages for"
         titleGold="Professionals & Consultants."
-        description="Create professional portfolio pages, automate consultation bookings, and rank on Google — all from a single WhatsApp message. Coming soon to Brisvora."
+        description="Create professional portfolio pages, automate consultation bookings, and rank on Google — all from a single WhatsApp message. Coming soon to Marketing OS."
         badge="Coming Soon"
         cta={{ label: 'Join Waitlist →', href: '/register' }}
         ctaSecondary={{ label: 'View All Solutions', href: '/solutions' }}
@@ -53,7 +53,7 @@ export default function ProfessionalServicesPage() {
             Be first when<br /><span style={{ color: 'var(--gold)' }}>Professional Services launches.</span>
           </h2>
           <p style={{ fontSize: 'clamp(0.82rem,1.2vw,0.95rem)', color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: '2rem' }}>
-            Join the waitlist and get early access when Brisvora for Professional Services goes live.
+            Join the waitlist and get early access when Marketing OS for Professional Services goes live.
           </p>
           <Link href="/register" className="btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.82rem' }}>Join Waitlist →</Link>
         </div>

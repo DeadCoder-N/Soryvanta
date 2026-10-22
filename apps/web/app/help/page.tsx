@@ -6,7 +6,7 @@ import HoverCard from '@/components/HoverCard'
 
 export const metadata: Metadata = {
   title: 'Help Center — Support & FAQs',
-  description: 'Find answers to common questions, troubleshoot issues, and get support from the Brisvora team.',
+  description: 'Find answers to common questions, troubleshoot issues, and get support from the Marketing OS team.',
 }
 
 const TOPICS = [

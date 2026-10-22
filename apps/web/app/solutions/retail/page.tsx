@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Retail & E-commerce — AI Product Pages & Customer Automation',
-  description: 'Brisvora helps retail businesses create AI-powered product pages, automate customer enquiries, and rank on Google.',
+  description: 'Marketing OS helps retail businesses create AI-powered product pages, automate customer enquiries, and rank on Google.',
 }
 
 const FEATURES = [
@@ -24,7 +24,7 @@ export default function RetailPage() {
         label="Retail & E-commerce"
         title="AI-Powered Product Pages for"
         titleGold="Retail Businesses."
-        description="Create stunning product showcase pages, automate customer enquiries, and rank on Google — all from a single WhatsApp message. Coming soon to Brisvora."
+        description="Create stunning product showcase pages, automate customer enquiries, and rank on Google — all from a single WhatsApp message. Coming soon to Marketing OS."
         badge="Coming Soon"
         cta={{ label: 'Join Waitlist →', href: '/register' }}
         ctaSecondary={{ label: 'View All Solutions', href: '/solutions' }}
@@ -53,7 +53,7 @@ export default function RetailPage() {
             Be first when<br /><span style={{ color: 'var(--gold)' }}>Retail launches.</span>
           </h2>
           <p style={{ fontSize: 'clamp(0.82rem,1.2vw,0.95rem)', color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: '2rem' }}>
-            Join the waitlist and get early access when Brisvora for Retail goes live.
+            Join the waitlist and get early access when Marketing OS for Retail goes live.
           </p>
           <Link href="/register" className="btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.82rem' }}>Join Waitlist →</Link>
         </div>

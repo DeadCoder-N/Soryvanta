@@ -3,8 +3,8 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Brisvora',
-  description: 'How Brisvora collects, uses, and protects your personal information.',
+  title: 'Privacy Policy — Marketing OS',
+  description: 'How Marketing OS collects, uses, and protects your personal information.',
 }
 
 const SECTIONS = [
@@ -40,13 +40,13 @@ For full details on our cookie usage, see our Cookie Policy.`,
   },
   {
     title: 'Your Rights',
-    content: `You have the right to access, correct, or delete your personal data at any time. You may also request a copy of your data in a portable format. To exercise any of these rights, contact us at privacy@brisvora.com.
+    content: `You have the right to access, correct, or delete your personal data at any time. You may also request a copy of your data in a portable format. To exercise any of these rights, contact us at privacy@marketingos.in.
 
 If you are located in the European Union, you have additional rights under GDPR including the right to object to processing and the right to lodge a complaint with a supervisory authority.`,
   },
   {
     title: 'Changes to This Policy',
-    content: `We may update this Privacy Policy from time to time. We will notify you of significant changes by email or through a notice on the platform. Your continued use of Brisvora after changes take effect constitutes your acceptance of the updated policy.`,
+    content: `We may update this Privacy Policy from time to time. We will notify you of significant changes by email or through a notice on the platform. Your continued use of Marketing OS after changes take effect constitutes your acceptance of the updated policy.`,
   },
 ]
 
@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
         label="Legal"
         title="Privacy"
         titleGold="Policy."
-        description="Last updated: July 2026. This policy explains how Brisvora Technologies collects, uses, and protects your information."
+        description="Last updated: July 2026. This policy explains how Marketing OS Technologies collects, uses, and protects your information."
       />
 
       <section style={{
@@ -96,10 +96,10 @@ export default function PrivacyPolicyPage() {
         }}>
           <p style={{ fontSize: 'clamp(0.72rem,1.05vw,0.82rem)', color: 'var(--text-muted)', lineHeight: 1.7 }}>
             Questions about this policy? Contact us at{' '}
-            <a href="mailto:privacy@brisvora.com" style={{ color: 'var(--gold)', textDecoration: 'none' }}>
-              privacy@brisvora.com
+            <a href="mailto:privacy@marketingos.in" style={{ color: 'var(--gold)', textDecoration: 'none' }}>
+              privacy@marketingos.in
             </a>
-            {' '}or write to Brisvora Technologies, India.
+            {' '}or write to Marketing OS Technologies, India.
           </p>
         </div>
       </section>

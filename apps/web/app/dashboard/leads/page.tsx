@@ -1,5 +1,5 @@
 import { auth } from '@/auth'
-import { getBrokerLeads } from '@brisvora/api'
+import { getBrokerLeads } from '@marketing-os/api'
 import LeadsClient from './LeadsClient'
 
 export default async function LeadsPage() {

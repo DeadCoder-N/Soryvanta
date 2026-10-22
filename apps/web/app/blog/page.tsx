@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Blog — AI, Growth & Business Insights',
-  description: 'Insights on AI, WhatsApp automation, SEO, and business growth from the Brisvora team.',
+  description: 'Insights on AI, WhatsApp automation, SEO, and business growth from the Marketing OS team.',
 }
 
 const POSTS = [
@@ -43,8 +43,8 @@ const POSTS = [
   },
   {
     category: 'Product',
-    title: 'Introducing Brisvora: AI-Powered Growth for Every Business',
-    desc: 'We built Brisvora because we saw how much time small business owners waste on tasks AI can handle in seconds.',
+    title: 'Introducing Marketing OS: AI-Powered Growth for Every Business',
+    desc: 'We built Marketing OS because we saw how much time small business owners waste on tasks AI can handle in seconds.',
     date: 'June 2026',
     readTime: '3 min read',
     href: '/blog',

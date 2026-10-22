@@ -4,8 +4,8 @@ import PageHero from '@/components/PageHero'
 import DocLink from './DocLink'
 
 export const metadata: Metadata = {
-  title: 'Documentation — Brisvora Developer & User Docs',
-  description: 'Everything you need to get started with Brisvora. Guides, API reference, WhatsApp setup, and integration documentation.',
+  title: 'Documentation — Marketing OS Developer & User Docs',
+  description: 'Everything you need to get started with Marketing OS. Guides, API reference, WhatsApp setup, and integration documentation.',
 }
 
 const SECTIONS = [
@@ -45,7 +45,7 @@ const SECTIONS = [
   {
     icon: '◎',
     title: 'SEO & Analytics',
-    desc: 'Understand how Brisvora optimizes your pages for Google and tracks performance.',
+    desc: 'Understand how Marketing OS optimizes your pages for Google and tracks performance.',
     links: [
       { label: 'SEO Optimization Guide', href: '/docs' },
       { label: 'Analytics Dashboard', href: '/docs' },
@@ -56,7 +56,7 @@ const SECTIONS = [
   {
     icon: '▲',
     title: 'API Reference',
-    desc: 'Integrate Brisvora into your own systems using our REST API.',
+    desc: 'Integrate Marketing OS into your own systems using our REST API.',
     links: [
       { label: 'Authentication', href: '/api' },
       { label: 'Listings API', href: '/api' },
@@ -83,8 +83,8 @@ export default function DocsPage() {
       <PageHero
         label="Documentation"
         title="Everything You Need to"
-        titleGold="Build with Brisvora."
-        description="Guides, API reference, and tutorials to help you get the most out of Brisvora. From first setup to advanced automation."
+        titleGold="Build with Marketing OS."
+        description="Guides, API reference, and tutorials to help you get the most out of Marketing OS. From first setup to advanced automation."
         cta={{ label: 'Quick Start →', href: '/docs' }}
         ctaSecondary={{ label: 'API Reference', href: '/api' }}
       />

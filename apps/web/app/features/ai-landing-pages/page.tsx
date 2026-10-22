@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'AI Landing Pages — Generate Pages from WhatsApp',
-  description: 'Brisvora generates SEO-optimized landing pages from a single WhatsApp message in under 60 seconds. No design skills, no technical knowledge required.',
+  description: 'Marketing OS generates SEO-optimized landing pages from a single WhatsApp message in under 60 seconds. No design skills, no technical knowledge required.',
 }
 
 const CAPABILITIES = [
@@ -24,7 +24,7 @@ export default function AILandingPagesPage() {
         label="AI Landing Pages"
         title="Generate Pages from"
         titleGold="a Single WhatsApp Message."
-        description="Send your business details via WhatsApp. Brisvora AI builds a professional, SEO-optimized landing page in under 60 seconds — no design skills required."
+        description="Send your business details via WhatsApp. Marketing OS AI builds a professional, SEO-optimized landing page in under 60 seconds — no design skills required."
         badge="Live · Available Now"
         cta={{ label: 'Start Building Free →', href: '/register' }}
         ctaSecondary={{ label: 'Explore All Features', href: '/features' }}

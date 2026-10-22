@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Healthcare Clinics — AI Appointment Pages & Patient Automation',
-  description: 'Brisvora helps healthcare clinics create AI-powered appointment pages, automate patient enquiries, and rank on Google.',
+  description: 'Marketing OS helps healthcare clinics create AI-powered appointment pages, automate patient enquiries, and rank on Google.',
 }
 
 const FEATURES = [
@@ -24,7 +24,7 @@ export default function HealthcarePage() {
         label="Healthcare"
         title="AI-Powered Clinic Pages for"
         titleGold="Healthcare Professionals."
-        description="Create professional appointment pages, automate patient enquiries, and rank on Google — all from a single WhatsApp message. Coming soon to Brisvora."
+        description="Create professional appointment pages, automate patient enquiries, and rank on Google — all from a single WhatsApp message. Coming soon to Marketing OS."
         badge="Coming Soon"
         cta={{ label: 'Join Waitlist →', href: '/register' }}
         ctaSecondary={{ label: 'View All Solutions', href: '/solutions' }}
@@ -53,7 +53,7 @@ export default function HealthcarePage() {
             Be first when<br /><span style={{ color: 'var(--gold)' }}>Healthcare launches.</span>
           </h2>
           <p style={{ fontSize: 'clamp(0.82rem,1.2vw,0.95rem)', color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: '2rem' }}>
-            Join the waitlist and get early access when Brisvora for Healthcare goes live.
+            Join the waitlist and get early access when Marketing OS for Healthcare goes live.
           </p>
           <Link href="/register" className="btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.82rem' }}>Join Waitlist →</Link>
         </div>

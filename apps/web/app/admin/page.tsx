@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import Link from 'next/link'
-import { formatPrice } from '@brisvora/shared'
+import { formatPrice } from '@marketing-os/shared'
 
 type GroupByResult = { status?: string; type?: string; _count: number }
 type RecentUser = { id: string; name: string | null; email: string; role: string; createdAt: Date }
@@ -69,7 +69,7 @@ const statusColor: Record<string, string> = {
 
 export default async function AdminOverviewPage() {
   const session = await auth()
-  const { prisma } = await import('@brisvora/shared')
+  const { prisma } = await import('@marketing-os/shared')
 
   const totalUsers        = await prisma.user.count()
   const totalProperties   = await prisma.property.count()

@@ -6,9 +6,9 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 const CONTACT_OPTIONS = [
-  { icon: '◉', title: 'General Enquiries', desc: 'Questions about Brisvora, partnerships, or press.', email: 'hello@brisvora.in' },
-  { icon: '✦', title: 'Sales', desc: 'Talk to our team about Business or Enterprise plans.', email: 'sales@brisvora.in' },
-  { icon: '◈', title: 'Support', desc: 'Need help with your account or a technical issue?', email: 'support@brisvora.in' },
+  { icon: '◉', title: 'General Enquiries', desc: 'Questions about Marketing OS, partnerships, or press.', email: 'hello@marketingos.in' },
+  { icon: '✦', title: 'Sales', desc: 'Talk to our team about Business or Enterprise plans.', email: 'sales@marketingos.in' },
+  { icon: '◈', title: 'Support', desc: 'Need help with your account or a technical issue?', email: 'support@marketingos.in' },
 ]
 
 export default function ContactPage() {

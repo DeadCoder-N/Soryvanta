@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Real Estate — AI Listings & Lead Automation',
-  description: 'Brisvora helps property brokers generate AI-powered listings from WhatsApp, capture leads automatically, and rank on Google — all in under 60 seconds.',
+  description: 'Marketing OS helps property brokers generate AI-powered listings from WhatsApp, capture leads automatically, and rank on Google — all in under 60 seconds.',
 }
 
 const FEATURES = [
@@ -160,7 +160,7 @@ export default function RealEstatePage() {
             color: 'var(--text-secondary)', lineHeight: 1.75,
             marginBottom: 'clamp(1.5rem,3vw,2.5rem)',
           }}>
-            Join brokers already using Brisvora to generate listings, capture leads, and grow faster with AI.
+            Join brokers already using Marketing OS to generate listings, capture leads, and grow faster with AI.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/register" className="btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.82rem' }}>

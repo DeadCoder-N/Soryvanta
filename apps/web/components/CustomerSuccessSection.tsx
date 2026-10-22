@@ -96,7 +96,7 @@ const TRUST_ELEMENTS = [
 
 const SUCCESS_TIMELINE = [
   { step: 1, label: 'Business Challenge', icon: '⬡' },
-  { step: 2, label: 'Used Brisvora', icon: '✦' },
+  { step: 2, label: 'Used Marketing OS', icon: '✦' },
   { step: 3, label: 'Generated Landing Page', icon: '◈' },
   { step: 4, label: 'Improved Workflow', icon: '▲' },
   { step: 5, label: 'Collected Leads', icon: '◉' },
@@ -200,7 +200,7 @@ export default function CustomerSuccessSection() {
               maxWidth: '56ch', margin: '0 auto',
             }}
           >
-            Every improvement inside Brisvora is driven by real business workflows, user feedback and continuous iteration. Here is how businesses are growing with the platform.
+            Every improvement inside Marketing OS is driven by real business workflows, user feedback and continuous iteration. Here is how businesses are growing with the platform.
           </p>
         </div>
 
@@ -578,7 +578,7 @@ export default function CustomerSuccessSection() {
                     gap: '0.4rem',
                   }}>
                     <span style={{ color: 'var(--gold)' }}>✦</span>
-                    Brisvora Solution
+                    Marketing OS Solution
                   </p>
                   <p style={{
                     fontSize: 'clamp(0.7rem,1.1vw,0.82rem)',

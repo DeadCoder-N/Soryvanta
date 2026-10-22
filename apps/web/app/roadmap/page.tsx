@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Roadmap — What We Are Building Next',
-  description: 'See what the Brisvora team is working on. Upcoming features, industry expansions, and platform improvements.',
+  description: 'See what the Marketing OS team is working on. Upcoming features, industry expansions, and platform improvements.',
 }
 
 const SHIPPED = [
@@ -42,7 +42,7 @@ export default function RoadmapPage() {
         label="Roadmap"
         title="What We Are"
         titleGold="Building Next."
-        description="A transparent look at what the Brisvora team has shipped, what we are working on right now, and what is coming next."
+        description="A transparent look at what the Marketing OS team has shipped, what we are working on right now, and what is coming next."
       />
 
       <section style={{
@@ -166,7 +166,7 @@ export default function RoadmapPage() {
             Have a feature request?
           </p>
           <p style={{ fontSize: 'clamp(0.72rem,1.05vw,0.82rem)', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
-            We build what our users need. Tell us what would make Brisvora better for you.
+            We build what our users need. Tell us what would make Marketing OS better for you.
           </p>
           <Link href="/contact" className="btn-primary" style={{ padding: '0.85rem 1.75rem', fontSize: '0.8rem' }}>
             Suggest a Feature

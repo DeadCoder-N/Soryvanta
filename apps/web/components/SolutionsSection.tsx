@@ -177,7 +177,7 @@ export default function SolutionsSection() {
               maxWidth: '52ch', margin: '0 auto',
             }}
           >
-            Every industry has different challenges. Brisvora adapts its AI workflows, landing pages, automation and analytics to match each business type.
+            Every industry has different challenges. Marketing OS adapts its AI workflows, landing pages, automation and analytics to match each business type.
           </p>
         </div>
 

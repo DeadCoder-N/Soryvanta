@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Restaurants & Cafés — AI Menu Pages & Reservation Automation',
-  description: 'Brisvora helps restaurants and cafés create AI-powered menu pages, automate reservations, and improve Google visibility.',
+  description: 'Marketing OS helps restaurants and cafés create AI-powered menu pages, automate reservations, and improve Google visibility.',
 }
 
 const FEATURES = [
@@ -24,7 +24,7 @@ export default function RestaurantsPage() {
         label="Restaurants & Cafés"
         title="AI-Powered Menu Pages for"
         titleGold="Restaurants & Cafés."
-        description="Create stunning menu pages, automate reservations, and rank on Google — all from a single WhatsApp message. Coming soon to Brisvora."
+        description="Create stunning menu pages, automate reservations, and rank on Google — all from a single WhatsApp message. Coming soon to Marketing OS."
         badge="Coming Soon"
         cta={{ label: 'Join Waitlist →', href: '/register' }}
         ctaSecondary={{ label: 'View All Solutions', href: '/solutions' }}
@@ -53,7 +53,7 @@ export default function RestaurantsPage() {
             Be first when<br /><span style={{ color: 'var(--gold)' }}>Restaurants launches.</span>
           </h2>
           <p style={{ fontSize: 'clamp(0.82rem,1.2vw,0.95rem)', color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: '2rem' }}>
-            Join the waitlist and get early access when Brisvora for Restaurants goes live.
+            Join the waitlist and get early access when Marketing OS for Restaurants goes live.
           </p>
           <Link href="/register" className="btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.82rem' }}>Join Waitlist →</Link>
         </div>

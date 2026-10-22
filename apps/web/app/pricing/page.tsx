@@ -2,14 +2,15 @@ import type { Metadata } from 'next'
 import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 import PricingSection from '@/components/PricingSection'
+import { getCanonicalUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
-  title: 'Pricing — Brisvora Plans & Features',
+  title: 'Pricing — Marketing OS Plans & Features',
   description: 'Simple, transparent pricing for every stage of growth. Start free, scale as you grow. No hidden fees. Cancel anytime.',
   openGraph: {
-    title: 'Brisvora Pricing — Start Free, Scale Without Limits',
+    title: 'Marketing OS Pricing — Start Free, Scale Without Limits',
     description: 'Choose the plan that fits your brokerage. From solo brokers to large agencies.',
-    url: 'https://brisvora.vercel.app/pricing',
+    url: `${getCanonicalUrl()}/pricing`,
   },
 }
 

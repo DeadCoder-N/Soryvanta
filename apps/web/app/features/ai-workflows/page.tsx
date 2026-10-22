@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'AI Workflows — Automate Repetitive Tasks',
-  description: 'Brisvora AI Workflows automate your repetitive business tasks. From lead follow-ups to page updates — let AI handle the routine.',
+  description: 'Marketing OS AI Workflows automate your repetitive business tasks. From lead follow-ups to page updates — let AI handle the routine.',
 }
 
 const CAPABILITIES = [
@@ -24,7 +24,7 @@ export default function AIWorkflowsPage() {
         label="AI Workflows"
         title="Automate the Routine."
         titleGold="Focus on What Matters."
-        description="Brisvora AI Workflows handle your repetitive tasks automatically — lead follow-ups, page updates, notifications, and routing. Set it once, let AI run it forever."
+        description="Marketing OS AI Workflows handle your repetitive tasks automatically — lead follow-ups, page updates, notifications, and routing. Set it once, let AI run it forever."
         badge="Coming Soon"
         cta={{ label: 'Join Waitlist →', href: '/register' }}
         ctaSecondary={{ label: 'Explore All Features', href: '/features' }}

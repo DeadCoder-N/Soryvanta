@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 import DashboardSidebar from './DashboardSidebar'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

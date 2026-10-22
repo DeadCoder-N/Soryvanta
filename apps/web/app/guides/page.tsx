@@ -4,8 +4,8 @@ import PageHero from '@/components/PageHero'
 import HoverCard from '@/components/HoverCard'
 
 export const metadata: Metadata = {
-  title: 'Guides — Step-by-Step Tutorials for Brisvora',
-  description: 'Step-by-step guides to help you get the most out of Brisvora. From setup to advanced automation.',
+  title: 'Guides — Step-by-Step Tutorials for Marketing OS',
+  description: 'Step-by-step guides to help you get the most out of Marketing OS. From setup to advanced automation.',
 }
 
 const GUIDES = [
@@ -31,7 +31,7 @@ const GUIDES = [
     icon: '◎',
     level: 'Intermediate',
     title: 'SEO Guide: Ranking Your Listings on Google',
-    desc: 'Understand how Brisvora\'s SEO engine works and what you can do to maximize your Google rankings.',
+    desc: 'Understand how Marketing OS\'s SEO engine works and what you can do to maximize your Google rankings.',
     steps: 5,
     time: '12 min',
     href: '/guides',
@@ -40,7 +40,7 @@ const GUIDES = [
     icon: '◈',
     level: 'Intermediate',
     title: 'Lead Management: From Capture to Conversion',
-    desc: 'How to use Brisvora\'s lead dashboard to track, organize, and convert every enquiry into a deal.',
+    desc: 'How to use Marketing OS\'s lead dashboard to track, organize, and convert every enquiry into a deal.',
     steps: 7,
     time: '18 min',
     href: '/guides',
@@ -82,7 +82,7 @@ export default function GuidesPage() {
       <PageHero
         label="Guides"
         title="Step-by-Step Tutorials to"
-        titleGold="Master Brisvora."
+        titleGold="Master Marketing OS."
         description="Practical, step-by-step guides that take you from setup to advanced automation. Learn at your own pace."
         cta={{ label: 'Start with Basics →', href: '/guides' }}
         ctaSecondary={{ label: 'Read Documentation', href: '/docs' }}

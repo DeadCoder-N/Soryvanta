@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
+import { getContactEmails } from '@/lib/contact'
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy — Brisvora',
-  description: 'How Brisvora uses cookies and similar tracking technologies on the platform.',
+  title: 'Cookie Policy — Marketing OS',
+  description: 'How Marketing OS uses cookies and similar tracking technologies on the platform.',
 }
 
 const COOKIE_TYPES = [
@@ -35,13 +36,14 @@ const COOKIE_TYPES = [
 ]
 
 export default function CookiesPage() {
+  const { privacy } = getContactEmails()
   return (
     <MarketingLayout>
       <PageHero
         label="Legal"
         title="Cookie"
         titleGold="Policy."
-        description="Last updated: July 2026. This policy explains how Brisvora uses cookies and how you can control them."
+        description="Last updated: July 2026. This policy explains how Marketing OS uses cookies and how you can control them."
       />
 
       <section style={{
@@ -54,7 +56,7 @@ export default function CookiesPage() {
             fontSize: 'clamp(0.75rem,1.1vw,0.85rem)',
             color: 'var(--text-secondary)', lineHeight: 1.8,
           }}>
-            Cookies are small text files stored on your device when you visit a website. Brisvora uses cookies to keep you signed in, remember your preferences, and understand how the platform is used. You can control non-essential cookies through your browser settings.
+            Cookies are small text files stored on your device when you visit a website. Marketing OS uses cookies to keep you signed in, remember your preferences, and understand how the platform is used. You can control non-essential cookies through your browser settings.
           </p>
         </div>
 
@@ -121,8 +123,8 @@ export default function CookiesPage() {
             color: 'var(--text-muted)', lineHeight: 1.7,
           }}>
             To manage cookies, adjust your browser settings or contact us at{' '}
-            <a href="mailto:privacy@brisvora.com" style={{ color: 'var(--gold)', textDecoration: 'none' }}>
-              privacy@brisvora.com
+            <a href={`mailto:${privacy}`} style={{ color: 'var(--gold)', textDecoration: 'none' }}>
+              {privacy}
             </a>
           </p>
         </div>

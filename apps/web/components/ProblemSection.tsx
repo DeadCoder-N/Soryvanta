@@ -339,7 +339,7 @@ export default function ProblemSection() {
               onMouseEnter={e => e.currentTarget.style.opacity = '1'}
               onMouseLeave={e => e.currentTarget.style.opacity = '0.7'}
             >
-              This is why Brisvora exists
+              This is why Marketing OS exists
               <span style={{ fontSize: '0.8em' }}>↓</span>
             </Link>
           </div>

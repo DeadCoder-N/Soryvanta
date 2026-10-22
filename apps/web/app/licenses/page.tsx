@@ -3,8 +3,8 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
-  title: 'Licenses — Brisvora',
-  description: 'Open source licenses and third-party attributions used in the Brisvora platform.',
+  title: 'Licenses — Marketing OS',
+  description: 'Open source licenses and third-party attributions used in the Marketing OS platform.',
 }
 
 const LICENSES = [
@@ -71,7 +71,7 @@ export default function LicensesPage() {
         label="Legal"
         title="Open Source"
         titleGold="Licenses."
-        description="Brisvora is built on the shoulders of great open source software. Here are the third-party libraries and their licenses."
+        description="Marketing OS is built on the shoulders of great open source software. Here are the third-party libraries and their licenses."
       />
 
       <section style={{
@@ -135,9 +135,9 @@ export default function LicensesPage() {
           borderRadius: 'var(--radius-xl)',
         }}>
           <p style={{ fontSize: 'clamp(0.72rem,1.05vw,0.82rem)', color: 'var(--text-muted)', lineHeight: 1.7 }}>
-            The Brisvora platform itself is proprietary software. All rights reserved. For licensing inquiries, contact{' '}
-            <a href="mailto:legal@brisvora.com" style={{ color: 'var(--gold)', textDecoration: 'none' }}>
-              legal@brisvora.com
+            The Marketing OS platform itself is proprietary software. All rights reserved. For licensing inquiries, contact{' '}
+            <a href="mailto:legal@marketingos.in" style={{ color: 'var(--gold)', textDecoration: 'none' }}>
+              legal@marketingos.in
             </a>
           </p>
         </div>

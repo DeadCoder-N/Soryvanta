@@ -152,7 +152,7 @@ export default function IntegrationsSection() {
               maxWidth: '52ch', margin: '0 auto',
             }}
           >
-            Brisvora connects communication, AI, websites, analytics and marketing into one seamless workflow — without replacing the tools you already use.
+            Marketing OS connects communication, AI, websites, analytics and marketing into one seamless workflow — without replacing the tools you already use.
           </p>
         </div>
 
@@ -213,7 +213,7 @@ export default function IntegrationsSection() {
                 fontSize: 'clamp(0.36rem,0.58vw,0.44rem)',
                 letterSpacing: '0.14em', textTransform: 'uppercase',
                 color: 'var(--gold)', textAlign: 'center', lineHeight: 1.3,
-              }}>Brisvora</p>
+              }}>Marketing OS</p>
             </div>
           </div>
 

@@ -4,8 +4,8 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
-  title: 'Webhooks — Brisvora Real-Time Events',
-  description: 'Receive real-time event notifications from Brisvora. Connect your systems to leads, listings, and analytics events.',
+  title: 'Webhooks — Marketing OS Real-Time Events',
+  description: 'Receive real-time event notifications from Marketing OS. Connect your systems to leads, listings, and analytics events.',
 }
 
 const EVENTS = [
@@ -25,7 +25,7 @@ export default function WebhooksPage() {
         label="Webhooks"
         title="Real-Time"
         titleGold="Event Notifications."
-        description="Subscribe to Brisvora events and receive instant HTTP POST notifications to your endpoint. Build automations, sync CRMs, and trigger workflows in real time."
+        description="Subscribe to Marketing OS events and receive instant HTTP POST notifications to your endpoint. Build automations, sync CRMs, and trigger workflows in real time."
       />
 
       <section style={{
@@ -51,7 +51,7 @@ export default function WebhooksPage() {
             {[
               { step: '01', title: 'Register Endpoint', desc: 'Provide your HTTPS endpoint URL in the dashboard.' },
               { step: '02', title: 'Select Events', desc: 'Choose which events you want to subscribe to.' },
-              { step: '03', title: 'Receive Payloads', desc: 'Brisvora sends a signed JSON POST to your endpoint instantly.' },
+              { step: '03', title: 'Receive Payloads', desc: 'Marketing OS sends a signed JSON POST to your endpoint instantly.' },
             ].map(s => (
               <div key={s.step} style={{
                 padding: 'clamp(1rem,2vw,1.5rem)',

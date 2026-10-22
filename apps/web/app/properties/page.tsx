@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { searchListings } from '@brisvora/api'
-import { formatPrice } from '@brisvora/shared'
+import { searchListings } from '@marketing-os/api'
+import { formatPrice } from '@marketing-os/shared'
 import { auth } from '@/auth'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -18,7 +18,7 @@ type SearchListing = {
 }
 
 export const metadata = {
-  title: 'Properties — Brisvora',
+  title: 'Properties — Marketing OS',
   description: 'Browse AI-powered real estate listings. Search by city, type, BHK and price.',
 }
 

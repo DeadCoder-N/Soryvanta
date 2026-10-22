@@ -4,15 +4,15 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
-  title: 'Security — Brisvora',
-  description: 'How Brisvora protects your data and platform security practices.',
+  title: 'Security — Marketing OS',
+  description: 'How Marketing OS protects your data and platform security practices.',
 }
 
 const PRACTICES = [
   {
     icon: '◆',
     title: 'Encryption in Transit',
-    desc: 'All data transmitted between your browser and Brisvora is encrypted using TLS 1.3. We enforce HTTPS across all endpoints with no fallback to HTTP.',
+    desc: 'All data transmitted between your browser and Marketing OS is encrypted using TLS 1.3. We enforce HTTPS across all endpoints with no fallback to HTTP.',
   },
   {
     icon: '◆',
@@ -27,7 +27,7 @@ const PRACTICES = [
   {
     icon: '◆',
     title: 'Infrastructure Security',
-    desc: 'Brisvora runs on AWS and Supabase infrastructure with network isolation, private VPCs, and restricted access controls. Production systems are not accessible from the public internet.',
+    desc: 'Marketing OS runs on AWS and Supabase infrastructure with network isolation, private VPCs, and restricted access controls. Production systems are not accessible from the public internet.',
   },
   {
     icon: '◆',
@@ -48,7 +48,7 @@ export default function SecurityPage() {
         label="Security"
         title="Built Secure"
         titleGold="From Day One."
-        description="Security is not an afterthought at Brisvora. Every layer of the platform is designed with your data protection in mind."
+        description="Security is not an afterthought at Marketing OS. Every layer of the platform is designed with your data protection in mind."
       />
 
       <section style={{
@@ -131,10 +131,10 @@ export default function SecurityPage() {
             color: 'var(--text-secondary)', lineHeight: 1.7,
             marginBottom: '1.25rem',
           }}>
-            We take security reports seriously. If you discover a vulnerability in Brisvora, please report it responsibly. Do not publicly disclose the issue until we have had a chance to investigate and resolve it.
+            We take security reports seriously. If you discover a vulnerability in Marketing OS, please report it responsibly. Do not publicly disclose the issue until we have had a chance to investigate and resolve it.
           </p>
           <Link
-            href="mailto:security@brisvora.com"
+            href="mailto:security@marketingos.in"
             className="btn-primary"
             style={{ padding: '0.85rem 1.75rem', fontSize: '0.8rem', display: 'inline-block' }}
           >

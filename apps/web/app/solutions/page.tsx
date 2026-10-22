@@ -5,7 +5,7 @@ import HoverCard from '@/components/HoverCard'
 
 export const metadata: Metadata = {
   title: 'Solutions — AI for Every Industry',
-  description: 'Brisvora adapts its AI workflows, landing pages, and automation to match your industry. Real Estate, Hotels, Restaurants, Healthcare, Education, Retail, and more.',
+  description: 'Marketing OS adapts its AI workflows, landing pages, and automation to match your industry. Real Estate, Hotels, Restaurants, Healthcare, Education, Retail, and more.',
 }
 
 const INDUSTRIES = [
@@ -25,7 +25,7 @@ export default function SolutionsPage() {
         label="Solutions"
         title="Built for Every Business"
         titleGold="Ready to Grow."
-        description="Every industry has different challenges. Brisvora adapts its AI workflows, landing pages, automation and analytics to match each business type."
+        description="Every industry has different challenges. Marketing OS adapts its AI workflows, landing pages, automation and analytics to match each business type."
         cta={{ label: 'Start Free →', href: '/register' }}
         ctaSecondary={{ label: 'View Features', href: '/features' }}
       />

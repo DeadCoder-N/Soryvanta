@@ -51,7 +51,7 @@ export default function Hero({ isLoggedIn }: HeroProps) {
   return (
     <section
       ref={sectionRef}
-      aria-label="Brisvora — AI Growth Operating System"
+      aria-label="Marketing OS — AI Growth Operating System"
       onMouseMove={onMouseMove}
       style={{ position: 'relative', minHeight: '100svh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: 'var(--bg)' }}
     >

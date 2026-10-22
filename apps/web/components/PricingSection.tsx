@@ -126,7 +126,7 @@ const FAQ_ITEMS = [
     a: 'We accept all major credit cards, UPI, net banking, and Razorpay. Enterprise plans support invoicing.',
   },
   {
-    q: 'Can I use Brisvora for multiple businesses?',
+    q: 'Can I use Marketing OS for multiple businesses?',
     a: 'Yes. The Business and Enterprise plans support multiple businesses under a single account with separate dashboards.',
   },
   {
@@ -287,7 +287,7 @@ export default function PricingSection() {
               maxWidth: '56ch', margin: '0 auto',
             }}
           >
-            Whether you are an individual broker or a growing business, Brisvora offers flexible plans designed to support every stage of growth.
+            Whether you are an individual broker or a growing business, Marketing OS offers flexible plans designed to support every stage of growth.
           </p>
           <div className={visible && !reduced ? 'animate-fade-up delay-300' : ''} style={{ marginTop: 'clamp(1rem,2vw,1.5rem)' }}>
             <Link
@@ -757,7 +757,7 @@ export default function PricingSection() {
               lineHeight: 1.2,
             }}
           >
-            See What Brisvora Saves You
+            See What Marketing OS Saves You
           </p>
 
           <div

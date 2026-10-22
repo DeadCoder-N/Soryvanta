@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
@@ -121,36 +120,17 @@ export default function Navbar() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           gap: '16px',
         }}>
-          <Link href="/" aria-label="Brisvora home" style={{
+          <Link href="/" aria-label="Marketing OS home" style={{
             textDecoration: 'none', display: 'flex', alignItems: 'center',
             gap: '10px', flexShrink: 0,
           }}>
-            <div
-              style={{
-                width: '40px', height: '40px', borderRadius: '10px',
-                background: 'var(--gold-dim)', border: '1px solid var(--gold-border)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'transform 0.22s ease, box-shadow 0.22s ease', flexShrink: 0,
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = 'scale(1.02)'
-                e.currentTarget.style.boxShadow = '0 0 0 2px var(--gold-border), 0 4px 20px rgba(201,150,14,0.22)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
-            >
-              <Image src="/Brisvora.png" alt="Brisvora" width={26} height={26}
-                className="logo-img" style={{ objectFit: 'contain' }} priority />
-            </div>
             <span style={{
               fontFamily: 'var(--font-serif)',
               fontSize: 'clamp(1.05rem, 2vw, 1.2rem)',
               color: 'var(--text-primary)',
               letterSpacing: '0.05em', fontWeight: 400, userSelect: 'none',
             }}>
-              Brisvora
+              Marketing OS
             </span>
           </Link>
 

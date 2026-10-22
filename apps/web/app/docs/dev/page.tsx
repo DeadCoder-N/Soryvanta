@@ -4,8 +4,8 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
-  title: 'Developer Docs — Brisvora',
-  description: 'Technical documentation for developers integrating with the Brisvora platform. API reference, authentication, and guides.',
+  title: 'Developer Docs — Marketing OS',
+  description: 'Technical documentation for developers integrating with the Marketing OS platform. API reference, authentication, and guides.',
 }
 
 const SECTIONS = [
@@ -57,8 +57,8 @@ export default function DevDocsPage() {
       <PageHero
         label="Developer Docs"
         title="Build On"
-        titleGold="Brisvora."
-        description="Everything you need to integrate, extend, and automate with the Brisvora platform. APIs, SDKs, webhooks, and step-by-step guides."
+        titleGold="Marketing OS."
+        description="Everything you need to integrate, extend, and automate with the Marketing OS platform. APIs, SDKs, webhooks, and step-by-step guides."
       />
 
       <section style={{

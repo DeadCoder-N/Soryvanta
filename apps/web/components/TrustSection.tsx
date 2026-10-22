@@ -128,7 +128,7 @@ export default function TrustSection() {
               maxWidth: '52ch', margin: '0 auto',
             }}
           >
-            Brisvora combines AI automation, WhatsApp-native workflows, and SEO-first publishing to help businesses grow faster — with zero technical overhead.
+            Marketing OS combines AI automation, WhatsApp-native workflows, and SEO-first publishing to help businesses grow faster — with zero technical overhead.
           </p>
         </div>
 
@@ -399,7 +399,7 @@ export default function TrustSection() {
               marginBottom: 'clamp(1.25rem,2.5vw,1.75rem)',
               maxWidth: '38ch',
             }}>
-              From first message to indexed landing page — Brisvora handles every step so you can focus on closing deals.
+              From first message to indexed landing page — Marketing OS handles every step so you can focus on closing deals.
             </p>
 
             <Link href="/register" className="btn-primary" style={{

@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 import EditListingForm from './EditListingForm'
 
 export default async function EditListingPage({ params }: { params: Promise<{ id: string }> }) {

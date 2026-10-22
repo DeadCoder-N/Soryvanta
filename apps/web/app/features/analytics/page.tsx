@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Analytics — Views, Clicks & Conversions',
-  description: 'Brisvora analytics tracks every view, click, and conversion across all your pages and leads. Understand exactly what drives your business growth.',
+  description: 'Marketing OS analytics tracks every view, click, and conversion across all your pages and leads. Understand exactly what drives your business growth.',
 }
 
 const CAPABILITIES = [
@@ -24,7 +24,7 @@ export default function AnalyticsPage() {
         label="Analytics"
         title="Know Exactly What"
         titleGold="Drives Your Growth."
-        description="Brisvora tracks every view, click, lead, and conversion across all your pages. Make data-driven decisions without needing a data analyst."
+        description="Marketing OS tracks every view, click, lead, and conversion across all your pages. Make data-driven decisions without needing a data analyst."
         badge="Live · Available Now"
         cta={{ label: 'Start Tracking Free →', href: '/register' }}
         ctaSecondary={{ label: 'Explore All Features', href: '/features' }}

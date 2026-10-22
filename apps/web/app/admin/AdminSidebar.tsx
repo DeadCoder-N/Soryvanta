@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import SignOutButton from '../dashboard/SignOutButton'
@@ -92,9 +91,8 @@ export default function AdminSidebar({ role, email }: { role: string; email?: st
       {/* Logo + identity */}
       <div style={{ padding: '20px 16px 16px', borderBottom: '1px solid var(--border)' }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <Image src="/Brisvora.png" alt="Brisvora" width={28} height={28} style={{ objectFit: 'contain' }} className="logo-img" />
           <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1rem', color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
-            Brisvora
+            Marketing OS
             <span style={{ color: 'var(--gold)', fontSize: '0.5rem', verticalAlign: 'super', marginLeft: '2px' }}>™</span>
           </span>
         </Link>
@@ -182,7 +180,9 @@ export default function AdminSidebar({ role, email }: { role: string; email?: st
         padding: '0 1rem', height: '56px', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Image src="/Brisvora.png" alt="Brisvora" width={28} height={28} style={{ objectFit: 'contain' }} className="logo-img" />
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1rem', color: 'var(--text-primary)', letterSpacing: '0.04em', fontWeight: 400 }}>
+            Marketing OS
+          </span>
         </Link>
         <button onClick={() => setOpen(o => !o)}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--text-primary)' }}

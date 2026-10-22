@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 
 const NAV_PLATFORM = [
@@ -48,10 +47,10 @@ const TRUST_BADGES = [
 ]
 
 const SOCIALS = [
-  { label: '𝕏', href: 'https://x.com/brisvora' },
-  { label: 'in', href: 'https://linkedin.com/company/brisvora' },
-  { label: '◐', href: 'https://instagram.com/brisvora' },
-  { label: '▶', href: 'https://youtube.com/@brisvora' },
+  { label: '𝕏', href: 'https://x.com/marketingos' },
+  { label: 'in', href: 'https://linkedin.com/company/marketingos' },
+  { label: '◐', href: 'https://instagram.com/marketingos' },
+  { label: '▶', href: 'https://youtube.com/@marketingos' },
   { label: '⌂', href: 'https://github.com/DeadCoder-N/BRISVORA' },
 ]
 
@@ -146,34 +145,24 @@ export default function Footer() {
             borderBottom: '1px solid var(--border)',
           }}
         >
-          {/* ── Brand Column ── */}
+{/* ── Brand Column ── */}
           <div className={visible && !reduced.current ? 'animate-fade-up' : ''}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: 'clamp(0.75rem,1.4vw,1rem)' }}>
-              <Image
-                src="/Brisvora.png"
-                alt="Brisvora"
-                width={32}
-                height={32}
-                className="logo-img"
-                style={{ objectFit: 'contain', flexShrink: 0 }}
-              />
+            <span style={{
+              fontFamily: "'Playfair Display', var(--font-serif), serif",
+              fontSize: 'clamp(0.95rem,1.5vw,1.15rem)',
+              color: 'var(--text-primary)',
+              letterSpacing: '0.04em',
+            }}>
+              Marketing OS
               <span style={{
-                fontFamily: "'Playfair Display', var(--font-serif), serif",
-                fontSize: 'clamp(0.95rem,1.5vw,1.15rem)',
-                color: 'var(--text-primary)',
-                letterSpacing: '0.04em',
+                color: 'var(--gold)',
+                fontSize: '0.5rem',
+                verticalAlign: 'super',
+                marginLeft: '2px',
               }}>
-                Brisvora
-                <span style={{
-                  color: 'var(--gold)',
-                  fontSize: '0.5rem',
-                  verticalAlign: 'super',
-                  marginLeft: '2px',
-                }}>
-                  ™
-                </span>
+                ™
               </span>
-            </div>
+            </span>
 
             <p style={{
               fontFamily: "'Playfair Display', serif",
@@ -193,7 +182,7 @@ export default function Footer() {
               maxWidth: '300px',
               marginBottom: 'clamp(1rem,2vw,1.5rem)',
             }}>
-              Brisvora brings AI, automation, SEO and business growth together into one intelligent platform built for modern businesses.
+              Marketing OS brings AI, automation, SEO and business growth together into one intelligent platform built for modern businesses.
             </p>
 
             {/* Product Status */}
@@ -588,7 +577,7 @@ export default function Footer() {
             fontSize: 'clamp(0.55rem,0.85vw,0.65rem)',
             color: 'var(--text-muted)',
           }}>
-            © 2026 Brisvora Technologies. Built for businesses that grow.
+            © 2026 Marketing OS Technologies. Built for businesses that grow.
           </p>
           <p style={{
             fontSize: 'clamp(0.5rem,0.78vw,0.6rem)',

@@ -4,8 +4,8 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
-  title: 'SDKs — Brisvora Developer Tools',
-  description: 'Official Brisvora SDKs for JavaScript, Python, and more. Integrate Brisvora into your application in minutes.',
+  title: 'SDKs — Marketing OS Developer Tools',
+  description: 'Official Marketing OS SDKs for JavaScript, Python, and more. Integrate Marketing OS into your application in minutes.',
 }
 
 const SDKS = [
@@ -13,21 +13,21 @@ const SDKS = [
     lang: 'JavaScript / TypeScript',
     status: 'coming-soon',
     icon: '⬡',
-    desc: 'Full-featured SDK for Node.js and browser environments. Supports all Brisvora API endpoints with TypeScript types included.',
-    install: 'npm install @brisvora/sdk',
+    desc: 'Full-featured SDK for Node.js and browser environments. Supports all Marketing OS API endpoints with TypeScript types included.',
+    install: 'npm install @marketing-os/sdk',
   },
   {
     lang: 'Python',
     status: 'coming-soon',
     icon: '⬡',
     desc: 'Python SDK for server-side integrations. Ideal for data pipelines, automation scripts, and backend services.',
-    install: 'pip install brisvora',
+    install: 'pip install marketing-os',
   },
   {
     lang: 'REST API',
     status: 'available',
     icon: '◆',
-    desc: 'Use the Brisvora REST API directly from any language or platform. Full documentation with request and response examples.',
+    desc: 'Use the Marketing OS REST API directly from any language or platform. Full documentation with request and response examples.',
     install: null,
   },
 ]
@@ -38,8 +38,8 @@ export default function SdksPage() {
       <PageHero
         label="SDKs"
         title="Build With"
-        titleGold="Brisvora."
-        description="Official client libraries and developer tools to integrate Brisvora into your application. REST API available now — language SDKs coming soon."
+        titleGold="Marketing OS."
+        description="Official client libraries and developer tools to integrate Marketing OS into your application. REST API available now — language SDKs coming soon."
       />
 
       <section style={{

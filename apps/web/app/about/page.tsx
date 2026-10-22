@@ -4,13 +4,13 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
-  title: 'About — The Story Behind Brisvora',
-  description: 'Brisvora is an AI-powered growth platform built for businesses that want to grow faster with less effort. Learn about our mission and team.',
+  title: 'About — The Story Behind Marketing OS',
+  description: 'Marketing OS is an AI-powered growth platform built for businesses that want to grow faster with less effort. Learn about our mission and team.',
 }
 
 const VALUES = [
   { icon: '✦', title: 'AI-First', desc: 'We believe AI should do the heavy lifting. Every feature we build starts with the question: can AI handle this better than a human?' },
-  { icon: '◉', title: 'WhatsApp Native', desc: 'India runs on WhatsApp. We built Brisvora to work where your customers already are — no new apps, no friction.' },
+  { icon: '◉', title: 'WhatsApp Native', desc: 'India runs on WhatsApp. We built Marketing OS to work where your customers already are — no new apps, no friction.' },
   { icon: '◎', title: 'Radical Simplicity', desc: 'The best tool is the one you actually use. We obsess over making complex things feel effortless.' },
   { icon: '◈', title: 'Built for India', desc: 'We understand the Indian market — the languages, the workflows, the way business actually gets done here.' },
   { icon: '▲', title: 'Transparent', desc: 'No hidden fees, no dark patterns, no lock-in. We earn trust by being honest about what we are and what we are not.' },
@@ -28,10 +28,10 @@ export default function AboutPage() {
   return (
     <MarketingLayout>
       <PageHero
-        label="About Brisvora"
+        label="About Marketing OS"
         title="Built for Businesses That"
         titleGold="Refuse to Stay Small."
-        description="Brisvora started with a simple observation: small business owners in India spend hours on tasks that AI can handle in seconds. We built the platform to fix that."
+        description="Marketing OS started with a simple observation: small business owners in India spend hours on tasks that AI can handle in seconds. We built the platform to fix that."
       />
 
       {/* Mission */}
@@ -60,7 +60,7 @@ export default function AboutPage() {
             color: 'var(--text-secondary)', lineHeight: 1.8,
             maxWidth: '60ch', margin: '0 auto',
           }}>
-            A property broker in Pune should be able to generate a professional, SEO-optimized listing page as easily as a Fortune 500 company. A restaurant owner in Chennai should be able to automate their customer enquiries without hiring a developer. That is what Brisvora is for.
+            A property broker in Pune should be able to generate a professional, SEO-optimized listing page as easily as a Fortune 500 company. A restaurant owner in Chennai should be able to automate their customer enquiries without hiring a developer. That is what Marketing OS is for.
           </p>
         </div>
       </section>
@@ -146,7 +146,7 @@ export default function AboutPage() {
             Ready to grow your<br /><span style={{ color: 'var(--gold)' }}>business with AI?</span>
           </h2>
           <p style={{ fontSize: 'clamp(0.82rem,1.2vw,0.95rem)', color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: '2rem' }}>
-            Join businesses already using Brisvora to generate listings, capture leads, and grow faster.
+            Join businesses already using Marketing OS to generate listings, capture leads, and grow faster.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/register" className="btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.82rem' }}>

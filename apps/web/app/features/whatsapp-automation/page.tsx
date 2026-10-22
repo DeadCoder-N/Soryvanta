@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'WhatsApp Automation — AI Bot for Listings & Leads',
-  description: 'Brisvora WhatsApp AI bot handles enquiries, captures leads, and automates your entire WhatsApp workflow 24/7.',
+  description: 'Marketing OS WhatsApp AI bot handles enquiries, captures leads, and automates your entire WhatsApp workflow 24/7.',
 }
 
 const CAPABILITIES = [
@@ -24,7 +24,7 @@ export default function WhatsAppAutomationPage() {
         label="WhatsApp Automation"
         title="AI Bot That Works"
         titleGold="While You Sleep."
-        description="Brisvora's WhatsApp AI bot handles enquiries, captures leads, and generates landing pages — all from your existing WhatsApp number. No new app required."
+        description="Marketing OS's WhatsApp AI bot handles enquiries, captures leads, and generates landing pages — all from your existing WhatsApp number. No new app required."
         badge="Live · Available Now"
         cta={{ label: 'Connect WhatsApp Free →', href: '/register' }}
         ctaSecondary={{ label: 'Explore All Features', href: '/features' }}

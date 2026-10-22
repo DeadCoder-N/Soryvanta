@@ -5,7 +5,7 @@ import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
   title: 'Lead Management — Capture, Track & Organize Every Lead',
-  description: 'Brisvora captures every lead from every channel and organizes them in one intelligent dashboard. Never lose a lead again.',
+  description: 'Marketing OS captures every lead from every channel and organizes them in one intelligent dashboard. Never lose a lead again.',
 }
 
 const CAPABILITIES = [
@@ -24,7 +24,7 @@ export default function LeadManagementPage() {
         label="Lead Management"
         title="Every Lead Captured."
         titleGold="None Ever Lost."
-        description="Brisvora captures leads from every channel — WhatsApp, landing pages, and enquiry forms — and organizes them in one intelligent dashboard."
+        description="Marketing OS captures leads from every channel — WhatsApp, landing pages, and enquiry forms — and organizes them in one intelligent dashboard."
         badge="Live · Available Now"
         cta={{ label: 'Start Managing Leads Free →', href: '/register' }}
         ctaSecondary={{ label: 'Explore All Features', href: '/features' }}

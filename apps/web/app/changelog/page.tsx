@@ -3,8 +3,8 @@ import MarketingLayout from '@/components/MarketingLayout'
 import PageHero from '@/components/PageHero'
 
 export const metadata: Metadata = {
-  title: 'Changelog — What\'s New in Brisvora',
-  description: 'Every update, improvement, and new feature shipped by the Brisvora team.',
+  title: 'Changelog — What\'s New in Marketing OS',
+  description: 'Every update, improvement, and new feature shipped by the Marketing OS team.',
 }
 
 const ENTRIES = [
@@ -71,7 +71,7 @@ const ENTRIES = [
     version: 'v2.0.0',
     date: 'June 2026',
     type: 'launch',
-    title: 'Brisvora Platform Launch',
+    title: 'Marketing OS Platform Launch',
     changes: [
       'AI-powered landing page generation from WhatsApp',
       'Real Estate solution with full listing workflow',
@@ -95,7 +95,7 @@ export default function ChangelogPage() {
         label="Changelog"
         title="Every Update We"
         titleGold="Ship."
-        description="A transparent record of every feature, improvement, and fix shipped by the Brisvora team. Updated with every release."
+        description="A transparent record of every feature, improvement, and fix shipped by the Marketing OS team. Updated with every release."
       />
 
       <section style={{

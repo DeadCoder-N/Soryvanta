@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 const WORKFLOW = [
   { id: 'biz',      icon: '◈', label: 'Business',      sub: 'Owner',          color: '#C9960E' },
   { id: 'wa',       icon: '◉', label: 'WhatsApp',      sub: 'Message',        color: '#15803D' },
-  { id: 'ai',       icon: '✦', label: 'Brisvora AI',   sub: 'Processing',     color: '#C9960E', pulse: true },
+  { id: 'ai',       icon: '✦', label: 'Marketing OS AI',   sub: 'Processing',     color: '#C9960E', pulse: true },
   { id: 'page',     icon: '⬡', label: 'Landing Page',  sub: 'Generated',      color: '#C9960E' },
   { id: 'seo',      icon: '◎', label: 'Google',        sub: 'Indexed',        color: '#15803D' },
   { id: 'leads',    icon: '◆', label: 'Leads',         sub: 'Captured',       color: '#C9960E' },
@@ -124,7 +124,7 @@ export default function SolutionSection() {
               maxWidth: '52ch', margin: '0 auto',
             }}
           >
-            Send one WhatsApp message. Brisvora AI builds your landing page, optimizes it for Google, captures leads, and delivers analytics — all automatically.
+            Send one WhatsApp message. Marketing OS AI builds your landing page, optimizes it for Google, captures leads, and delivers analytics — all automatically.
           </p>
         </div>
 

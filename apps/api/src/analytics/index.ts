@@ -1,4 +1,4 @@
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 
 type PropertyWithAnalytics = {
   id: string

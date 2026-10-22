@@ -1,5 +1,5 @@
-import { prisma, generateSlug } from '@brisvora/shared'
-import type { GeneratedListing } from '@brisvora/shared'
+import { prisma, generateSlug } from '@marketing-os/shared'
+import type { GeneratedListing } from '@marketing-os/shared'
 
 export async function createListing(
   ownerPhone: string,

@@ -1,5 +1,5 @@
-import { prisma } from '@brisvora/shared'
-import { ConversationContextSchema, ConversationStateTypeSchema } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
+import { ConversationContextSchema, ConversationStateTypeSchema } from '@marketing-os/shared'
 
 export type ConversationStateType = 'GREETING' | 'ACCUMULATING' | 'GENERATING'
 
@@ -64,7 +64,7 @@ export async function processConversationalMessage(
     }
 
     await setConversationState(userId, 'ACCUMULATING', { accumulatedText: '', imageUrls: context.imageUrls })
-    return "Hi, this is the *Brisvora team*.\n\nSend your property details in one or more messages. Include the property type, BHK, price, location, built-up area, amenities, furnishing, parking, availability, and any other relevant information. Upload clear property photos as well.\n\nOnce you've shared everything, simply send *done*. We'll generate your property listing and share the live link. To cancel at any time, send *cancel*."
+    return "Hi, this is the *Marketing OS team*.\n\nSend your property details in one or more messages. Include the property type, BHK, price, location, built-up area, amenities, furnishing, parking, availability, and any other relevant information. Upload clear property photos as well.\n\nOnce you've shared everything, simply send *done*. We'll generate your property listing and share the live link. To cancel at any time, send *cancel*."
   }
 
   if (existing.state === 'ACCUMULATING') {

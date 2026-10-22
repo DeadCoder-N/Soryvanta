@@ -1,4 +1,4 @@
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 import crypto from 'crypto'
 import { sendMessage } from '../whatsapp'
 
@@ -18,7 +18,7 @@ export async function sendOtpWhatsApp(
   otp: string,
   waId?: string
 ): Promise<boolean> {
-  const message = `Your Brisvora verification code is: ${otp}\n\nThis code expires in 10 minutes. Do not share this with anyone.\n\n- Team Brisvora`
+  const message = `Your Marketing OS verification code is: ${otp}\n\nThis code expires in 10 minutes. Do not share this with anyone.\n\n- Team Marketing OS`
   
   const to = waId || phone
   try {

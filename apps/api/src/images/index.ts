@@ -8,7 +8,7 @@ cloudinary.config({
 
 export async function uploadImage(
   buffer: Buffer,
-  folder = 'brisvora/properties',
+  folder = 'marketing-os/properties',
   resourceType: 'image' | 'video' | 'auto' = 'auto'
 ): Promise<{ url: string; thumbnailUrl: string }> {
   return new Promise((resolve, reject) => {

@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import type { GeneratedListing, ListingGenerationInput } from '@brisvora/shared'
+import type { GeneratedListing, ListingGenerationInput } from '@marketing-os/shared'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',

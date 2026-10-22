@@ -1,4 +1,4 @@
-import { prisma } from '@brisvora/shared'
+import { prisma } from '@marketing-os/shared'
 
 export async function createLead(data: {
   propertyId: string

@@ -1,8 +1,6 @@
 <div align="center">
 
-<img src="apps/web/public/Brisvora.png" alt="Brisvora Logo" width="72" height="72" />
-
-# Brisvora
+# Marketing OS
 
 ### AI-Powered Growth OS for Indian Real Estate Brokers
 
@@ -30,12 +28,12 @@
 | Microservice | [Python Flask](https://flask.palletsprojects.com) | 3.x |
 | Styling | Inline styles + CSS custom properties | — |
 | Typography | Playfair Display · Cinzel · DM Sans | Google Fonts |
-| Auth | [NextAuth](https://authjs.dev) v5 beta + Prisma adapter | 5.0.0-beta.31 |
+| Auth | [NextAuth](https://authjs.dev) v5 beta, Credentials provider, JWT sessions | 5.0.0-beta.31 |
 | Database | [PostgreSQL](https://supabase.com) via Supabase | — |
 | ORM | [Prisma](https://prisma.io) | latest |
-| AI | [Claude 3.5 Sonnet](https://anthropic.com) — regex mock fallback | Anthropic SDK |
+| AI | [Anthropic](https://anthropic.com) Claude Sonnet 4.5 — regex and Flask fallbacks | Anthropic SDK |
 | WhatsApp | [AiSensy](https://aisensy.com) API (webhook + send) | — |
-| Images + Video | [Cloudinary](https://cloudinary.com) — optional, fallback exists | — |
+| Images + Video | [Cloudinary](https://cloudinary.com) uploads for images and video | — |
 | Testing | [Vitest](https://vitest.dev) + [MSW](https://mswjs.io) + [Pytest](https://pytest.org) | 4.x + 2.x + latest |
 | Monorepo | [pnpm](https://pnpm.io) 9 + [Turborepo](https://turbo.build) | 9.15.0 + 2.x |
 | Deployment Web | [Vercel](https://vercel.com) | — |
@@ -48,7 +46,7 @@
 
 ```mermaid
 flowchart LR
-    subgraph BRISVORA["BRISVORA Monorepo"]
+    subgraph MARKETING_OS["MARKETING OS Monorepo"]
         direction TB
         APPS["apps/"] --> WEB["web/<br/>Next.js 16 App Router<br/>:3000"]
         APPS --> FLASK["flask-api/<br/>Python Flask Microservice<br/>:5000"]
@@ -66,7 +64,7 @@ flowchart LR
         ROOT["Root Config"] --> FILES["turbo.json | pnpm-workspace.yaml<br/>tsconfig.base.json | .github/workflows"]
     end
 
-    style BRISVORA fill:#000,color:#fff,stroke:#fff,stroke-width:2px
+    style MARKETING_OS fill:#000,color:#fff,stroke:#fff,stroke-width:2px
     style WEB fill:#333,color:#fff,stroke:#fff
     style FLASK fill:#555,color:#fff,stroke:#fff
     style API fill:#777,color:#fff,stroke:#fff
@@ -114,12 +112,14 @@ pnpm db:generate
 # 6. Run database migrations
 pnpm db:migrate
 
-# 7. Start both servers
+# 7. Start the Next.js app
 pnpm dev        # Next.js on :3000
+
+# 8. Optional: start the Flask mock-data service in a second terminal
 cd apps/flask-api && python app.py   # Flask on :5000
 ```
 
-> **Next.js**: http://localhost:3000 · **Flask API**: http://localhost:5000
+> **Next.js**: http://localhost:3000 · **Flask API**: http://localhost:5000 when started separately
 
 ---
 
@@ -137,6 +137,8 @@ NEXTAUTH_URL=http://localhost:3000
 # WHATSAPP — AiSensy API
 # ─────────────────────────────────────────────
 AISENSY_API_KEY=<your_aisensy_campaign_api_key>
+AISENSY_PROJECT_API_KEY=<your_aisensy_project_api_key>
+AISENSY_PROJECT_ID=<your_aisensy_project_id>
 AISENSY_PHONE_NUMBER=<your_aisensy_whatsapp_number>
 
 # ─────────────────────────────────────────────
@@ -145,7 +147,7 @@ AISENSY_PHONE_NUMBER=<your_aisensy_whatsapp_number>
 ANTHROPIC_API_KEY=<your_anthropic_api_key>
 
 # ─────────────────────────────────────────────
-# IMAGES — Cloudinary (optional)
+# IMAGES — Cloudinary (required for image/video uploads)
 # ─────────────────────────────────────────────
 CLOUDINARY_CLOUD_NAME=<your_cloud_name>
 CLOUDINARY_API_KEY=<your_cloudinary_api_key>
@@ -155,6 +157,13 @@ CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
 # FLASK MOCK API URL (optional, for fallback)
 # ─────────────────────────────────────────────
 NEXT_PUBLIC_FLASK_API_URL=http://localhost:5000
+
+# ─────────────────────────────────────────────
+# FIRST SUPER ADMIN (CLI only; do not commit)
+# ─────────────────────────────────────────────
+SUPER_ADMIN_EMAIL=<admin_email>
+SUPER_ADMIN_PASSWORD=<admin_password>
+SUPER_ADMIN_NAME=<admin_name>
 ```
 
 ---
@@ -164,10 +173,10 @@ NEXT_PUBLIC_FLASK_API_URL=http://localhost:5000
 ```bash
 # ── Development ──────────────────────────────
 pnpm dev              # Next.js on port 3000
-cd apps/flask-api && python app.py  # Flask on port 5000
+cd apps/flask-api && python app.py  # Optional Flask service on port 5000
 
 # ── Testing ──────────────────────────────────
-pnpm test:run         # 44 Vitest tests
+pnpm --filter web test:run  # Vitest tests in apps/web
 cd apps/flask-api && pytest  # Flask tests
 
 # ── Build ────────────────────────────────────
@@ -177,7 +186,27 @@ pnpm build            # Next.js production build
 pnpm db:generate      # Regenerate Prisma client
 pnpm db:migrate       # Run pending migrations
 pnpm db:studio        # Prisma Studio at localhost:5555
+
+# Create or promote the first super admin. Prefer a secret manager for production.
+SUPER_ADMIN_EMAIL=admin@example.com \
+SUPER_ADMIN_PASSWORD='use-a-strong-password' \
+SUPER_ADMIN_NAME='Marketing OS Admin' \
+pnpm db:super-admin
 ```
+
+After the command succeeds, sign in at `/login` with the configured email and password,
+then open `/admin`. The command is safe to rerun: it promotes the matching email and
+resets its password to the supplied value. Run `pnpm db:migrate` first so the
+`SUPER_ADMIN` enum is present in the database.
+
+### Current Implementation Notes
+
+- The Next.js app is the primary server. The Flask app is an optional mock-data service and must be started separately.
+- Authentication uses the Credentials provider with JWT sessions. The Prisma `Account` and `Session` models exist for compatibility, but a Prisma adapter is not currently configured.
+- The `/admin` area currently includes users, properties, leads, messages, and overview pages. A CMS route is not implemented yet.
+- Cloudinary credentials are required for image/video uploads; there is no upload fallback provider.
+- The checked-in Prisma schema and migration history should be validated together before provisioning a fresh database. Some schema additions are documented in manual SQL files.
+- The Flask handler is defined as `/api/mock/<property_type>/<bhk>`. Apartment examples use `1bhk`, `2bhk`, and `3bhk`; non-apartment callers should be verified against the deployed Flask service.
 
 ---
 
@@ -247,7 +276,7 @@ pnpm db:studio        # Prisma Studio at localhost:5555
 | Properties | `/admin/properties` |
 | Leads | `/admin/leads` |
 | Messages | `/admin/messages` |
-| CMS (Super Admin only) | `/admin/cms` |
+| CMS | Not currently implemented |
 
 ---
 
@@ -283,7 +312,7 @@ pnpm db:studio        # Prisma Studio at localhost:5555
 
 ## 🗄️ Database Schema — Changes Reference
 
-### Property (3 new additive fields)
+### Property (2 new additive fields)
 
 ```prisma
 model Property {
@@ -291,8 +320,6 @@ model Property {
 
   mockDataUrl String?   // NEW: URL to Flask mock JSON for page fallback
   mediaJson   Json?     // NEW: [{ url, type: "image"|"video", caption, order }]
-  plan        String?   // NEW: "starter" | "professional" | "business" | "enterprise"
-
   // ... existing relations unchanged
 }
 ```
@@ -336,13 +363,13 @@ model User {
 
 | Rule | Detail |
 |---|---|
-| DB access | Always through `@brisvora/shared` — never import Prisma directly in `web` |
-| Business logic | Always in `@brisvora/api` or Flask — route handlers are thin wrappers |
+| DB access | Always through `@marketing-os/shared` — never import Prisma directly in `web` |
+| Business logic | Always in `@marketing-os/api` or Flask — route handlers are thin wrappers |
 | Slugs | Auto-generated from property title + UUID prefix via `generateSlug()` |
 | Phone numbers | Normalized with country code — e.g. `+919999999999` |
 | Property URLs | Type-specific: `/apartment/[slug]`, `/villa/[slug]`, `/plot/[slug]`, `/commercial/[slug]` |
 | Legacy redirect | `/property/[slug]` → 301 redirects to correct type route |
-| Fallback chain (generation) | Claude 3.5 → Regex mock → Flask JSON mock API |
+| Fallback chain (generation) | Claude Sonnet 4.5 → Regex mock → Flask JSON mock API |
 | Fallback chain (page render) | DB data → Flask mock → Hardcoded TS fallback |
 | Styling | Inline styles + CSS custom properties — no Tailwind, no CSS modules |
 | Charts | Pure SVG/CSS — no chart libraries |
@@ -350,7 +377,7 @@ model User {
 | DB changes | ADDITIVE ONLY — never remove or rename existing fields |
 | Duplicate detection | Properties: phone+city+price+BHK within 24hrs · Leads: propertyId+phone within 24hrs |
 | Mock data | Flask serves JSON at `/api/mock/{type}/{bhk}`, URL stored in `Property.mockDataUrl` |
-| CMS | Super Admin only — controls schemas, templates, global content |
+| Admin access | Super Admin controls user roles, plans, and user deletion; no CMS route currently exists |
 | Country dropdown | Default India (+91) on both registration and LeadForm |
 | Video | Optional media type via `Image.mediaType` — Cloudinary auto-detects |
 | Flask deployment | Render.com — Docker container, auto-deploy from GitHub |
@@ -370,9 +397,9 @@ model User {
 | Country code as separate field | Supports international buyers without breaking existing phone number format |
 | Token counter on LeadForm | Gives buyer real-time feedback, helps broker prioritize quality leads |
 | Duplicate detection at 2 levels | Prevents broker frustration (same property twice) AND buyer confusion (double enquiry) |
-| CMS for Super Admin only | You control the templates — no one else can break the schema |
+| Admin permissions | Super Admin has elevated user and plan management permissions |
 | Render.com for Flask (not Vercel) | ffmpeg support, unlimited timeout, file system access for future video transcoding |
-| mediaJson instead of mediaType on Image | One JSON column stores all media metadata — zero migration for new types |
+| mediaJson on Property plus mediaType on Image | Property-level media metadata is stored in `mediaJson`; individual media records use `Image.mediaType` |
 | Additive DB changes only | Never breaks existing production data — safe to deploy at any time |
 
 ---
@@ -387,7 +414,7 @@ flowchart TB
         direction TB
         PUBLIC["PUBLIC PAGES<br/>/apartment/[slug]<br/>/villa/[slug]<br/>/plot/[slug]<br/>/commercial/[slug]"]
         DASHBOARD["DASHBOARD<br/>/dashboard/growth<br/>/dashboard/listings<br/>/dashboard/leads<br/>/dashboard/analytics"]
-        ADMIN["ADMIN PANEL<br/>/admin/users<br/>/admin/properties<br/>/admin/leads<br/>/admin/cms"]
+        ADMIN["ADMIN PANEL<br/>/admin/users<br/>/admin/properties<br/>/admin/leads<br/>/admin/messages"]
         API_ROUTES["API ROUTES<br/>/api/leads<br/>/api/upload<br/>/api/whatsapp/webhook<br/>/api/broker/*"]
     end
 
@@ -686,7 +713,7 @@ GET /health                      -> { status: "ok", version: "1.0.0" }
   "images": [
     { "url": "https://placehold.co/800x600", "caption": "Living Room", "type": "image" }
   ],
-  "broker": { "name": "Rahul Sharma", "phone": "918850908790", "agency": "Brisvora Realty" },
+  "broker": { "name": "Rahul Sharma", "phone": "918850908790", "agency": "Marketing OS Realty" },
   "location": { "lat": 19.0596, "lng": 72.8295 }
 }
 ```
@@ -813,7 +840,7 @@ flowchart LR
         INSTALL["pnpm install --no-frozen-lockfile"]
         TYPE_CHECK["pnpm type-check"]
         LINT["pnpm lint"]
-        VITEST["pnpm test:run (44 Vitest tests)"]
+        VITEST["pnpm --filter web test:run (Vitest tests)"]
         PYTEST["pytest apps/flask-api/"]
         BUILD["pnpm build --filter=web..."]
     end
@@ -1324,8 +1351,8 @@ flowchart LR
 ## 🧪 Testing
 
 ```bash
-# 44 Vitest tests + Pytest suite
-pnpm test:run
+# Vitest tests + Pytest suite
+pnpm --filter web test:run
 cd apps/flask-api && pytest
 ```
 
@@ -1339,4 +1366,4 @@ cd apps/flask-api && pytest
 
 ## 📝 License
 
-Private — All Rights Reserved. © 2025 Brisvora
+Private — All Rights Reserved. © 2025 Marketing OS

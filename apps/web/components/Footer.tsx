@@ -585,7 +585,17 @@ export default function Footer() {
             opacity: 0.5,
             letterSpacing: '0.04em',
           }}>
-            Made in India 🇮🇳
+            Made in India 🇮🇳 · Developed by{' '}
+            <a
+              href="https://github.com/DeadCoder-N"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7 }}
+              onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.color = 'var(--gold)' }}
+              onMouseLeave={e => { e.currentTarget.style.opacity = '0.7'; e.currentTarget.style.color = 'inherit' }}
+            >
+              DeadCoder-N
+            </a>
           </p>
         </div>
       </div>
